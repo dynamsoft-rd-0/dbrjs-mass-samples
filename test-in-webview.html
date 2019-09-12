@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<body>
+<!-- jquery + kConsole to show log -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+<script src="https://demo.dynamsoft.com/dbr_wasm/js/kConsole.js"></script>
+    <!--
+        Warning: Use a specific version in production. (e.g. https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@x.x.x/dist/dbr.min.js)
+        Please visit https://www.dynamsoft.com/CustomerPortal/Portal/TrialLicense.aspx to get trial license.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7/dist/dbr.min.js" data-productKeys="LICENSE-KEY"></script>
+    <script>
+				/*
+        * important time in log:
+        * * download timecost (only exist at first time access)
+        * * build instance from binary timecost
+        * * finish handle dbr wasm, total timecost
+				*/
+
+        let barcodeScanner = null;
+        // bind log to kconsole
+        Dynamsoft.BarcodeReader._onLog = kConsoleLog;
+        // show kconsole
+        $('#kConsoleShowHideBtn').click();
+        
+        Dynamsoft.BarcodeScanner.createInstance({
+            onFrameRead: results => {console.log(results);},
+            onUnduplicatedRead: (txt, result) => {alert(txt);}
+        }).then(scanner => {
+            barcodeScanner = scanner;
+            barcodeScanner.show().then(() => {
+            	// hide immediately to stop too many logs
+            	//barcodeScanner.hide();
+            });
+        });
+    </script>
+</body>
+</html>
