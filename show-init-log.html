@@ -26,13 +26,15 @@
         let timeStart = Date.now();
         Dynamsoft.BarcodeScanner.createInstance({
             onFrameRead: results => {console.log(results);},
-            onUnduplicatedRead: (txt, result) => {alert(txt);}
+            onUnduplicatedRead: (txt, result) => {
+                barcodeScanner.hide();
+                alert(txt);
+            }
         }).then(scanner => {
             barcodeScanner = scanner;
             barcodeScanner.show().then(() => {
             	// hide immediately to stop too many logs
                 kConsoleLog("init-wasm + ask-video time cost (include the time wait for camera permission): "+(Date.now() - timeStart));
-            	barcodeScanner.hide();
             });
         });
     </script>
