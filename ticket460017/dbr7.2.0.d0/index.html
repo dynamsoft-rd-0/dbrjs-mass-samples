@@ -4,9 +4,10 @@
 </head>
 <body>
     <input id="ipt-file" type="file" accept="image/png,image/jpeg,image/bmp,image/gif">
-<script src="dbr-7.2.0.d0.js" data-productKeys="t0068MgAAAF7OqWzARmKrYHvqtydX/VaGTqgGHBNldo9sSr+HFBYGOGNoO7kfvhvLSj4H5C75xctLSG7oo/x9J63G/d07Kwg="></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7.2.2-v2/dist/dbr.js" data-productKeys="t0068MgAAAF7OqWzARmKrYHvqtydX/VaGTqgGHBNldo9sSr+HFBYGOGNoO7kfvhvLSj4H5C75xctLSG7oo/x9J63G/d07Kwg="></script>
 <script>
     let reader = null;
+    Dynamsoft.BarcodeReader._bUseFullFeature = true;
     document.getElementById('ipt-file').addEventListener("change", async function(){
         if(!reader){
             reader = await Dynamsoft.BarcodeReader.createInstance();
