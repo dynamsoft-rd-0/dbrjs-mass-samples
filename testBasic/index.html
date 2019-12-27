@@ -8,9 +8,9 @@
         Dynamsoft.BarcodeScanner.createInstance({
             onFrameRead: results => {console.log(results);},
             onUnduplicatedRead: (txt, result) => {alert(txt);}
-        }).then(s => {
+        }).then(async s => {
             scanner = s;
-            scanner.updateVideoSettings({video:true});
+            await scanner.updateVideoSettings({video:true});
             return scanner.show();
         }).catch(async ex=>{
             alert(ex.message||ex);
