@@ -10,7 +10,7 @@
             onUnduplicatedRead: (txt, result) => {alert(txt);}
         }).then(scanner => {
             barcodeScanner = scanner;
-            return barcodeScanner.show();
+            return barcodeScanner.show();//check if update?
         }).catch(ex=>{
             alert(ex.message||ex);
         });
