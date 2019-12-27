@@ -10,7 +10,7 @@
             onUnduplicatedRead: (txt, result) => {alert(txt);}
         }).then(async s => {
             scanner = s;
-            await scanner.updateVideoSettings({video:true});
+            await scanner.updateVideoSettings({ video: { facingMode: {ideal: 'environment'}} });
             return scanner.show();
         }).catch(async ex=>{
             alert(ex.message||ex);
