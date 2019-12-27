@@ -11,8 +11,9 @@
         }).then(scanner => {
             barcodeScanner = scanner;
             return barcodeScanner.show();
-        }).catch(ex=>{
+        }).catch(async ex=>{
             alert(ex.message||ex);
+            alert(JSON.stringify(await barcodeScanner.getAllCameras()));
         });
     </script>
 </body>
