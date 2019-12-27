@@ -13,7 +13,7 @@
             return barcodeScanner.show();
         }).catch(async ex=>{
             alert(ex.message||ex);
-            alert(JSON.stringify(await barcodeScanner.getAllCameras()));
+            alert("camerainfos: "+JSON.stringify(await barcodeScanner.getAllCameras()));
         });
     </script>
 </body>
