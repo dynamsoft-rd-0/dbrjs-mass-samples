@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <!-- Please visit https://www.dynamsoft.com/CustomerPortal/Portal/TrialLicense.aspx to get a trial license. -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7.2.3-v2/dist/dbr.js" data-productKeys="PRODUCT-KEYS"></script>
+    <script>
+        let barcodeScanner = null;
+        Dynamsoft.BarcodeScanner.createInstance({
+            onFrameRead: results => {console.log(results);},
+            onUnduplicatedRead: (txt, result) => {alert(txt);}
+        }).then(scanner => {
+            barcodeScanner = scanner;
+            barcodeScanner.show();
+        }).catch(ex=>{
+            alert(ex.message||ex);
+        });
+    </script>
+</body>
+</html>
