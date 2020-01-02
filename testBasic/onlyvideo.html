@@ -13,7 +13,7 @@
             await scanner.updateVideoSettings({ video: true });
             await scanner.show();
             setTimeout(async()=>{
-                alert("camerainfos: "+JSON.stringify(await scanner.getAllCameras()));
+                alert("camerainfos: "+JSON.stringify(await navigator.mediaDevices.enumerateDevices()));
             }, 2000);
         }).catch(async ex=>{
             alert(ex.message||ex);
