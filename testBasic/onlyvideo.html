@@ -12,12 +12,12 @@
             scanner = s;
             await scanner.updateVideoSettings({ video: true });
             await scanner.show();
-            setTimeout(()=>{
+            setTimeout(async()=>{
                 alert("camerainfos: "+JSON.stringify(await scanner.getAllCameras()));
             }, 2000);
         }).catch(async ex=>{
             alert(ex.message||ex);
-            
+            alert("camerainfos: "+JSON.stringify(await scanner.getAllCameras()));
         });
     </script>
 </body>
