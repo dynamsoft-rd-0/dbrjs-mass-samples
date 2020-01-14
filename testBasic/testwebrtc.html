@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <video autoplay="true"  playsinline="true">
+    <script>
+        (async()=>{
+            let stream = await navigator.mediaDevices.getUserMedia({video:true});
+            document.querySelector('video').srcObject = stream;
+        })();
+    </script>
+</body>
+</html>
