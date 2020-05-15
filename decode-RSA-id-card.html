@@ -39,7 +39,7 @@
                         let info = parseIDCard(result.barcodeText)
                         resultsToAlert.push(JSON.stringify(info,null,2));
                     }else{
-                        resultsToAlert.push(txt);
+                        resultsToAlert.push(result.barcodeText);
                     }
                 }
             }
