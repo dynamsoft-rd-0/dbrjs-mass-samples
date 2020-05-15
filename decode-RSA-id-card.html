@@ -26,7 +26,7 @@
         try{
             reader = reader || await Dynamsoft.BarcodeReader.createInstance();
             let runtimeSettings = await reader.getRuntimeSettings();
-            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417;
+            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417 | Dynamsoft.EnumBarcodeFormat.BF_QR_CODE | Dynamsoft.EnumBarcodeFormat.BF_ONED;
             await reader.updateRuntimeSettings(runtimeSettings);
 
             let resultsToAlert = [];
@@ -35,8 +35,12 @@
                 resultsToAlert.push(i + '. ' + file.name + ":");
                 let results = await reader.decode(file);
                 for(let result of results){
-                    let info = parseIDCard(result.barcodeText)
-                    resultsToAlert.push(JSON.stringify(info,null,2));
+                    if(result.barcodeFormat == Dynamsoft.EnumBarcodeFormat.BF_PDF417){
+                        let info = parseIDCard(result.barcodeText)
+                        resultsToAlert.push(JSON.stringify(info,null,2));
+                    }else{
+                        resultsToAlert.push(txt);
+                    }
                 }
             }
             alert(resultsToAlert.join('\n'));
@@ -52,7 +56,7 @@
         try{
             scanner = scanner || await Dynamsoft.BarcodeScanner.createInstance();
             var runtimeSettings = await scanner.getRuntimeSettings();
-            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417;
+            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417 | Dynamsoft.EnumBarcodeFormat.BF_QR_CODE | Dynamsoft.EnumBarcodeFormat.BF_ONED;
             runtimeSettings.deblurLevel = 9;
             runtimeSettings.localizationModes = [2,4,0,0,0,0,0,0];
             await scanner.updateRuntimeSettings(runtimeSettings);
@@ -62,8 +66,12 @@
                 }
             };
             scanner.onUnduplicatedRead = (txt, result) => {
-                let info = parseIDCard(result.barcodeText)
-                alert(JSON.stringify(info,null,2));
+                if(result.barcodeFormat == Dynamsoft.EnumBarcodeFormat.BF_PDF417){
+                    let info = parseIDCard(txt)
+                    alert(JSON.stringify(info,null,2));
+                }else{
+                    alert(txt);
+                }
             };
             await scanner.show();
         }catch(ex){
