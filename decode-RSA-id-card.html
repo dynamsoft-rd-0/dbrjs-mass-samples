@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+    Choose image(s) to decode:
+    <input id="ipt-file" type="file" multiple accept="image/png,image/jpeg,image/bmp,image/gif">
+    <br><br>
+    <button id="btn-show-scanner">show scanner</button>
+
+<!-- Please visit https://www.dynamsoft.com/CustomerPortal/Portal/TrialLicense.aspx to get trial license. -->
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7.3.0-v4/dist/dbr.js" data-productKeys="t0068NQAAABlxvk+uDgBP6Rfmzt0j5AeisEy+3bgyCpPqqJwDWjkGtz5kkDL2JLKwCvbgnylW8C5i2PNWU4Mh55lG3B4tAbk="></script>
+
+<script>
+    // Dynamsoft.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+
+    // reader for decoding picture
+    let reader = null;
+    // scanner for decoding video
+    let scanner = null;
+
+    // decode input picture
+    document.getElementById('ipt-file').addEventListener('change', async function(){
+        try{
+            reader = reader || await Dynamsoft.BarcodeReader.createInstance();
+            let runtimeSettings = await reader.getRuntimeSettings();
+            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417;
+            await reader.updateRuntimeSettings(runtimeSettings);
+
+            let resultsToAlert = [];
+            for(let i = 0; i < this.files.length; ++i){
+                let file = this.files[i];
+                resultsToAlert.push(i + '. ' + file.name + ":");
+                let results = await reader.decode(file);
+                for(let result of results){
+                    let info = parseIDCard(result.barcodeText)
+                    resultsToAlert.push(JSON.stringify(info,null,2));
+                }
+            }
+            alert(resultsToAlert.join('\n'));
+        }catch(ex){
+            alert(ex.message);
+            throw ex;
+        }
+        this.value = '';
+    });
+
+    // decode video from camera
+    document.getElementById('btn-show-scanner').addEventListener('click', async () => {
+        try{
+            scanner = scanner || await Dynamsoft.BarcodeScanner.createInstance();
+            var runtimeSettings = await scanner.getRuntimeSettings();
+            runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417;
+            runtimeSettings.deblurLevel = 9;
+            runtimeSettings.localizationModes = [2,4,0,0,0,0,0,0];
+            await scanner.updateRuntimeSettings(runtimeSettings);
+            scanner.onFrameRead = results => {
+                if(results.length){
+                    console.log(results);
+                }
+            };
+            scanner.onUnduplicatedRead = (txt, result) => {
+                let info = parseIDCard(result.barcodeText)
+                alert(JSON.stringify(info,null,2));
+            };
+            await scanner.show();
+        }catch(ex){
+            alert(ex.message);
+            throw ex;
+        }
+    });
+
+    let parseIDCard = txt => {
+        let [surname, names, sex, nationality, identityNumber, dateOfBirth, countryOfBirth, citizenshipStatus, dateOfIssue, hiddenNumber, cardNumber] = txt.split('|', 11);
+        identityNumber = parseInt(identityNumber);
+        hiddenNumber = parseInt(hiddenNumber);
+        cardNumber = parseInt(cardNumber);
+
+        let info = {surname, names, sex, nationality, identityNumber, dateOfBirth, countryOfBirth, citizenshipStatus, dateOfIssue, hiddenNumber, cardNumber};
+        console.log(info);
+        return info;
+    }
+</script>
+</body>
+</html>
