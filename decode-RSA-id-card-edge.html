@@ -76,7 +76,7 @@
                 }
             };
             // https://github.com/Microsoft/TypeScript/issues/29325
-            scanner.decode = scanner.__proto__.__proto__.decode;
+            //scanner.decode = scanner.__proto__.__proto__.decode;
             await scanner.show();
         }catch(ex){
             alert(ex.message);
