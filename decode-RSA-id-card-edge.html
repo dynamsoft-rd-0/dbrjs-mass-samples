@@ -51,7 +51,6 @@
         this.value = '';
     });
 
-    Dynamsoft.BarcodeReader._onLog = console.log;
     // decode video from camera
     document.getElementById('btn-show-scanner').addEventListener('click', async () => {
         try{
@@ -75,8 +74,6 @@
                     alert(txt);
                 }
             };
-            // https://github.com/Microsoft/TypeScript/issues/29325
-            //scanner.decode = scanner.__proto__.__proto__.decode;
             await scanner.show();
         }catch(ex){
             alert(ex.message);
