@@ -51,6 +51,7 @@
         this.value = '';
     });
 
+    Dynamsoft.BarcodeReader._onLog = console.log;
     // decode video from camera
     document.getElementById('btn-show-scanner').addEventListener('click', async () => {
         try{
@@ -59,7 +60,8 @@
             runtimeSettings.barcodeFormatIds = Dynamsoft.EnumBarcodeFormat.BF_PDF417 | Dynamsoft.EnumBarcodeFormat.BF_QR_CODE | Dynamsoft.EnumBarcodeFormat.BF_ONED;
             runtimeSettings.deblurLevel = 9;
             runtimeSettings.localizationModes = [2,4,0,0,0,0,0,0];
-            await scanner.updateRuntimeSettings(runtimeSettings);
+            // https://github.com/Microsoft/TypeScript/issues/29325
+            await scanner.__proto__.__proto__.updateRuntimeSettings.apply(scanner, [runtimeSettings]);
             scanner.onFrameRead = results => {
                 if(results.length){
                     console.log(results);
@@ -73,6 +75,8 @@
                     alert(txt);
                 }
             };
+            // https://github.com/Microsoft/TypeScript/issues/29325
+            scanner.decode = scanner.__proto__.__proto__.decode;
             await scanner.show();
         }catch(ex){
             alert(ex.message);
