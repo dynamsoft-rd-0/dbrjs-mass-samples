@@ -10,9 +10,12 @@
     <input id="ipt-file" type="file" multiple accept="image/png,image/jpeg,image/bmp,image/gif">
     <br><br>
     <button id="btn-show-scanner">show scanner</button>
+    <br><br>
+    decode url: <input id="ipt-url" value="./sample-full.png">
+    <button id="btn-decode-url">decode</button>
 
 <!-- Please visit https://www.dynamsoft.com/CustomerPortal/Portal/TrialLicense.aspx to get a trial license. -->
-<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7.4.0-v1/dist/dbr.js" data-productKeys="PRODUCT-KEYS"></script>
+<script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20200603125434.0/dist/dbr.js" data-productKeys="PRODUCT-KEYS"></script>
 
 <script>
     // Dynamsoft.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
@@ -62,6 +65,24 @@
             alert(ex.message);
             throw ex;
         }
+    });
+
+    document.getElementById("btn-decode-url").addEventListener('click', async ()=>{
+        try{
+            reader = reader || await Dynamsoft.BarcodeReader.createInstance();
+            await reader.updateRuntimeSettings("speed");
+            let resultsToAlert = [];
+            let results = await reader.decode(document.getElementById('ipt-url').value);
+            console.log(results);
+            for(let result of results){
+                resultsToAlert.push(result.barcodeText);
+            }
+            alert(resultsToAlert.join('\n'));
+        }catch(ex){
+            alert(ex.message);
+            throw ex;
+        }
+        this.value = '';
     });
 </script>
 </body>
