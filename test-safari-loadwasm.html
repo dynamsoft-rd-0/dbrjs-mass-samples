@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+<script>
+var dbrBNode = false;
+var dbrEngineResourcePath = "https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20200605134449.0/dist/";
+var dbrBUseFullFeature = false;
+var dbrVersion = "7.4.0.1";
+var Module = { // eslint-disable-line
+    //dynamicLibraries: ["libDM_Statistic.wasm"],
+    locateFile: function(path){//(path, prefix)
+        if(path == 'libDynamsoftBarcodeReader.wasm'){
+            if(!dbrBNode){
+                return dbrEngineResourcePath + 'dbr-' + dbrVersion + (dbrBUseFullFeature?".full":"") + '.wasm';
+            }else{
+                return dbrEngineResourcePath + 'dbr-' + dbrVersion + '.node.wasm';
+            }
+        }else{
+            return dbrEngineResourcePath + path;
+        }
+    },
+    print: message=>{
+        console.log(message);
+    },
+    printErr: message=>{
+        console.error(message); // eslint-disable-line
+    },
+    onRuntimeInitialized: async function(){
+        console.log("loaded");
+    }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20200605134449.0/dist/dbr-7.4.0.1.wasm.js"></script>
+</body>
