@@ -1,10 +1,17 @@
 import * as React from "react"
-import { BarcodeReader, BarcodeScanner } from "dynamsoft-javascript-barcode";
+//import {} from "../no-use-but-tell-dbrjs-it-is-ssr";
 
-BarcodeReader.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.0.0/dist/";
-// Please visit https://www.dynamsoft.com/customer/license/trialLicense to get a trial license
-BarcodeReader.productKeys = "PRODUCT-KEYS";
-// BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+let promiseLoadDbrjs;
+let BarcodeReader, BarcodeScanner;
+if(typeof document != "undefined"){
+  promiseLoadDbrjs = (async()=>{
+    ({ BarcodeReader, BarcodeScanner } = await import("dynamsoft-javascript-barcode"));
+    BarcodeReader.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.0.0/dist/";
+    // Please visit https://www.dynamsoft.com/customer/license/trialLicense to get a trial license
+    BarcodeReader.productKeys = "PRODUCT-KEYS";
+    // BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+  })();
+}
 
 // reader for decoding picture
 let reader = null;
@@ -19,6 +26,7 @@ let funcReadFileIpt = event=>{
 
   (async ()=>{
       try{
+        await promiseLoadDbrjs;
         reader = reader || await BarcodeReader.createInstance();
         let resultsToAlert = [];
         for(let i = 0; i < input.files.length; ++i){
