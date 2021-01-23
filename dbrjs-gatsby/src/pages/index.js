@@ -1,81 +1,109 @@
-import * as React from "react"
-//import {} from "../no-use-but-tell-dbrjs-it-is-ssr";
+import DBR from "../dbr";
+import React from 'react';
+import BarcodeScanner from './BarcodeScanner';
 
-let promiseLoadDbrjs;
-let BarcodeReader, BarcodeScanner;
-if(typeof document != "undefined"){
-  promiseLoadDbrjs = (async()=>{
-    ({ BarcodeReader, BarcodeScanner } = await import("dynamsoft-javascript-barcode"));
-    BarcodeReader.engineResourcePath = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.0.0/dist/";
-    // Please visit https://www.dynamsoft.com/customer/license/trialLicense to get a trial license
-    BarcodeReader.productKeys = "PRODUCT-KEYS";
-    // BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
-  })();
-}
-
-// reader for decoding picture
-let reader = null;
-// scanner for decoding video
-let scanner = null;
-
-// decode input picture
-let funcReadFileIpt = event=>{
-  // React can't get event.target in async func by default.
-  // Thus get event.target in sync part.
-  let input = event.target;
-
-  (async ()=>{
-      try{
-        await promiseLoadDbrjs;
-        reader = reader || await BarcodeReader.createInstance();
-        let resultsToAlert = [];
-        for(let i = 0; i < input.files.length; ++i){
-            let file = input.files[i];
-            resultsToAlert.push(i + '. ' + file.name + ":");
-            let results = await reader.decode(file);
-            console.log(results);
-            for(let result of results){
-                resultsToAlert.push(result.barcodeText);
-            }
-        }
-        alert(resultsToAlert.join('\n'));
-      }catch(ex){
-        alert(ex.message);
-        throw ex;
-      }
-      input.value = "";
-  })();
-};
-
-// decode video from camera
-let funcShowScanner = async () => {
-    try{
-        scanner = scanner || await BarcodeScanner.createInstance();
-        scanner.onFrameRead = results => {
-            if(results.length){
-                console.log(results);
-            }
+class HelloWorld extends React.Component {
+    constructor(props){
+        super(props);
+        this.reader = null;
+        this.refDivMessage = React.createRef();
+        this.state = {
+            messageKeyBase: 0,
+            messages: [],
+            bShowScanner: false
         };
-        scanner.onUnduplicatedRead = (txt, result) => {
-            alert(result.barcodeFormatString + ': ' + txt);
-        };
-        await scanner.show();
-    }catch(ex){
-        alert(ex.message);
-        throw ex;
     }
-};
+    componentDidUpdate(){
+        this.refDivMessage.current.scrollTop = this.refDivMessage.current.scrollHeight;
+    }
+    componentWillUnmount(){
+        if(this.reader){
+            this.reader.destroy();
+        }
+    }
+    render() {
+        return (
+            <div>
+                <h1>{ this.props.title }</h1>
 
-// markup
-const IndexPage = () => {
-  return (
-    <main>
-      Choose image(s) to decode:
-      <input onChange={funcReadFileIpt} type="file" multiple accept="image/png,image/jpeg,image/bmp,image/gif"/>
-      <br/><br/>
-      <button onClick={funcShowScanner}>show scanner</button>
-    </main>
-  )
+                { !this.state.bShowScanner ? (
+                    <div>
+                        Choose image(s) to decode:
+                        <input onChange={this.onIptChange} type="file" multiple accept="image/png,image/jpeg,image/bmp,image/gif" />
+                        <br/><br/>
+                        <button onClick={this.showScanner}>show scanner</button>
+                    </div>
+                ) : (
+                    <div>
+                        <button onClick={this.hideScanner}>hide scanner</button>
+                        <BarcodeScanner appendMessage={this.appendMessage}></BarcodeScanner>
+                    </div>
+                ) }
+            
+                <div className="div-message" style={style.div_message} ref={this.refDivMessage}>
+                    { this.state.messages.map((message, index) => 
+                        <p key={ this.state.messageKeyBase + index }>
+                            { message }
+                        </p>
+                    ) }
+                </div>
+            </div>
+        );
+    }
+    appendMessage = str => {
+        this.setState(state=>{
+            state.messages.push(str);
+            if(state.messages.length > 500){
+                ++state.messageKeyBase;
+                state.messages.splice(0, 1);
+            }
+            return state;
+        });
+    }
+    onIptChange = event=>{
+        // React can't get event.target in async func by default.
+        // Thus get event.target in sync part.
+        let input = event.target;
+
+        (async ()=>{
+            try{
+                this.appendMessage("======== start read... ========");
+                let reader = this.reader = this.reader || await DBR.BarcodeReader.createInstance();
+                let files = input.files;
+                for(let i = 0; i < files.length; ++i){
+                let file = files[i];
+                this.appendMessage(file.name + ':')
+                let results = await reader.decode(file);
+                for(let result of results){
+                    this.appendMessage(result.barcodeText);
+                }
+                }
+                input.value = "";
+                this.appendMessage("======== finish read ========");
+            }catch(ex){
+                this.appendMessage(ex.message);
+                console.error(ex);
+            }
+        })();
+    }
+    showScanner = ()=>{
+        this.setState({
+            bShowScanner: true
+        });
+    }
+    hideScanner = ()=>{
+        this.setState({
+            bShowScanner: false
+        });
+    }
 }
 
-export default IndexPage
+const style = {
+    div_message: {
+        maxHeight: "200px",
+        overflowY: "auto",
+        resize: "both"
+    }
+}
+
+export default HelloWorld;
