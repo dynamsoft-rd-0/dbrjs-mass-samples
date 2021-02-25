@@ -17,7 +17,7 @@
   "license": "0BSD",
   "dependencies": {
     "gatsby": "^2.26.1",
-    "keillion-dynamsoft-javascript-barcode": "0.20210123145106.0",
+    "keillion-dynamsoft-javascript-barcode": "0.20210220145101.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   }
