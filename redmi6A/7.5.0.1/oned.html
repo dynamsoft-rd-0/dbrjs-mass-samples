@@ -47,7 +47,7 @@
                 }
             };
             scanner.onUnduplicatedRead = (txt, result) => {
-                //alert(result.barcodeFormatString + ': ' + txt);
+                alert(result.barcodeFormatString + ': ' + txt);
             };
             await scanner.show();
         }catch(ex){
