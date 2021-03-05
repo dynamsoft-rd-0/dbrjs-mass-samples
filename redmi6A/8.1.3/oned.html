@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+    <button id="btn-show-scanner">show scanner</button>
+
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<!-- Please visit https://www.dynamsoft.com/customer/license/trialLicense to get a trial license. -->
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.1.3/dist/dbr.js" data-productKeys="t0068MgAAAG0R9nTm/sXdAiSi/XFdmAESI/p36wPvve1dliXEMuFVHy9n1bT5GJYctcWCgUQKr7usYv40fbnnhvECKSzvUvg="></script>
+
+<script>
+    eruda.init();
+    Dynamsoft.DBR.BarcodeReader._onLog = console.log;
+
+    // Dynamsoft.DBR.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+
+    // scanner for decoding video
+    let scanner = null;
+
+    // decode video from camera
+    document.getElementById('btn-show-scanner').addEventListener('click', async () => {
+        try{
+            scanner = scanner || await Dynamsoft.DBR.BarcodeScanner.createInstance();
+
+            await scanner.updateRuntimeSettings("speed");
+            
+            let rs = await scanner.getRuntimeSettings();
+            rs.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ONED;
+            rs.region.regionMeasuredByPercentage = 1;
+            rs.region.regionRight = 100;
+            rs.region.regionTop = 45;
+            rs.region.regionBottom = 55;
+            rs.barcodeZoneMinDistanceToImageBorders = 0;
+            rs.localizationModes = [16,0,0,0,0,0,0,0];//16
+            await scanner.updateRuntimeSettings(rs);
+
+            let scanSettings = await scanner.getScanSettings();
+            scanSettings.oneDTrustFrameCount = 1;
+            await scanner.updateScanSettings(scanSettings);
+
+            scanner.onFrameRead = results => {
+                if(results.length){
+                    console.log(results);
+                }
+            };
+            scanner.onUnduplicatedRead = (txt, result) => {
+                //alert(result.barcodeFormatString + ': ' + txt);
+            };
+            await scanner.show();
+        }catch(ex){
+            alert(ex.message);
+            throw ex;
+        }
+    });
+</script>
+</body>
+</html>
