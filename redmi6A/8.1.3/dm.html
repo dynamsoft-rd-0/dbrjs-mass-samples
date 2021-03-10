@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
 <body>
+    <div style="z-index:1;">zoom:<input id="ipt-zoom" type="range" min="100" max="600" value="100" step="1"></div>
     <button id="btn-show-scanner">show scanner</button>
 
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -57,6 +58,19 @@
                 rs.region.regionBottom = (height + borderLength) / 2;
                 rs.barcodeZoneMinDistanceToImageBorders = 0;
                 await scanner.updateRuntimeSettings(rs);
+                // zoom
+                let capabilities = scanner.getCapabilities();
+                console.log(capabilities);
+                if(capabilities.zoom){
+                    let zoom = capabilities.zoom;
+                    console.log(zoom.min+"~"+zoom.max);
+                    let iptZoom = document.getElementById("ipt-zoom");
+                    // iptZoom.setAttribute("max",zoom.max);
+                    // iptZoom.setAttribute("min",zoom.min);
+                    iptZoom.max = zoom.max;
+                    iptZoom.min = zoom.min;
+                    iptZoom.value = zoom.min;
+                }
             };
 
             await scanner.show();
@@ -65,6 +79,11 @@
             alert(ex.message);
             throw ex;
         }
+    });
+
+    document.getElementById('ipt-zoom').addEventListener("change", function(){
+        console.log("change zoom:"+this.value);
+        scanner.setZoom(this.value);
     });
 </script>
 </body>
