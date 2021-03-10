@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
 <body>
-    <div style="z-index:1;">zoom:<input id="ipt-zoom" type="range" min="100" max="600" value="100" step="1"></div>
+    <div style="z-index:1;position:relative;top:200px;">zoom:<input id="ipt-zoom" type="range" min="100" max="600" value="100" step="1"></div>
     <button id="btn-show-scanner">show scanner</button>
 
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -26,7 +26,7 @@
         try{
             scanner = scanner || await Dynamsoft.DBR.BarcodeScanner.createInstance();
 
-            await scanner.updateRuntimeSettings("speed");
+            await scanner.updateRuntimeSettings("balance");
             
             // Scan a very small area. So we can skip first frame very quick, just want to get the video size.
             let rs = await scanner.getRuntimeSettings();
