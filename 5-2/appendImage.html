@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+
+    <button id="btn-show-scanner">show scanner</button>
+
+<!-- Please visit https://www.dynamsoft.com/customer/license/trialLicense/?product=dbr&utm_source=github&package=js to get a trial license. -->
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.2.5/dist/dbr.js" data-productKeys="t0068MgAAAJJz2OX0RKfa/ohq9M9f+KdJy2UbbbOJTokmHJV487T8N6S1VYwAAwnCV7F8iohlKFGq8h/ciClMylSHeJ4Emrw="></script>
+
+<script>
+    // Dynamsoft.DBR.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+
+    // scanner for decoding video
+    let scanner = null;
+
+    // decode video from camera
+    document.getElementById('btn-show-scanner').addEventListener('click', async () => {
+        try{
+            scanner = scanner || await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            scanner.bSaveOriCanvas = true;
+            scanner.onFrameRead = results => {
+                if(results.length){
+                    console.log(results);
+                }
+                document.body.append(scanner.oriCanvas);
+            };
+            scanner.onUnduplicatedRead = (txt, result) => {
+                alert(result.barcodeFormatString + ': ' + txt);
+            };
+            await scanner.show();
+        }catch(ex){
+            alert(ex.message);
+            throw ex;
+        }
+    });
+</script>
+</body>
+</html>
