@@ -28,9 +28,6 @@
                 }
                 document.body.append(scanner.oriCanvas);
             };
-            scanner.onUnduplicatedRead = (txt, result) => {
-                alert(result.barcodeFormatString + ': ' + txt);
-            };
             await scanner.show();
         }catch(ex){
             alert(ex.message);
