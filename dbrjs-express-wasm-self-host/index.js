@@ -3,6 +3,10 @@ const fs = require('fs-extra');
 const https = require('https');
 const path = require('path');
 
+if(!fs.existsSync('public/dynamsoft-javascript-barcode')){
+    fs.copySync('node_modules/dynamsoft-javascript-barcode','public/dynamsoft-javascript-barcode');
+}
+
 const app = express();
 
 // static files
