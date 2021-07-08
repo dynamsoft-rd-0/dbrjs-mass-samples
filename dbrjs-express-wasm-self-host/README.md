@@ -7,7 +7,7 @@
 Open the url. Try.
 
 
-# How this work
+# Notes
 
 ## 1
 
@@ -19,7 +19,7 @@ Copy dbrjs's dist to a network available place.
 
 ## 3
 
-Set `Dynamsoft.DBR.BarcodeReader.engineResourcePath` to your self host one. 
+Set `Dynamsoft.DBR.BarcodeReader.engineResourcePath` to your self-host one. 
 
 This must be done in `react`, `vue`, `angular`. Can be omitted in raw html.
 
