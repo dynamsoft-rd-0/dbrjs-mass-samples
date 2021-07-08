@@ -4,25 +4,25 @@
 
 `node index.js`
 
-Open the url. Try.
+Run the URL and test it.
 
 
 # Notes
 
 ## 1
 
-Latest express doesn't need to set `application/wasm` manually. It's already built in.
+The latest express doesn't require setting `application/wasm` manually. It is already built in.
 
 ## 2
 
-Copy dbrjs's dist to a network available place.
+Please make sure you copy the `dist` folder of the Dynamsoft Barcode Reader SDK to a network available location (e.g. the `public` folder in this sample).
 
 ## 3
 
-Set `Dynamsoft.DBR.BarcodeReader.engineResourcePath` to your self-host one. 
+Don't forget to set `Dynamsoft.DBR.BarcodeReader.engineResourcePath` to your self-hosted address. 
 
-This must be done in `react`, `vue`, `angular`. Can be omitted in raw html.
+This setting is required in framework based project like `react`, `vue`, `angular`.
 
-You can find the similar usage in https://github.com/Dynamsoft/javascript-barcode/blob/master/example/web/react/src/dbr.js
+An example for your reference: https://github.com/Dynamsoft/javascript-barcode/blob/master/example/web/react/src/dbr.js
 
-> In dbrjs 7.6 use `Dynamsoft.BarcodeReader.engineResourcePath` instead.
+> If you are running Dynamsoft Barcode Reader JavaScript edition v7.6, please instead use `Dynamsoft.BarcodeReader.engineResourcePath`.
