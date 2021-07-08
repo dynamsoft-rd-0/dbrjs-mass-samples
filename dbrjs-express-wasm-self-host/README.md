@@ -11,7 +11,7 @@ Open the url. Try.
 
 ## 1
 
-Latest express doesn't need set `application/wasm` manually. It already built in.
+Latest express doesn't need to set `application/wasm` manually. It's already built in.
 
 ## 2
 
