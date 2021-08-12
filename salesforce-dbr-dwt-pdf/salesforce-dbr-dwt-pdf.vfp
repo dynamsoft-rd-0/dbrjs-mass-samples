@@ -1,0 +1,81 @@
+<apex:page >
+    result: <textarea id="ipt-txt" disabled="disabled" style="width:500px;height:100px;"></textarea><br/>
+    <button id="btn-scan">scan</button><br/>
+    <button id="btn-pdf">generate pdf</button><br/>
+    
+    <script src="https://unpkg.com/dwt/dist/dynamsoft.webtwain.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.4.0/dist/dbr.js"></script>
+    <script>
+        /**=================== dbrjs =============*/
+        ////Please use
+        Dynamsoft.DBR.productKeys = 't0068MgAAAKnK/Dglkoypy74QZYZQZz0F6Q4tcCL3dHFP4hZZ2HGLY4ZBAYk31SFAnxVMeLhhNJLDZK4Fmra5skeGH3VcvlA=';
+        ////or
+        //Dynamsoft.DBR.organizationID = 'xxxxx';
+        ////or
+        //Dynamsoft.DBR.handshakeCode = 'xxxxx';
+        ////to init license
+        let needCount = 3;
+    	let arrCanvas = [];
+        let scanner = null;
+		document.getElementById('btn-scan').addEventListener('click',async()=>{
+            scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            scanner.bSaveOriCanvas = true;
+            scanner.onUnduplicatedRead = async(txt, result)=>{
+                document.getElementById('ipt-txt').value += txt + '\n';
+            	arrCanvas.push(scanner.oriCanvas);
+            	if(0 == --needCount){
+            		await scanner.hide();
+        		}
+            };
+            await scanner.show();
+        });
+
+        /**=================== dwtjs =============*/
+		Dynamsoft.DWT.ProductKey = 't00901wAAAJLih35A7b5lyElTG8GzK8GLIahKwWbbGvzolCwd96cIZUujAlD5fr0gA0qYMAjEvvEN8XpZ9iXWhJfh5ehezsf521Aw3y0gOvAJMg0gYm5qojdpmiuj';
+        Dynamsoft.DWT.ResourcesPath = 'https://unpkg.com/dwt/dist/';
+        Dynamsoft.DWT.UseLocalService = false;
+        Dynamsoft.DWT.AutoLoad = false;
+        Dynamsoft.DWT.Load();
+        let DWObject;
+        function LoadImage() {
+            if (DWObject) {
+            }
+        }
+        document.getElementById('btn-pdf').addEventListener('click',async()=>{
+			if(!arrCanvas.length)return;
+            
+            await new Promise((rs,rj)=>{
+                Dynamsoft.DWT.CreateDWTObjectEx({ WebTwainId: 'temp' }, function (obj) {
+                    DWObject = obj;
+                    rs();
+                }, function (e) {
+                    console.log(e)
+                    rj();
+                });
+        	});
+    		for(let i = 0;i<arrCanvas.length;++i){
+                await new Promise((rs,rj)=>{
+                    let cvs = arrCanvas[i];
+                    // refer: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
+                    // todo: safari
+                    cvs.toBlob(blob=>{
+                        DWObject.LoadImageFromBinary(blob, function () {
+                    		rs();
+                        }, function () {
+         					rj();
+                        })
+                	});
+                });
+            }
+            // convert 3 img to pdf
+            let pdf = await new Promise((rs,rj)=>{
+                DWObject.ConvertToBlob([0,1,2], Dynamsoft.DWT.EnumDWT_ImageType.IT_PDF, function (blob) {
+                    rs(blob);
+                }, function () {
+                    rj();
+                });
+            });
+            console.log(pdf);
+        });
+    </script>
+</apex:page>
