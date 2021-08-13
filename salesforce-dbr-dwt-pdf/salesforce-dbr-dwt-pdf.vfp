@@ -15,34 +15,30 @@
         //Dynamsoft.DBR.handshakeCode = 'xxxxx';
         ////to init license
         let needCount = 3;
-    	let arrCanvas = [];
+        let arrCanvas = [];
         let scanner = null;
-		document.getElementById('btn-scan').addEventListener('click',async()=>{
+        document.getElementById('btn-scan').addEventListener('click',async()=>{
             scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
             scanner.bSaveOriCanvas = true;
             scanner.onUnduplicatedRead = async(txt, result)=>{
                 document.getElementById('ipt-txt').value += txt + '\n';
-            	arrCanvas.push(scanner.oriCanvas);
-            	if(0 == --needCount){
-            		await scanner.hide();
-        		}
+                arrCanvas.push(scanner.oriCanvas);
+                if(0 == --needCount){
+                    await scanner.hide();
+                }
             };
             await scanner.show();
         });
 
         /**=================== dwtjs =============*/
-		Dynamsoft.DWT.ProductKey = 't00901wAAAJLih35A7b5lyElTG8GzK8GLIahKwWbbGvzolCwd96cIZUujAlD5fr0gA0qYMAjEvvEN8XpZ9iXWhJfh5ehezsf521Aw3y0gOvAJMg0gYm5qojdpmiuj';
+        Dynamsoft.DWT.ProductKey = 't00901wAAAJLih35A7b5lyElTG8GzK8GLIahKwWbbGvzolCwd96cIZUujAlD5fr0gA0qYMAjEvvEN8XpZ9iXWhJfh5ehezsf521Aw3y0gOvAJMg0gYm5qojdpmiuj';
         Dynamsoft.DWT.ResourcesPath = 'https://unpkg.com/dwt/dist/';
         Dynamsoft.DWT.UseLocalService = false;
         Dynamsoft.DWT.AutoLoad = false;
         Dynamsoft.DWT.Load();
         let DWObject;
-        function LoadImage() {
-            if (DWObject) {
-            }
-        }
         document.getElementById('btn-pdf').addEventListener('click',async()=>{
-			if(!arrCanvas.length)return;
+            if(!arrCanvas.length)return;
             
             await new Promise((rs,rj)=>{
                 Dynamsoft.DWT.CreateDWTObjectEx({ WebTwainId: 'temp' }, function (obj) {
@@ -52,19 +48,19 @@
                     console.log(e)
                     rj();
                 });
-        	});
-    		for(let i = 0;i<arrCanvas.length;++i){
+            });
+            for(let i = 0;i<arrCanvas.length;++i){
                 await new Promise((rs,rj)=>{
                     let cvs = arrCanvas[i];
                     // refer: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
                     // todo: safari
                     cvs.toBlob(blob=>{
                         DWObject.LoadImageFromBinary(blob, function () {
-                    		rs();
+                            rs();
                         }, function () {
-         					rj();
+                            rj();
                         })
-                	});
+                    });
                 });
             }
             // convert 3 img to pdf
