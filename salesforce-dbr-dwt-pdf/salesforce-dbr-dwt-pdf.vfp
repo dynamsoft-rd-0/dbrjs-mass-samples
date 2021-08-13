@@ -52,15 +52,14 @@
             for(let i = 0;i<arrCanvas.length;++i){
                 await new Promise((rs,rj)=>{
                     let cvs = arrCanvas[i];
-                    // refer: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-                    // todo: safari
-                    cvs.toBlob(blob=>{
-                        DWObject.LoadImageFromBinary(blob, function () {
-                            rs();
-                        }, function () {
-                            rj();
-                        })
-                    });
+                    if(cvs.toBlob){
+                        cvs.toBlob(blob=>{
+                            DWObject.LoadImageFromBinary(blob, rs, rj);
+                        });
+                    }else{
+                        // safari go this way
+                        DWObject.LoadImageFromBase64Binary(cvs.toDataURL(), Dynamsoft.DWT.EnumDWT_ImageType.IT_PNG, rs, rj);
+                    }
                 });
             }
             // convert 3 img to pdf
