@@ -1,0 +1,80 @@
+<apex:page >
+    <button id="btn-getBarcode">get barcode</button> result:<input id="ipt-txt" disabled="disabled" style="width:500px;"/>
+    <br/><br/>
+    take picture: <input id="ipt-takePic" type="file" accept="image/*" capture="camera" multiple/>
+    <br/><br/>
+    <button id="btn-pdf">generate pdf</button><br/>
+    
+    <script src="https://unpkg.com/dwt/dist/dynamsoft.webtwain.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.4.0/dist/dbr.js"></script>
+    <script>
+        /**=================== dbrjs =============*/
+        ////Please use
+        Dynamsoft.DBR.productKeys = 't0068MgAAAKnK/Dglkoypy74QZYZQZz0F6Q4tcCL3dHFP4hZZ2HGLY4ZBAYk31SFAnxVMeLhhNJLDZK4Fmra5skeGH3VcvlA=';
+        ////or
+        //Dynamsoft.DBR.organizationID = 'xxxxx';
+        ////or
+        //Dynamsoft.DBR.handshakeCode = 'xxxxx';
+        ////to init license
+        let pScanner = null;
+        document.getElementById('btn-getBarcode').addEventListener('click',async()=>{
+            let scanner = await (pScanner = pScanner || Dynamsoft.DBR.BarcodeScanner.createInstance());
+            scanner.onUnduplicatedRead = async(txt, result)=>{
+                document.getElementById('ipt-txt').value = txt;
+                await scanner.hide();
+            };
+            await scanner.show();
+        });
+
+        /**=================== take pic =============*/
+        // todo: use dwt's camera api, so one can take multiple pics continuously
+        const pics = [];
+        document.getElementById('ipt-takePic').addEventListener('change',function(){
+            for(let i = 0; i < this.files.length; ++i){
+                pics.push(this.files[i]);
+            }
+        });
+
+        /**=================== dwtjs =============*/
+        Dynamsoft.DWT.ProductKey = 't00901wAAAJLih35A7b5lyElTG8GzK8GLIahKwWbbGvzolCwd96cIZUujAlD5fr0gA0qYMAjEvvEN8XpZ9iXWhJfh5ehezsf521Aw3y0gOvAJMg0gYm5qojdpmiuj';
+        Dynamsoft.DWT.ResourcesPath = 'https://unpkg.com/dwt/dist/';
+        Dynamsoft.DWT.UseLocalService = false;
+        Dynamsoft.DWT.AutoLoad = false;
+        Dynamsoft.DWT.Load();
+        let DWObject;
+        // todo: show dwt UI, so one can remove some
+        document.getElementById('btn-pdf').addEventListener('click',async()=>{
+            if(!pics.length)return;
+            
+            await new Promise((rs,rj)=>{
+                Dynamsoft.DWT.CreateDWTObjectEx({ WebTwainId: 'temp' }, function (obj) {
+                    DWObject = obj;
+                    rs();
+                }, function (e) {
+                    console.log(e)
+                    rj();
+                });
+            });
+            for(let i = 0;i<pics.length;++i){
+                await new Promise((rs,rj)=>{
+                    DWObject.LoadImageFromBinary(pics[i], rs, rj);
+                });
+            }
+            // convert pictures to pdf
+            let pdf = await new Promise((rs,rj)=>{
+                // todo: find out how dwt convert all pics into one pdf
+                const arr = [];
+                for(let i = 0;i<pics.length;++i){
+                    arr.push(i)
+                }
+                DWObject.ConvertToBlob(arr, Dynamsoft.DWT.EnumDWT_ImageType.IT_PDF, function (blob) {
+                    rs(blob);
+                }, function () {
+                    rj();
+                });
+            });
+            console.log(pdf);
+            alert(`generate pdf ${document.getElementById('ipt-txt').value} in console success`);
+        });
+    </script>
+</apex:page>
