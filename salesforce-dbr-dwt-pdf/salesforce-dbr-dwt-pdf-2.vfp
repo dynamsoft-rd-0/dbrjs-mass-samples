@@ -39,7 +39,8 @@
         Dynamsoft.DWT.AutoLoad = true;
         let DWObject;
         function Dynamsoft_OnReady() {
-            DWObject = Dynamsoft.DWT.GetWebTwainEx('dwtcontrolContainer'); 
+            DWObject = Dynamsoft.DWT.GetWebTwainEx('dwtcontrolContainer');
+            DWObject.Viewer.setViewMode(2, 2); // column row
         }
         document.getElementById('btn-takePic').addEventListener('click',async()=>{
             // https://www.dynamsoft.com/web-twain/docs/info/api/Addon_Camera.html?ver=latest#showvideo
