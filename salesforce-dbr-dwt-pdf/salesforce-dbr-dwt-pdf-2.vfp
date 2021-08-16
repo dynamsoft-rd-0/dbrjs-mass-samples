@@ -1,9 +1,13 @@
 <apex:page >
+    <style>
+        html,body{width:100%;height:100%;}
+    </style>
     <button id="btn-getBarcode">get barcode</button> result:<input id="ipt-txt" disabled="disabled" style="width:500px;"/>
     <br/><br/>
-    take picture: <input id="ipt-takePic" type="file" accept="image/*" capture="camera" multiple/>
+    <button id="btn-takePic">take picture</button>
     <br/><br/>
-    <button id="btn-pdf">generate pdf</button><br/>
+    <div id="dwtcontrolContainer" style="width:90%;height:80%;"></div>
+    <button id="btn-remove">remove selected</button><button id="btn-pdf">generate pdf</button><br/>
     
     <script src="https://unpkg.com/dwt/dist/dynamsoft.webtwain.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.4.0/dist/dbr.js"></script>
@@ -26,55 +30,66 @@
             await scanner.show();
         });
 
-        /**=================== take pic =============*/
-        // todo: use dwt's camera api, so one can take multiple pics continuously
-        const pics = [];
-        document.getElementById('ipt-takePic').addEventListener('change',function(){
-            for(let i = 0; i < this.files.length; ++i){
-                pics.push(this.files[i]);
-            }
-        });
-
         /**=================== dwtjs =============*/
         Dynamsoft.DWT.ProductKey = 't00901wAAAJLih35A7b5lyElTG8GzK8GLIahKwWbbGvzolCwd96cIZUujAlD5fr0gA0qYMAjEvvEN8XpZ9iXWhJfh5ehezsf521Aw3y0gOvAJMg0gYm5qojdpmiuj';
         Dynamsoft.DWT.ResourcesPath = 'https://unpkg.com/dwt/dist/';
+        Dynamsoft.DWT.Containers = [{ ContainerId: 'dwtcontrolContainer', Width: '100%', Height: '100%' }];
         Dynamsoft.DWT.UseLocalService = false;
-        Dynamsoft.DWT.AutoLoad = false;
-        Dynamsoft.DWT.Load();
+        Dynamsoft.DWT.AutoLoad = true;
         let DWObject;
+        function Dynamsoft_OnReady() {
+            DWObject = Dynamsoft.DWT.GetWebTwainEx('dwtcontrolContainer'); 
+        }
+        document.getElementById('btn-takePic').addEventListener('click',async()=>{
+            // https://www.dynamsoft.com/web-twain/docs/info/api/Addon_Camera.html?ver=latest#showvideo
+            DWObject.Addon.Camera.showVideo();
+            //// if need to choose camera, use:
+            // await DWObject.Addon.Camera.getSourceList()
+            // DWObject.Addon.Camera.showVideo('deviceIdxxx')
+        });
+        document.getElementById('btn-remove').addEventListener('click',async()=>{
+            // https://www.dynamsoft.com/web-twain/docs/info/api/WebTwain_Buffer.html#removeallselectedimages
+            DWObject.RemoveAllSelectedImages();
+        });
         // todo: show dwt UI, so one can remove some
         document.getElementById('btn-pdf').addEventListener('click',async()=>{
-            if(!pics.length)return;
-            
-            await new Promise((rs,rj)=>{
-                Dynamsoft.DWT.CreateDWTObjectEx({ WebTwainId: 'temp' }, function (obj) {
-                    DWObject = obj;
-                    rs();
-                }, function (e) {
-                    console.log(e)
-                    rj();
-                });
-            });
-            for(let i = 0;i<pics.length;++i){
-                await new Promise((rs,rj)=>{
-                    DWObject.LoadImageFromBinary(pics[i], rs, rj);
-                });
-            }
+            if(!DWObject || !DWObject.HowManyImagesInBuffer)return;
+
             // convert pictures to pdf
             let pdf = await new Promise((rs,rj)=>{
-                // todo: find out how dwt convert all pics into one pdf
-                const arr = [];
-                for(let i = 0;i<pics.length;++i){
-                    arr.push(i)
-                }
-                DWObject.ConvertToBlob(arr, Dynamsoft.DWT.EnumDWT_ImageType.IT_PDF, function (blob) {
-                    rs(blob);
-                }, function () {
-                    rj();
-                });
+                DWObject.ConvertToBlob(DWObject.SelectAllImages(), Dynamsoft.DWT.EnumDWT_ImageType.IT_PDF, rs, rj);
             });
-            console.log(pdf);
-            alert(`generate pdf ${document.getElementById('ipt-txt').value} in console success`);
+            downloadBlob(pdf, document.getElementById('ipt-txt').value+'.pdf');
+            //alert(`generate pdf ${document.getElementById('ipt-txt').value} in console success`);
         });
+
+        // https://dev.to/nombrekeff/download-file-from-blob-21ho
+        function downloadBlob(blob, name = 'file.txt') {
+            // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Create a link element
+            const link = document.createElement("a");
+
+            // Set link's href to point to the Blob URL
+            link.href = blobUrl;
+            link.download = name;
+
+            // Append link to the body
+            document.body.appendChild(link);
+
+            // Dispatch click event on the link
+            // This is necessary as link.click() does not work on the latest firefox
+            link.dispatchEvent(
+                new MouseEvent('click', { 
+                bubbles: true, 
+                cancelable: true, 
+                view: window 
+                })
+            );
+
+            // Remove link from body
+            document.body.removeChild(link);
+        }
     </script>
 </apex:page>
