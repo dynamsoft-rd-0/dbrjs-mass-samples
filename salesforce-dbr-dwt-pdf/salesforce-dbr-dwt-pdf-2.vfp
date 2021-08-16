@@ -27,6 +27,7 @@
                 document.getElementById('ipt-txt').value = txt;
                 await scanner.hide();
             };
+            // if want customize UI, refer: https://github.com/Dynamsoft/javascript-barcode#233-customize-the-ui
             await scanner.show();
         });
 
