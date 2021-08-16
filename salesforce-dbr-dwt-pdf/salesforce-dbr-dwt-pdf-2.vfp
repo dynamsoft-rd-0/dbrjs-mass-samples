@@ -52,7 +52,6 @@
             // https://www.dynamsoft.com/web-twain/docs/info/api/WebTwain_Buffer.html#removeallselectedimages
             DWObject.RemoveAllSelectedImages();
         });
-        // todo: show dwt UI, so one can remove some
         document.getElementById('btn-pdf').addEventListener('click',async()=>{
             if(!DWObject || !DWObject.HowManyImagesInBuffer)return;
 
