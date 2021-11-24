@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <button id="btn-show-scanner">show scanner</button>
+        <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.8.3/dist/dbr.js" data-productKeys="PRODUCT-KEYS"></script>
+        <script>
+            // Dynamsoft.DBR.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+        
+            // scanner for decoding video
+            let pScanner = null;
+        
+            var _this = {onFrameRead:function(results){
+                console.log(this,results);
+            }};
+            // decode video from camera
+            document.getElementById('btn-show-scanner').addEventListener('click', async () => {
+                try{
+                    let scanner = await (pScanner = pScanner || Dynamsoft.DBR.BarcodeScanner.createInstance());
+                    // scanner.onFrameRead = function(results){
+                    //     console.log(this,results);
+                    // };
+                    scanner.onFrameRead = _this.onFrameRead.bind(_this);
+                    scanner.onUnduplicatedRead = (txt, result) => {
+                        alert(result.barcodeFormatString + ': ' + txt);
+                    };
+                    await scanner.show();
+                }catch(ex){
+                    alert(ex.message);
+                    throw ex;
+                }
+            });
+        </script>
+    </body>
+</html>
