@@ -2,8 +2,11 @@
 <html>
     <body>
         <button id="btn-show-scanner">show scanner</button>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.8.3/dist/dbr.js" data-productKeys="PRODUCT-KEYS"></script>
         <script>
+            eruda.init();
+            Dynamsoft.DBR.BarcodeReader._onLog = console.log;
             // Dynamsoft.DBR.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
         
             // scanner for decoding video
