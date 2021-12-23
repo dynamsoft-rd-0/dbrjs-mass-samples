@@ -44,7 +44,7 @@
         if(bestDevice){
           // 2rd time will enter here
           console.log(`it's 2rd time`)
-          scanner.dce.getAllCameras = ()=>([{deviceId:'6098c907c6e13ed0e1a25f44375355c0b00eb033017d152276c2650bb468e48d',label:'camera2 0, facing back',_checked:true}]);
+          scanner.dce.getAllCameras = ()=>([{deviceId:bestDevice, label:'camera2 0, facing back',_checked:true}]);
           scanner.dce.updateVideoSettings({
             "video":{
               "width":{"ideal":1280},"height":{"ideal":720},
