@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>test</title>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.8.3/dist/dbr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eruda@2.4.1/eruda.min.js"></script>
+  <style>
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -999;
+    }
+  </style>
+</head>
+<body>
+  <button>dbr</button>
+  <button>native</button>
+  <video id="video" onloadedmetadata="cameraLoaded()"></video>
+  <script>
+    eruda.init();
+    let btns = document.querySelectorAll('button')
+    let nativeTime
+    function getUserMedia(constraints, success) {
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia(constraints).then(success)
+      }
+    }
+    let video = document.getElementById('video');
+    function success(stream) {
+      video.srcObject = stream;
+      video.play();
+    }
+    btns[0].addEventListener('click', ()=>{
+      (async () => {
+        let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+        scanner.onFrameRead = results => {
+          if (results.length > 0) console.log(results);
+        };
+        scanner.onUnduplicatedRead = (txt, result) => {
+          alert(txt);
+        };
+        let beginTime = Date.now()
+        await scanner.show();
+        console.log((Date.now() - beginTime) + 'ms');
+      })()
+    })
+    btns[1].addEventListener('click', async () => {
+      nativeTime = Date.now()
+      getUserMedia({video : {width: 480, height: 320}}, success)
+    })
+    function cameraLoaded() {
+      console.log((Date.now() - nativeTime) + 'ms');
+      document.querySelector('video').style.zIndex = '999'
+    }
+  </script>
+</body>
+</html>
+
