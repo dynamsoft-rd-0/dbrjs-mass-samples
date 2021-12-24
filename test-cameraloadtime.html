@@ -13,7 +13,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: -999;
     }
   </style>
 </head>
@@ -21,87 +20,88 @@
   <button>dbr</button>
   <button>native</button>
   <button>clear localStorage</button>
-  <video class="native-video" id="video" onloadedmetadata="cameraLoaded()"></video>
+  <video class="native-video" id="video" style="display:none;"></video>
   <script>
     eruda.init();
     let btns = document.querySelectorAll('button')
-    let nativeTime
-    function getUserMedia(constraints, success) {
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia(constraints).then(success)
-      }
-    }
     let video = document.getElementById('video');
-    function success(stream) {
+    
+    btns[0].addEventListener('click', async()=>{
+
+      let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+
+      scanner.onFrameRead = results => {
+        if (results.length > 0) console.log(results);
+      };
+      scanner.onUnduplicatedRead = (txt, result) => {
+        alert(txt);
+      };
+
+
+      let bFirst = true;
+      let bestDevice = localStorage.getItem('dynamsoft-bestDevice');
+      let _old_getAllCameras;
+
+
+      if(bestDevice){
+        // 2rd time will enter here
+        console.log(`it's 2rd time, best DeviceId is ${bestDevice}`)
+        _old_getAllCameras = scanner.dce.getAllCameras
+        scanner.dce.getAllCameras = ()=>{
+          const devices = [{deviceId: bestDevice ,label:'camera2 0, facing back',_checked:true}];
+          scanner.dce._allCameras = devices;
+          return devices;
+        };
+        scanner.dce.updateVideoSettings({
+          video:{
+            width:{ideal:1280},
+            height:{ideal:720},
+            deviceId: bestDevice
+          }
+        });
+        bFirst = false;
+      } else{
+        console.log(`it's 1st time`)
+      }
+
+      let beginTime = Date.now()
+      await scanner.show();
+      console.log((Date.now() - beginTime) + 'ms');
+
+      // save best device into localStorage
+      bestDevice = scanner.dce._lastDeviceId;
+      if(bestDevice){
+        localStorage.setItem('dynamsoft-bestDevice',bestDevice);
+        console.log(`bestDevice ${bestDevice} had saved.`)
+      }
+
+      if(!bFirst){
+        scanner.dce.getAllCameras = _old_getAllCameras;
+        await scanner.dce.getAllCameras();
+        scanner.dce._renderSelCameraInfo();
+      }
+    })
+
+    btns[1].addEventListener('click', async () => {
+      const nativeTime = Date.now();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width:{ideal:1280},
+          height:{ideal:720}
+        }
+      });
+      video.onloadedmetadata = ()=>{
+        video.onloadedmetadata = null;
+        console.log((Date.now() - nativeTime) + 'ms');
+        video.style.display = ''
+      };
       video.srcObject = stream;
       video.play();
-    }
-    btns[0].addEventListener('click', ()=>{
-      (async () => {
-        let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
-        window.mysr = scanner;
-        scanner.onFrameRead = results => {
-          if (results.length > 0) console.log(results);
-        };
-        scanner.onUnduplicatedRead = (txt, result) => {
-          alert(txt);
-        };
-
-
-        let bFirst = true;
-        let bestDevice = localStorage.getItem('dynamsoft-bestDevice');
-        let _old_getAllCameras;
-
-
-        if(bestDevice){
-          // 2rd time will enter here
-          console.log(`it's 2rd time, best DeviceId is ${bestDevice}`)
-          _old_getAllCameras = scanner.dce.getAllCameras
-          scanner.dce.getAllCameras = ()=>{
-            const devices = [{deviceId: bestDevice ,label:'camera2 0, facing back',_checked:true}];
-            scanner.dce._allCameras = devices;
-            return devices;
-          };
-          scanner.dce.updateVideoSettings({
-            "video":{
-              "width":{"ideal":1280},"height":{"ideal":720},
-              deviceId: bestDevice
-            }
-          });
-          bFirst = false;
-        } else{
-          console.log(`it's 1st time`)
-        }
-
-        let beginTime = Date.now()
-        await scanner.show();
-        console.log((Date.now() - beginTime) + 'ms');
-
-        // save best device into localStorage
-        bestDevice = scanner.dce._lastDeviceId;
-        if(bestDevice){
-          localStorage.setItem('dynamsoft-bestDevice',bestDevice);
-          console.log(`bestDevice ${bestDevice} had saved.`)
-        }
-
-        if(!bFirst){
-          scanner.dce.getAllCameras = _old_getAllCameras;
-          await scanner.dce.getAllCameras();
-          scanner.dce._renderSelCameraInfo();
-        }
-      })()
     })
-    btns[1].addEventListener('click', async () => {
-      nativeTime = Date.now()
-      getUserMedia({video : {width: 480, height: 320}}, success)
-    })
+
     btns[2].addEventListener('click', () => {
       localStorage.removeItem('dynamsoft-bestDevice')
     })
-    function cameraLoaded() {
-      console.log((Date.now() - nativeTime) + 'ms');
-      document.querySelector('video').style.zIndex = '999'
-    }
   </script>
 </body>
 </html>
