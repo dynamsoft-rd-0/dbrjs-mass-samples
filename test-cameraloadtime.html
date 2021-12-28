@@ -29,6 +29,17 @@
     btns[0].addEventListener('click', async()=>{
 
       let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+      
+      scanner.dce.updateVideoSettings({
+        video:{
+          width:{ideal:1280},
+          height:{ideal:720},
+          // facingMode: 'environment',
+          "facingMode": {
+            "exact": "environment"
+          },
+        }
+      });
 
       scanner.onFrameRead = results => {
         if (results.length > 0) console.log(results);
