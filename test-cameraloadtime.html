@@ -59,6 +59,7 @@
             deviceId: bestDevice
           }
         });
+        console.log(scanner.dce._lastDeviceId);
         bFirst = false;
       } else{
         console.log(`it's 1st time`)
@@ -70,8 +71,9 @@
 
       // save best device into localStorage
       bestDevice = scanner.dce._lastDeviceId;
-      // localStorage.setItem('dynamsoft-bestDevice',bestDevice);
-      // console.log(localStorage.getItem('dynamsoft-bestDevice'))
+      if(bestDevice !== localStorage.getItem('dynamsoft-bestDevice')) {
+        console.log('ID不同了');
+      }
       if(bestDevice){
         localStorage.setItem('dynamsoft-bestDevice',bestDevice);
         console.log(`bestDevice ${bestDevice} had saved.`)
@@ -107,4 +109,3 @@
   </script>
 </body>
 </html>
-
