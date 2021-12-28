@@ -58,10 +58,10 @@
         // 2rd time will enter here
         console.log(`it's 2rd time, best DeviceId is ${bestDevice}`)
         _old_getAllCameras = scanner.dce.getAllCameras
-        scanner.dce.getAllCameras = ()=>{
-          const devices = [{deviceId: 'test111' ,label:'camera2 0, facing back',_checked:true}];
-          scanner.dce._allCameras = devices;
-          return devices;
+        // scanner.dce.getAllCameras = ()=>{
+        //  const devices = [{deviceId: 'test111' ,label:'camera2 0, facing back',_checked:true}];
+        //  scanner.dce._allCameras = devices;
+        //  return devices;
         };
         //scanner.dce.updateVideoSettings({
         //  video:{
