@@ -29,17 +29,6 @@
     btns[0].addEventListener('click', async()=>{
 
       let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
-      
-      scanner.dce.updateVideoSettings({
-        video:{
-          width:{ideal:1280},
-          height:{ideal:720},
-          // facingMode: 'environment',
-          "facingMode": {
-            "exact": "environment"
-          },
-        }
-      });
 
       scanner.onFrameRead = results => {
         if (results.length > 0) console.log(results);
@@ -58,11 +47,11 @@
         // 2rd time will enter here
         console.log(`it's 2rd time, best DeviceId is ${bestDevice}`)
         _old_getAllCameras = scanner.dce.getAllCameras
-        // scanner.dce.getAllCameras = ()=>{
-        //  const devices = [{deviceId: 'test111' ,label:'camera2 0, facing back',_checked:true}];
-        //  scanner.dce._allCameras = devices;
-        //  return devices;
-        // };
+         scanner.dce.getAllCameras = ()=>{
+          const devices = [{label:'camera2 0, facing back',_checked:true}];
+          scanner.dce._allCameras = devices;
+          return devices;
+        };
         //scanner.dce.updateVideoSettings({
         //  video:{
         //    width:{ideal:1280},
