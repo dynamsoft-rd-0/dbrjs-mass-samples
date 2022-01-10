@@ -47,19 +47,24 @@
         // 2rd time will enter here
         console.log(`it's 2rd time, best DeviceId is ${bestDevice}`)
         _old_getAllCameras = scanner.dce.getAllCameras
-        scanner.dce.getAllCameras = ()=>{
-          const devices = [{deviceId: bestDevice ,label:'camera2 0, facing back',_checked:true}];
+         scanner.dce._lastDeviceId = null
+         scanner.dce.getAllCameras = ()=>{
+          const devices = [{deviceId: 'test111', label:'camera2 0, facing back',_checked:true}];
           scanner.dce._allCameras = devices;
           return devices;
         };
-        scanner.dce.updateVideoSettings({
-          video:{
-            width:{ideal:1280},
-            height:{ideal:720},
-            deviceId: bestDevice
-          }
-        });
+        //scanner.dce.updateVideoSettings({
+        //  video:{
+        //    width:{ideal:1280},
+        //    height:{ideal:720},
+            // facingMode: 'environment',
+        //    "facingMode": {
+        //      "exact": "environment"
+        //    },
+        //  }
+        // });
         bFirst = false;
+        console.log('updated123')
       } else{
         console.log(`it's 1st time`)
       }
@@ -105,4 +110,3 @@
   </script>
 </body>
 </html>
-
