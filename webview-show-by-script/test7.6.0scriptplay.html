@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <button id="btn-show-scanner">btn-show-scanner</button>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@7.6.0/dist/dbr.js" data-productKeys="t0068NQAAAA2dJoM3AaUM7iUkhKJIl5iMfhx/UTsV3Bg4epHAnAsEJkPMGWBS0ToSVk3CCpJ5sO/66jMo2rUExS5oeK9iVdg="></script>
+  <script>
+    window.onload=function(){
+    document.getElementById("btn-show-scanner").click();
+    };
+    
+    
+    
+    
+    // Dynamsoft.BarcodeReader._bUseFullFeature = true; // Control of loading min wasm or full wasm.
+    
+    
+    
+    // reader for decoding picture
+    let reader = null;
+    // scanner for decoding video
+    let scanner = null;
+    
+    
+    
+    // decode input picture
+    
+    
+    
+    // decode video from camera
+    document.getElementById('btn-show-scanner').addEventListener('click', async () => {
+    try{
+    scanner = scanner || await Dynamsoft.BarcodeScanner.createInstance();
+    await scanner.show();
+    }catch(ex){
+    alert(ex.message);
+    throw ex;
+    }
+    });
+  </script>
+</body>
+
+</html>
