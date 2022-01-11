@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <input id="ipt-file" type="file" multiple/>
+    <script>
+        document.getElementById('ipt-file').addEventListener('change',async function(){
+            const fd = new FormData();
+            for(let i = 0; i < this.files.length; ++i){
+                fd.append("img",this.files[i]);
+            }
+            this.value = '';
+            try{
+                const rep = await fetch('./decode', {method:"POST",body:fd});
+                const obj = await rep.json();
+                alert(JSON.stringify(obj, null, 2));
+            }catch(ex){
+                alert(ex.message);
+                throw ex;
+            }
+        });
+    </script>
+</body>
+</html>
