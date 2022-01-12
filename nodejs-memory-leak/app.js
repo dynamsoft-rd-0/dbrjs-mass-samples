@@ -41,6 +41,7 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
         }
         promiseDecodeReqInProcessing = (async()=>{
             await next();
+            await new Promise(r=>setTimeout(r,20)); // important, let worker have time to gc
             promiseDecodeReqInProcessing = null;
         })();
         await promiseDecodeReqInProcessing;
