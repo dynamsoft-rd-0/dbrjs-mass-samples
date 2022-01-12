@@ -18,10 +18,10 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
 
     const app = express();
 
-    const upload = multer({storage: multer.memoryStorage()});
+    const mwUpload = multer({storage: multer.memoryStorage()});
     
     // let countProcessingReq = 0;
-    // const checkBusy = async(req, res, next)=>{
+    // const middleWareCheckBusy = async(req, res, next)=>{
     //     if(countProcessingReq > 3){
     //         req.status(503).send('Server Busy');
     //         return;
@@ -35,19 +35,35 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
     // };
 
     let promiseDecodeReqInProcessing = null;
-    const waitDecodingInQueue = async(req, res, next)=>{
+    let funcResolveDecodeReqInProcessing = null; // for express, who can't await `next()`
+    const mwWaitDecodingInQueue = async(req, res, next)=>{
         while(promiseDecodeReqInProcessing){
             await promiseDecodeReqInProcessing;
         }
-        promiseDecodeReqInProcessing = (async()=>{
-            await next();
-            await new Promise(r=>setTimeout(r,20)); // important, let worker have time to gc
-            promiseDecodeReqInProcessing = null;
-        })();
-        await promiseDecodeReqInProcessing;
+
+        // // Koa has a more promise-centric design. (>_<) `next()` can't await in express
+        // promiseDecodeReqInProcessing = (async()=>{
+        //     await next();
+        //     promiseDecodeReqInProcessing = null;
+        // })();
+
+        promiseDecodeReqInProcessing = new Promise(r=>{
+            funcResolveDecodeReqInProcessing = ()=>{
+                funcResolveDecodeReqInProcessing = null;
+                promiseDecodeReqInProcessing = null;
+                r();
+            };
+            next();
+        });
+
+        //await promiseDecodeReqInProcessing;
     };
 
-    app.post('/decode', /*checkBusy,*/waitDecodingInQueue, upload.any(), async(req, res) => {
+    const mwResolveProcessing = ()=>{
+        funcResolveDecodeReqInProcessing();
+    };
+
+    app.post('/decode', /*mwCheckBusy,*/mwWaitDecodingInQueue, mwUpload.any(), async(req, res, next) => {
         let reader;
         let txts = [];
         try{
@@ -69,7 +85,8 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
             }
         }
         res.send(txts);
-    });
+        next();
+    }, mwResolveProcessing);
     
     // static files
     app.use(express.static(path.join(__dirname, 'public')));
