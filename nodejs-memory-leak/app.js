@@ -27,6 +27,9 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
             if(req.files.length){
                 reader = await DBR.BarcodeReader.createInstance();
                 for(let file of req.files){
+                    // const clonedBuf = new Buffer.alloc(file.buffer.length);
+                    // file.buffer.copy(clonedBuf);
+                    // const results = await reader.decode(clonedBuf);
                     const results = await reader.decode(file.buffer);
                     for(let result of results){
                         txts.push(result.barcodeText);

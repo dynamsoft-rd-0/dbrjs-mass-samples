@@ -12,13 +12,17 @@
                 fd.append("img",this.files[i]);
             }
             this.value = '';
-            try{
-                const rep = await fetch('./decode', {method:"POST",body:fd});
-                const obj = await rep.json();
-                alert(JSON.stringify(obj, null, 2));
-            }catch(ex){
-                alert(ex.message);
-                throw ex;
+            let round = 0;
+            while(++round){
+                    
+                try{
+                    const rep = await fetch('./decode', {method:"POST",body:fd});
+                    const obj = await rep.json();
+                    //alert(JSON.stringify(obj, null, 2));
+                }catch(ex){
+                    alert('round '+round+': '+ex.message);
+                    throw ex;
+                }
             }
         });
     </script>
