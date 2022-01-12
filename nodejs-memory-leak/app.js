@@ -20,7 +20,33 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
 
     const upload = multer({storage: multer.memoryStorage()});
     
-    app.post('/decode', upload.any(), async(req, res) => {
+    // let countProcessingReq = 0;
+    // const checkBusy = async(req, res, next)=>{
+    //     if(countProcessingReq > 3){
+    //         req.status(503).send('Server Busy');
+    //         return;
+    //     }
+    //     ++countProcessingReq;
+    //     try{
+    //         await next();
+    //     }finally{
+    //         --countProcessingReq;
+    //     }
+    // };
+
+    let promiseDecodeReqInProcessing = null;
+    const waitDecodingInQueue = async(req, res, next)=>{
+        while(promiseDecodeReqInProcessing){
+            await promiseDecodeReqInProcessing;
+        }
+        promiseDecodeReqInProcessing = (async()=>{
+            await next();
+            promiseDecodeReqInProcessing = null;
+        })();
+        await promiseDecodeReqInProcessing;
+    };
+
+    app.post('/decode', /*checkBusy,*/waitDecodingInQueue, upload.any(), async(req, res) => {
         let reader;
         let txts = [];
         try{
