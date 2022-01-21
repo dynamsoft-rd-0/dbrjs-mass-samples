@@ -34,36 +34,36 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
     //     }
     // };
 
-    let promiseDecodeReqInProcessing = null;
-    let funcResolveDecodeReqInProcessing = null; // for express, who can't await `next()`
-    const mwWaitDecodingInQueue = async(req, res, next)=>{
-        while(promiseDecodeReqInProcessing){
-            await promiseDecodeReqInProcessing;
-        }
+    // let promiseDecodeReqInProcessing = null;
+    // let funcResolveDecodeReqInProcessing = null; // for express, who can't await `next()`
+    // const mwWaitDecodingInQueue = async(req, res, next)=>{
+    //     while(promiseDecodeReqInProcessing){
+    //         await promiseDecodeReqInProcessing;
+    //     }
 
-        // // Koa has a more promise-centric design. (>_<) `next()` can't await in express
-        // promiseDecodeReqInProcessing = (async()=>{
-        //     await next();
-        //     promiseDecodeReqInProcessing = null;
-        // })();
+    //     // // Koa has a more promise-centric design. (>_<) `next()` can't await in express
+    //     // promiseDecodeReqInProcessing = (async()=>{
+    //     //     await next();
+    //     //     promiseDecodeReqInProcessing = null;
+    //     // })();
 
-        promiseDecodeReqInProcessing = new Promise(r=>{
-            funcResolveDecodeReqInProcessing = ()=>{
-                funcResolveDecodeReqInProcessing = null;
-                promiseDecodeReqInProcessing = null;
-                r();
-            };
-            next();
-        });
+    //     promiseDecodeReqInProcessing = new Promise(r=>{
+    //         funcResolveDecodeReqInProcessing = ()=>{
+    //             funcResolveDecodeReqInProcessing = null;
+    //             promiseDecodeReqInProcessing = null;
+    //             r();
+    //         };
+    //         next();
+    //     });
 
-        //await promiseDecodeReqInProcessing;
-    };
+    //     //await promiseDecodeReqInProcessing;
+    // };
 
-    const mwResolveProcessing = ()=>{
-        funcResolveDecodeReqInProcessing();
-    };
+    // const mwResolveProcessing = ()=>{
+    //     funcResolveDecodeReqInProcessing();
+    // };
 
-    app.post('/decode', /*mwCheckBusy,*/mwWaitDecodingInQueue, mwUpload.any(), async(req, res, next) => {
+    app.post('/decode', /*mwCheckBusy,mwWaitDecodingInQueue,*/ mwUpload.any(), async(req, res, next) => {
         let reader;
         let txts = [];
         try{
@@ -86,7 +86,7 @@ DBR.BarcodeReader.productKeys = 't0068MgAAACpEXBhcD4bWoh/rX54MC4LbThO29LVsJM884E
         }
         res.send(txts);
         next();
-    }, mwResolveProcessing);
+    }, /*mwResolveProcessing*/);
     
     // static files
     app.use(express.static(path.join(__dirname, 'public')));
