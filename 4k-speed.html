@@ -13,8 +13,8 @@
             scanner.onUniqueRead = (txt, result) => {
                 console.log(txt);
             };
-            scanner.updateRuntimeSettings("speed");
-            scanner.updateVideoSettings({
+            await scanner.updateRuntimeSettings("speed");
+            await scanner.updateVideoSettings({
                 video: {
                     width: {
                         ideal: 3840
