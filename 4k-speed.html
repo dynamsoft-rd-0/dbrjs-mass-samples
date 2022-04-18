@@ -14,6 +14,9 @@
                 console.log(txt);
             };
             await scanner.updateRuntimeSettings("speed");
+            let rtSettings = await scanner.getRuntimeSettings();
+            rtSettings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ONED;
+            await scanner.updateRuntimeSettings(rtSettings);
             await scanner.updateVideoSettings({
                 video: {
                     width: {
