@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBR and DLR with DCE</title>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.0.1/dist/dbr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.4/dist/dlr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@2.3.2/dist/dce.js"></script>
+</head>
+<body>
+  <script>
+    (async()=>{
+      const reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+      reader.onImageRead = (results)=>{
+        console.log('reader results = ');
+        console.log(results);
+      };
+      reader.onUniqueRead = txt => alert(`reader uniqueRead: ${txt}`);
+
+      const recognizer = await Dynamsoft.DLR.LabelRecognizer.createInstance();
+      recognizer.onImageRead = (results)=>{
+        console.log('recognizer results = ');
+        console.log(results);
+      };
+      recognizer.onUniqueRead = txt => alert(`recognizer uniqueRead: ${txt}`);
+
+      const cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance();
+      reader.setImageSource(cameraEnhancer);
+      recognizer.setImageSource(cameraEnhancer);
+      await recognizer.startScanning(true);
+      await reader.startScanning(true);
+    })();
+  </script>
+</body>
+</html>
