@@ -1,6 +1,10 @@
 // Maybe not best practice, but it works.
 // You can bind the script into
 // `Script Bottom` -> right click -> Events -> onClick
+
+// I follow this guide: 
+// https://developers.sap.com/tutorials/personas-access-learning-sys.html
+// https://sapinaminute.com/sap-screen-personas-adding-a-script-button/
 (async()=>{
     if("undefined" == typeof Dynamsoft || "undefined" == typeof Dynamsoft.DBR){
         let script = document.createElement('script');
