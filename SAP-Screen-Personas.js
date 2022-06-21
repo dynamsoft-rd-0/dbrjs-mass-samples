@@ -16,7 +16,7 @@
         Dynamsoft.DBR.BarcodeScanner.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
         self.dynamsoft_scanner = await await Dynamsoft.DBR.BarcodeScanner.createInstance();
         let ui = await dynamsoft_scanner.getUIElement();
-        ui.style.zIndex = '99999'; // make it not cover by SAP
+        ui.style.zIndex = '99999'; // make it not covered by SAP
     }
     let scanner = self.dynamsoft_scanner;
     scanner.onFrameRead = results => {
