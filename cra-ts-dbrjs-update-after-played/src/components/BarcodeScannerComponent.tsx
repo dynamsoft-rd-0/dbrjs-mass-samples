@@ -24,8 +24,17 @@ class BarcodeScannerComponent extends React.Component<BarcodeScannerComponentPro
       
       await this.initVideoSettings();
       
+      // start with a small region, to avoid out of memory
+      const settings = await scanner.getRuntimeSettings();
+      settings.region.regionLeft = 40;
+      settings.region.regionRight = 60;
+      settings.region.regionTop = 40;
+      settings.region.regionBottom = 60;
+      settings.region.regionMeasuredByPercentage = 1;
+      await scanner.updateRuntimeSettings(settings);
 
       if(scanner.isContextDestroyed()){ return; }
+
       this.elRef.current.appendChild(scanner.getUIElement());
       this.elRef.current.style.width = '100%';
       this.elRef.current.style.height = '100%';
