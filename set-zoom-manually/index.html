@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <title>set zoom manually</title>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220819094730.0/dist/dbr.js"></script>
+  </head>
+  <body>
+    <label for="sel-barcode-format">Barcode format: </label>
+    <select id="sel-barcode-format">
+      <option value="data_matrix">data matrix</option>
+      <option value="all">all</option>
+      <option value="1d">1d</option>
+      <option value="2d">2d</option>
+    </select>
+    <br />
+    <br />
+    <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
+    <button id="btn-zoom-out">zoom out</button>
+    <!-- <input id="ipt-zoom" type="range" /> -->
+    <input id="ipt-zoom" type="range" min="1" max="10" value="1" step="1" />
+    <button id="btn-zoom-in">zoom in</button>
+    <br />
+    <button id="btn-torch" autocomplete="off">torch</button>
+
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <script>
+      const selFormat = document.querySelector("#sel-barcode-format");
+      const iptZoom = document.querySelector("#ipt-zoom");
+      const btnTorch = document.querySelector("#btn-torch");
+      const step = 1;
+      let torchOn = false;
+
+      if (!navigator.mediaDevices.getSupportedConstraints().torch) {
+        btnTorch.setAttribute("disabled", "true");
+        alert("Torch unsupported.");
+      }
+
+      const changeCodeFormat = async (format) => {
+        if (!scanner) return;
+        const settings = await scanner.getRuntimeSettings();
+        switch (this.value) {
+          case "data_matrix":
+            settings.barcodeFormatIds =
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_NULL;
+            break;
+          case "all":
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
+            settings.barcodeFormatIds_2 = 0;
+            for (let format in Dynamsoft.DBR.EnumBarcodeFormat_2) {
+              settings.barcodeFormatIds_2 |=
+                Dynamsoft.DBR.EnumBarcodeFormat_2[format];
+            }
+            break;
+          case "1d":
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ONED;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_NULL;
+            break;
+          case "2d":
+            settings.barcodeFormatIds =
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_PDF417 |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_QR_CODE |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_AZTEC |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MAXICODE |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MICRO_QR |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MICRO_PDF417;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_DOTCODE;
+            break;
+          default:
+            break;
+        }
+        await scanner.updateRuntimeSettings(settings);
+      };
+
+      let scanner;
+      (async () => {
+        scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+        document
+          .querySelector("#div-ui-container")
+          .appendChild(scanner.getUIElement());
+        await scanner.setResolution(3840, 2160);
+        await scanner.updateRuntimeSettings("distance");
+        await changeCodeFormat(selFormat.value);
+        await scanner.open();
+
+        scanner.onFrameRead = (results)=>{
+          if(results.length) {
+            console.log(results);
+            alert(results[0].barcodeText);
+          }
+        };
+        // const capabilities = scanner.getCapabilities();
+        // const currentCameraSettings = scanner.getCameraSettings();
+        // iptZoom.setAttribute("min", capabilities.zoom.min);
+        // iptZoom.setAttribute("max", capabilities.zoom.max);
+        // iptZoom.setAttribute("step", capabilities.zoom.step);
+        // iptZoom.setAttribute("value", currentCameraSettings.zoom);
+        // console.log(capabilities.zoom.min);
+        // console.log(capabilities.zoom.max);
+        // console.log(capabilities.zoom.step);
+      })();
+
+      iptZoom.addEventListener("change", () => {
+        if (!scanner) return;
+        // scanner.setZoom(iptZoom.value);
+        scanner.setZoom(parseFloat(iptZoom.value));
+      });
+
+      selFormat.addEventListener("change", async () => {
+        await changeCodeFormat(selFormat.value);
+      });
+
+      document
+        .querySelector("#btn-zoom-out")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+          // await scanner.setZoom(parseFloat(iptZoom.value) - 1);
+          // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
+          let value = scanner.getScale() - step;
+          value = value<1?1:value;
+          scanner.setScale(value);
+          iptZoom.setAttribute("value", scanner.getScale());
+        });
+
+      document
+        .querySelector("#btn-zoom-in")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+          // await scanner.setZoom(parseFloat(iptZoom.value) + 1);
+          // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
+          let value = scanner.getScale() + step;
+          value = value>10?10:value;
+          scanner.setScale(value);
+          iptZoom.setAttribute("value", scanner.getScale());
+        });
+
+      document
+        .querySelector("#btn-torch")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+
+          if (torchOn) {
+            await scanner.turnOffTorch();
+            torchOn = false;
+          } else {
+            await scanner.turnOnTorch();
+            torchOn = true;
+          }
+        });
+    </script>
+  </body>
+</html>
