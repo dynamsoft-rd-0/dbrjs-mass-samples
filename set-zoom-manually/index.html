@@ -48,7 +48,7 @@
       const changeCodeFormat = async (format) => {
         if (!scanner) return;
         const settings = await scanner.getRuntimeSettings();
-        switch (this.value) {
+        switch (format) {
           case "data_matrix":
             settings.barcodeFormatIds =
               Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX;
@@ -95,17 +95,23 @@
         // await scanner.setResolution(1920, 1080);
         await scanner.setResolution(3840, 2160);
         await scanner.updateRuntimeSettings("distance");
+        await changeCodeFormat(selFormat.value);
+        await scanner.open();
+
+        // set a square region, see: 
+        // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
+        const sideLen = Math.min(scanner.video.videoWidth, scanner.video.videoHeight)*0.5;
+        let precentW = Math.round(sideLen/scanner.video.videoWidth*100)
+        let precentH = Math.round(sideLen/scanner.video.videoHeight*100);
         let settings = await scanner.getRuntimeSettings();
         settings.region = {
-          regionLeft: 25,
-          regionRight: 75,
-          regionTop: 25,
-          regionBottom: 75,
+          regionLeft: (100 - precentW) / 2,
+          regionRight: (100 + precentW) / 2,
+          regionTop: (100 - precentH) / 2,
+          regionBottom: (100 + precentH) / 2,
           regionMeasuredByPercentage: true
         };
         await scanner.updateRuntimeSettings(settings);
-        await changeCodeFormat(selFormat.value);
-        await scanner.open();
 
         scanner.onFrameRead = (results) => {
           if (results.length) {
