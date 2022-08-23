@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=0"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
     <title>set zoom manually</title>
     <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script> -->
@@ -92,7 +92,6 @@
         document
           .querySelector("#div-ui-container")
           .appendChild(scanner.getUIElement());
-        // await scanner.setResolution(1920, 1080);
         await scanner.setResolution(3840, 2160);
         await scanner.updateRuntimeSettings("distance");
         await changeCodeFormat(selFormat.value);
@@ -119,21 +118,10 @@
             // alert(results[0].barcodeText);
           }
         };
-        // const capabilities = scanner.getCapabilities();
-        const currentCameraSettings = scanner.getCameraSettings();
-        console.log(currentCameraSettings)
-        // iptZoom.setAttribute("min", capabilities.zoom.min);
-        // iptZoom.setAttribute("max", capabilities.zoom.max);
-        // iptZoom.setAttribute("step", capabilities.zoom.step);
-        // iptZoom.setAttribute("value", currentCameraSettings.zoom);
-        // console.log(capabilities.zoom.min);
-        // console.log(capabilities.zoom.max);
-        // console.log(capabilities.zoom.step);
       })();
 
       iptZoom.addEventListener("change", () => {
         if (!scanner) return;
-        // scanner.setZoom(iptZoom.value);
         scanner.setZoom(parseFloat(iptZoom.value));
       });
 
@@ -145,8 +133,6 @@
         .querySelector("#btn-zoom-out")
         .addEventListener("click", async () => {
           if (!scanner) return;
-          // await scanner.setZoom(parseFloat(iptZoom.value) - 1);
-          // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
           let value = scanner.getZoom() - step;
           value = value < 1 ? 1 : value;
           scanner.setZoom(value);
@@ -157,8 +143,6 @@
         .querySelector("#btn-zoom-in")
         .addEventListener("click", async () => {
           if (!scanner) return;
-          // await scanner.setZoom(parseFloat(iptZoom.value) + 1);
-          // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
           let value = scanner.getZoom() + step;
           value = value > 10 ? 10 : value;
           scanner.setZoom(value);
