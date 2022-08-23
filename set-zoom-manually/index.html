@@ -94,10 +94,16 @@
           .appendChild(scanner.getUIElement());
         await scanner.setResolution(3840, 2160);
         await scanner.updateRuntimeSettings("distance");
+
+        // Reduce memory usage
+        let scanSettings = await scanner.getScanSettings();
+        scanSettings.captureAndDecodeInParallel = false;
+        await scanner.updateScanSettings(scanSettings);
+        
         await changeCodeFormat(selFormat.value);
         await scanner.open();
 
-        // set a square region, see: 
+        // Set a square region, see: 
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
         const sideLen = Math.min(scanner.video.videoWidth, scanner.video.videoHeight)*0.5;
         let precentW = Math.round(sideLen/scanner.video.videoWidth*100)
