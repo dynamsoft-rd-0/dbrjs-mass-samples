@@ -8,7 +8,7 @@
     />
     <title>set zoom manually</title>
     <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220823094932.0/dist/dbr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220823152328.0/dist/dbr.js"></script>
   </head>
   <body>
     <label for="sel-barcode-format">Barcode format: </label>
@@ -99,7 +99,7 @@
         let scanSettings = await scanner.getScanSettings();
         scanSettings.captureAndDecodeInParallel = false;
         await scanner.updateScanSettings(scanSettings);
-        
+
         await changeCodeFormat(selFormat.value);
         await scanner.open();
 
