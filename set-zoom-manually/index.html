@@ -22,21 +22,35 @@
     <br />
     <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
     <button id="btn-zoom-out">zoom out</button>
-    <!-- <input id="ipt-zoom" type="range" /> -->
     <input id="ipt-zoom" type="range" min="1" max="10" value="1" step="1" />
     <button id="btn-zoom-in">zoom in</button>
     <br />
     <button id="btn-torch" autocomplete="off">torch</button>
+    <div>Results：</div>
+    <textarea
+      id="textarea-results"
+      style="width: 100%; height: 20vh"
+    ></textarea>
 
-    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
-      eruda.init();
-    </script>
+      /** LICENSE ALERT - README
+       * To use the library, you need to first specify a license key using the API "license" as shown below.
+       */
 
-    <script>
+      Dynamsoft.DBR.BarcodeReader.license =
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLWRicl9qc19zYW1wbGVzIiwib3JnYW5pemF0aW9uSUQiOiIyMDAwMDAifQ==";
+
+      /**
+       * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
+       * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+       * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.2.13&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+       * LICENSE ALERT - THE END
+       */
+
       const selFormat = document.querySelector("#sel-barcode-format");
       const iptZoom = document.querySelector("#ipt-zoom");
       const btnTorch = document.querySelector("#btn-torch");
+      const textareaResults = document.querySelector("#textarea-results");
       const step = 1;
       let torchOn = false;
 
@@ -103,25 +117,31 @@
         await changeCodeFormat(selFormat.value);
         await scanner.open();
 
-        // Set a square region, see: 
+        // Set a square region, see:
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
-        const sideLen = Math.min(scanner.video.videoWidth, scanner.video.videoHeight)*0.5;
-        let precentW = Math.round(sideLen/scanner.video.videoWidth*100)
-        let precentH = Math.round(sideLen/scanner.video.videoHeight*100);
+        const sideLen =
+          Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.5;
+        let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
+        let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
         let settings = await scanner.getRuntimeSettings();
         settings.region = {
           regionLeft: (100 - precentW) / 2,
           regionRight: (100 + precentW) / 2,
           regionTop: (100 - precentH) / 2,
           regionBottom: (100 + precentH) / 2,
-          regionMeasuredByPercentage: true
+          regionMeasuredByPercentage: true,
         };
         await scanner.updateRuntimeSettings(settings);
 
         scanner.onFrameRead = (results) => {
-          if (results.length) {
-            console.log(results);
-            // alert(results[0].barcodeText);
+          textareaResults.value = "";
+          for (let result of results) {
+            const type =
+              result.barcodeFormat === 0
+                ? result.barcodeFormatString_2
+                : result.barcodeFormatString;
+            const text = result.barcodeText;
+            textareaResults.value += `${type}: ${text}\n`;
           }
         };
       })();
