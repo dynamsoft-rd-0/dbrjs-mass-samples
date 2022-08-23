@@ -2,10 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=0"
+    />
     <title>set zoom manually</title>
     <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220819094730.0/dist/dbr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220823094932.0/dist/dbr.js"></script>
   </head>
   <body>
     <label for="sel-barcode-format">Barcode format: </label>
@@ -89,19 +92,30 @@
         document
           .querySelector("#div-ui-container")
           .appendChild(scanner.getUIElement());
+        // await scanner.setResolution(1920, 1080);
         await scanner.setResolution(3840, 2160);
         await scanner.updateRuntimeSettings("distance");
+        let settings = await scanner.getRuntimeSettings();
+        settings.region = {
+          regionLeft: 25,
+          regionRight: 75,
+          regionTop: 25,
+          regionBottom: 75,
+          regionMeasuredByPercentage: true
+        };
+        await scanner.updateRuntimeSettings(settings);
         await changeCodeFormat(selFormat.value);
         await scanner.open();
 
-        scanner.onFrameRead = (results)=>{
-          if(results.length) {
+        scanner.onFrameRead = (results) => {
+          if (results.length) {
             console.log(results);
-            alert(results[0].barcodeText);
+            // alert(results[0].barcodeText);
           }
         };
         // const capabilities = scanner.getCapabilities();
-        // const currentCameraSettings = scanner.getCameraSettings();
+        const currentCameraSettings = scanner.getCameraSettings();
+        console.log(currentCameraSettings)
         // iptZoom.setAttribute("min", capabilities.zoom.min);
         // iptZoom.setAttribute("max", capabilities.zoom.max);
         // iptZoom.setAttribute("step", capabilities.zoom.step);
@@ -127,10 +141,10 @@
           if (!scanner) return;
           // await scanner.setZoom(parseFloat(iptZoom.value) - 1);
           // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
-          let value = scanner.getScale() - step;
-          value = value<1?1:value;
-          scanner.setScale(value);
-          iptZoom.setAttribute("value", scanner.getScale());
+          let value = scanner.getZoom() - step;
+          value = value < 1 ? 1 : value;
+          scanner.setZoom(value);
+          iptZoom.setAttribute("value", scanner.getZoom());
         });
 
       document
@@ -139,10 +153,10 @@
           if (!scanner) return;
           // await scanner.setZoom(parseFloat(iptZoom.value) + 1);
           // iptZoom.setAttribute("value", scanner.getCameraSettings().zoom);
-          let value = scanner.getScale() + step;
-          value = value>10?10:value;
-          scanner.setScale(value);
-          iptZoom.setAttribute("value", scanner.getScale());
+          let value = scanner.getZoom() + step;
+          value = value > 10 ? 10 : value;
+          scanner.setZoom(value);
+          iptZoom.setAttribute("value", scanner.getZoom());
         });
 
       document
