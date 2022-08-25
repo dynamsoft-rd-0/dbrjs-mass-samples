@@ -6,11 +6,21 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
-    <title>set zoom manually</title>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script> -->
+    <title>Set zoom manually</title>
+    <!-- Note: it is a Development version, not Production version; -->
     <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220823152328.0/dist/dbr.js"></script>
   </head>
   <body>
+    <label for="sel-template">Template: </label>
+    <select id="sel-template">
+      <option value="distance">distance</option>
+      <option value="single">single</option>
+      <option value="speed">speed</option>
+      <option value="balance">balance</option>
+      <option value="coverage">coverage</option>
+      <option value="dense">dense</option>
+    </select>
+    <br>
     <label for="sel-barcode-format">Barcode format: </label>
     <select id="sel-barcode-format">
       <option value="data_matrix">data matrix</option>
@@ -38,7 +48,7 @@
        */
 
       Dynamsoft.DBR.BarcodeReader.license =
-        "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9";
+        "t0068NQAAAFOKvgrr/6nrmnm2k3osMftPLgdha1XLjjiRecDOAb051GbNuWAQjEIM4+1gn9GFF1FyrNeo6SOfBiv9PMu+J6U=";
 
       /**
        * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
@@ -48,6 +58,7 @@
        */
 
       const selFormat = document.querySelector("#sel-barcode-format");
+      const selTemplate = document.querySelector("#sel-template");
       const iptZoom = document.querySelector("#ipt-zoom");
       const btnTorch = document.querySelector("#btn-torch");
       const textareaResults = document.querySelector("#textarea-results");
@@ -107,7 +118,7 @@
           .querySelector("#div-ui-container")
           .appendChild(scanner.getUIElement());
         await scanner.setResolution(3840, 2160);
-        await scanner.updateRuntimeSettings("distance");
+        await scanner.updateRuntimeSettings(selTemplate.value);
 
         // Reduce memory usage
         let scanSettings = await scanner.getScanSettings();
@@ -151,7 +162,13 @@
         scanner.setZoom(parseFloat(iptZoom.value));
       });
 
+      selTemplate.addEventListener("change", async () => {
+        if (!scanner) return;
+        await scanner.updateRuntimeSettings(selTemplate.value);
+      });
+
       selFormat.addEventListener("change", async () => {
+        if (!scanner) return;
         await changeCodeFormat(selFormat.value);
       });
 
