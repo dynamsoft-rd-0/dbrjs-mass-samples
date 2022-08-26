@@ -147,12 +147,12 @@
         scanner.onFrameRead = (results) => {
           textareaResults.value = "";
           for (let result of results) {
-            const type =
-              result.barcodeFormat === 0
-                ? result.barcodeFormatString_2
-                : result.barcodeFormatString;
+            const format =
+              result.barcodeFormat
+                ? result.barcodeFormatString
+                : result.barcodeFormatString_2;
             const text = result.barcodeText;
-            textareaResults.value += `${type}: ${text}\n`;
+            textareaResults.value += `${format}: ${text}\n`;
           }
         };
       })();
