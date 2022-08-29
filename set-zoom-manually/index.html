@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>Set zoom manually</title>
     <!-- Note: it is a Development version, not Production version; -->
@@ -12,29 +12,33 @@
     <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220825163711.0/dist/dbr.js"></script>
   </head>
   <body>
-    <label for="sel-template">Template: </label>
-    <select id="sel-template">
-      <option value="distance">distance</option>
-      <option value="single">single</option>
-      <option value="speed">speed</option>
-      <option value="balance">balance</option>
-      <option value="coverage">coverage</option>
-      <option value="dense">dense</option>
-    </select>
-    <br>
-    <label for="sel-barcode-format">Barcode format: </label>
-    <select id="sel-barcode-format">
-      <option value="data_matrix">data matrix</option>
-      <option value="all">all</option>
-      <option value="1d">1d</option>
-      <option value="2d">2d</option>
-    </select>
-    <br />
+    <div>
+      <label for="sel-template">Template: </label>
+      <select id="sel-template">
+        <option value="distance">distance</option>
+        <option value="single">single</option>
+        <option value="speed">speed</option>
+        <option value="balance">balance</option>
+        <option value="coverage">coverage</option>
+        <option value="dense">dense</option>
+      </select>
+    </div>
+    <div>
+      <label for="sel-barcode-format">Barcode format: </label>
+      <select id="sel-barcode-format">
+        <option value="data_matrix">data matrix</option>
+        <option value="all">all</option>
+        <option value="1d">1d</option>
+        <option value="2d">2d</option>
+      </select>
+    </div>
     <br />
     <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
-    <button id="btn-zoom-out">zoom out</button>
-    <input id="ipt-zoom" type="range" min="1" max="10" value="1" step="1" />
-    <button id="btn-zoom-in">zoom in</button>
+    <div style="width: 100%;">
+      <button id="btn-zoom-out">zoom out</button>
+      <input id="ipt-zoom" type="range" min="1" max="10" value="1" step="1" />
+      <button id="btn-zoom-in">zoom in</button>
+    </div>
     <br />
     <button id="btn-torch" autocomplete="off">torch</button>
     <div>Results：</div>
@@ -80,6 +84,7 @@
               Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX;
             settings.barcodeFormatIds_2 =
               Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_NULL;
+            settings.furtherModes.dpmCodeReadingModes[0] = Dynamsoft.DBR.EnumDPMCodeReadingMode.DPMCRM_GENERAL;
             break;
           case "all":
             settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
@@ -131,19 +136,19 @@
 
         // Set a square region, see:
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
-        const sideLen =
-          Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.5;
-        let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
-        let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
-        let settings = await scanner.getRuntimeSettings();
-        settings.region = {
-          regionLeft: (100 - precentW) / 2,
-          regionRight: (100 + precentW) / 2,
-          regionTop: (100 - precentH) / 2,
-          regionBottom: (100 + precentH) / 2,
-          regionMeasuredByPercentage: true,
-        };
-        await scanner.updateRuntimeSettings(settings);
+        // const sideLen =
+        //   Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.5;
+        // let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
+        // let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
+        // let settings = await scanner.getRuntimeSettings();
+        // settings.region = {
+        //   regionLeft: (100 - precentW) / 2,
+        //   regionRight: (100 + precentW) / 2,
+        //   regionTop: (100 - precentH) / 2,
+        //   regionBottom: (100 + precentH) / 2,
+        //   regionMeasuredByPercentage: true,
+        // };
+        // await scanner.updateRuntimeSettings(settings);
 
         scanner.onFrameRead = (results) => {
           textareaResults.value = "";
@@ -166,10 +171,12 @@
       selTemplate.addEventListener("change", async () => {
         if (!scanner) return;
         await scanner.updateRuntimeSettings(selTemplate.value);
+        await changeCodeFormat(selFormat.value);
       });
 
       selFormat.addEventListener("change", async () => {
         if (!scanner) return;
+        await scanner.updateRuntimeSettings(selTemplate.value);
         await changeCodeFormat(selFormat.value);
       });
 
