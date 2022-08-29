@@ -124,6 +124,7 @@
           .querySelector("#div-ui-container")
           .appendChild(scanner.getUIElement());
         await scanner.setResolution(3840, 2160);
+        // await scanner.setResolution(2560, 1920);
         await scanner.updateRuntimeSettings(selTemplate.value);
 
         // Reduce memory usage
@@ -136,19 +137,19 @@
 
         // Set a square region, see:
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
-        // const sideLen =
-        //   Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.5;
-        // let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
-        // let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
-        // let settings = await scanner.getRuntimeSettings();
-        // settings.region = {
-        //   regionLeft: (100 - precentW) / 2,
-        //   regionRight: (100 + precentW) / 2,
-        //   regionTop: (100 - precentH) / 2,
-        //   regionBottom: (100 + precentH) / 2,
-        //   regionMeasuredByPercentage: true,
-        // };
-        // await scanner.updateRuntimeSettings(settings);
+        const sideLen =
+          Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
+        let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
+        let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
+        let settings = await scanner.getRuntimeSettings();
+        settings.region = {
+          regionLeft: (100 - precentW) / 2,
+          regionRight: (100 + precentW) / 2,
+          regionTop: (100 - precentH) / 2,
+          regionBottom: (100 + precentH) / 2,
+          regionMeasuredByPercentage: true,
+        };
+        await scanner.updateRuntimeSettings(settings);
 
         scanner.onFrameRead = (results) => {
           textareaResults.value = "";
