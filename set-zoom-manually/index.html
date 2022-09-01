@@ -124,6 +124,7 @@
       let scanner;
       (async () => {
         scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+        // Change the delay when video container resizes. This API has not been public yet.
         scanner.dce._updateLayersTimeout = 500;
         document
           .querySelector("#div-ui-container")
