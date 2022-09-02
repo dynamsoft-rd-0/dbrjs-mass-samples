@@ -9,6 +9,8 @@
     <title>Set zoom manually</title>
     <!-- Note: it is a Development version, not Production version. -->
     <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220901170527.0/dist/dbr.js"></script>
+
+    <!-- It is a plugin which can show console in mobile browser. -->
     <!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
         eruda.init();
@@ -80,7 +82,7 @@
         alert("Torch unsupported.");
       }
 
-      // Change settings about code format in barcode scanner.
+      // Change runtime settings about code format in barcode scanner.
       const changeCodeFormat = async (format) => {
         if (!scanner) return;
         const settings = await scanner.getRuntimeSettings();
@@ -166,6 +168,7 @@
         };
         await scanner.updateRuntimeSettings(settings);
 
+        // Set the callback fired when a frame is decoded.
         scanner.onFrameRead = (results) => {
           textareaResults.value = "";
           for (let result of results) {
