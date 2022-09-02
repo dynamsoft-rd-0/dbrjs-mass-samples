@@ -7,8 +7,7 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>Set zoom manually</title>
-    <!-- Note: it is a Development version, not Production version; -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220825163711.0/dist/dbr.js"></script> -->
+    <!-- Note: it is a Development version, not Production version. -->
     <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220901170527.0/dist/dbr.js"></script>
     <!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
@@ -40,7 +39,7 @@
     <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
     <div style="width: 100%;">
       <button id="btn-zoom-out">zoom out</button>
-      <input id="ipt-zoom" type="range" min="1" max="10" value="1" step="1" />
+      <input id="ipt-zoom" type="range" min="1" max="10" step="1" />
       <button id="btn-zoom-in">zoom in</button>
     </div>
     <br />
@@ -71,7 +70,9 @@
       const iptZoom = document.querySelector("#ipt-zoom");
       const btnTorch = document.querySelector("#btn-torch");
       const textareaResults = document.querySelector("#textarea-results");
+
       const step = 1;
+      let initialScale = 1;
       let torchOn = false;
 
       if (!navigator.mediaDevices.getSupportedConstraints().torch) {
@@ -79,6 +80,7 @@
         alert("Torch unsupported.");
       }
 
+      // Change settings about code format in barcode scanner.
       const changeCodeFormat = async (format) => {
         if (!scanner) return;
         const settings = await scanner.getRuntimeSettings();
@@ -124,8 +126,11 @@
       let scanner;
       (async () => {
         scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
-        // Change the delay of updating some layers when video container resizes. This API has not been public yet.
+
+        // Note: This API has not been public yet.
+        // Change the delay of updating some layers when video container resizes. 
         scanner.dce._updateLayersTimeout = 500;
+
         document
           .querySelector("#div-ui-container")
           .appendChild(scanner.getUIElement());
@@ -133,13 +138,17 @@
         // await scanner.setResolution(2560, 1920);
         await scanner.updateRuntimeSettings(selTemplate.value);
 
-        // Reduce memory usage
+        // Update scan setting to reduce memory usage.
         let scanSettings = await scanner.getScanSettings();
         scanSettings.captureAndDecodeInParallel = false;
         await scanner.updateScanSettings(scanSettings);
 
         await changeCodeFormat(selFormat.value);
         await scanner.open();
+
+        // Set initial scale.
+        scanner.setZoom(initialScale);
+        iptZoom.value = scanner.getZoom();
 
         // Set a square region, see:
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
@@ -170,11 +179,6 @@
         };
       })();
 
-      iptZoom.addEventListener("change", () => {
-        if (!scanner) return;
-        scanner.setZoom(parseFloat(iptZoom.value));
-      });
-
       selTemplate.addEventListener("change", async () => {
         if (!scanner) return;
         await scanner.updateRuntimeSettings(selTemplate.value);
@@ -187,6 +191,11 @@
         await changeCodeFormat(selFormat.value);
       });
 
+      iptZoom.addEventListener("change", () => {
+        if (!scanner) return;
+        scanner.setZoom(parseFloat(iptZoom.value));
+      });
+
       document
         .querySelector("#btn-zoom-out")
         .addEventListener("click", async () => {
@@ -194,7 +203,7 @@
           let value = scanner.getZoom() - step;
           value = value < 1 ? 1 : value;
           scanner.setZoom(value);
-          iptZoom.setAttribute("value", scanner.getZoom());
+          iptZoom.value = scanner.getZoom();
         });
 
       document
@@ -204,7 +213,7 @@
           let value = scanner.getZoom() + step;
           value = value > 10 ? 10 : value;
           scanner.setZoom(value);
-          iptZoom.setAttribute("value", scanner.getZoom());
+          iptZoom.value = scanner.getZoom();
         });
 
       document
