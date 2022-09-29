@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Set zoom manually</title>
+    <!-- Note: it is a Development version, not Production version. -->
+    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220901170527.0/dist/dbr.js"></script>
+
+    <!-- It is a plugin which can show console in mobile browser. -->
+    <!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        eruda.init();
+    </script> -->
+  </head>
+  <body>
+    <div>
+      <label for="sel-template">Template: </label>
+      <select id="sel-template">
+        <option value="distance">distance</option>
+        <option value="single">single</option>
+        <option value="speed">speed</option>
+        <option value="balance">balance</option>
+        <option value="coverage">coverage</option>
+        <option value="dense">dense</option>
+      </select>
+    </div>
+    <div>
+      <label for="sel-barcode-format">Barcode format: </label>
+      <select id="sel-barcode-format">
+        <option value="data_matrix">data matrix</option>
+        <option value="all">all</option>
+        <option value="1d">1d</option>
+        <option value="2d">2d</option>
+      </select>
+    </div>
+    <br />
+    <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
+    <div style="width: 100%;">
+      <button id="btn-zoom-out">zoom out</button>
+      <input id="ipt-zoom" type="range" min="1" max="10" step="1" />
+      <button id="btn-zoom-in">zoom in</button>
+    </div>
+    <br />
+    <button id="btn-torch" autocomplete="off">torch</button>
+    <div>Results：</div>
+    <textarea
+      id="textarea-results"
+      style="width: 100%; height: 20vh"
+    ></textarea>
+
+    <script>
+      /** LICENSE ALERT - README
+       * To use the library, you need to first specify a license key using the API "license" as shown below.
+       */
+
+      Dynamsoft.DBR.BarcodeReader.license =
+        "t0068NQAAAFOKvgrr/6nrmnm2k3osMftPLgdha1XLjjiRecDOAb051GbNuWAQjEIM4+1gn9GFF1FyrNeo6SOfBiv9PMu+J6U=";
+
+      /**
+       * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
+       * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+       * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.2.13&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+       * LICENSE ALERT - THE END
+       */
+
+      const selFormat = document.querySelector("#sel-barcode-format");
+      const selTemplate = document.querySelector("#sel-template");
+      const iptZoom = document.querySelector("#ipt-zoom");
+      const btnTorch = document.querySelector("#btn-torch");
+      const textareaResults = document.querySelector("#textarea-results");
+
+      const step = 1;
+      let initialScale = 1;
+      let torchOn = false;
+
+      if (!navigator.mediaDevices.getSupportedConstraints().torch) {
+        btnTorch.setAttribute("disabled", "true");
+        alert("Torch unsupported.");
+      }
+
+      // Change runtime settings about code format in barcode scanner.
+      const changeCodeFormat = async (format) => {
+        if (!scanner) return;
+        const settings = await scanner.getRuntimeSettings();
+        switch (format) {
+          case "data_matrix":
+            settings.barcodeFormatIds =
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_NULL;
+            settings.furtherModes.dpmCodeReadingModes[0] = Dynamsoft.DBR.EnumDPMCodeReadingMode.DPMCRM_GENERAL;
+            break;
+          case "all":
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
+            settings.barcodeFormatIds_2 = 0;
+            for (let format in Dynamsoft.DBR.EnumBarcodeFormat_2) {
+              settings.barcodeFormatIds_2 |=
+                Dynamsoft.DBR.EnumBarcodeFormat_2[format];
+            }
+            break;
+          case "1d":
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ONED;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_NULL;
+            break;
+          case "2d":
+            settings.barcodeFormatIds =
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_PDF417 |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_QR_CODE |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_DATAMATRIX |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_AZTEC |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MAXICODE |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MICRO_QR |
+              Dynamsoft.DBR.EnumBarcodeFormat.BF_MICRO_PDF417;
+            settings.barcodeFormatIds_2 =
+              Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_DOTCODE;
+            break;
+          default:
+            break;
+        }
+        await scanner.updateRuntimeSettings(settings);
+      };
+
+      let scanner;
+      (async () => {
+        scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+
+        // Note: This API has not been public yet.
+        // Change the delay of updating some layers when video container resizes. 
+        scanner.dce._updateLayersTimeout = 500;
+
+        document
+          .querySelector("#div-ui-container")
+          .appendChild(scanner.getUIElement());
+        await scanner.setResolution(3840, 2160);
+        // await scanner.setResolution(2560, 1920);
+        await scanner.updateRuntimeSettings(selTemplate.value);
+
+        // Update scan setting to reduce memory usage.
+        let scanSettings = await scanner.getScanSettings();
+        scanSettings.captureAndDecodeInParallel = false;
+        await scanner.updateScanSettings(scanSettings);
+
+        await changeCodeFormat(selFormat.value);
+        await scanner.open();
+
+        // Set initial scale.
+        scanner.setZoom(initialScale);
+        iptZoom.value = scanner.getZoom();
+
+        // Set a square region, see:
+        // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
+        const sideLen =
+          Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
+        let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
+        let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
+        let settings = await scanner.getRuntimeSettings();
+        settings.region = {
+          regionLeft: (100 - precentW) / 2,
+          regionRight: (100 + precentW) / 2,
+          regionTop: (100 - precentH) / 2,
+          regionBottom: (100 + precentH) / 2,
+          regionMeasuredByPercentage: true,
+        };
+        await scanner.updateRuntimeSettings(settings);
+
+        // Set the callback fired when a frame is decoded.
+        scanner.onFrameRead = (results) => {
+          textareaResults.value = "";
+          for (let result of results) {
+            const format =
+              result.barcodeFormat
+                ? result.barcodeFormatString
+                : result.barcodeFormatString_2;
+            const text = result.barcodeText;
+            textareaResults.value += `${format}: ${text}\n`;
+          }
+        };
+      })();
+
+      selTemplate.addEventListener("change", async () => {
+        if (!scanner) return;
+        await scanner.updateRuntimeSettings(selTemplate.value);
+        await changeCodeFormat(selFormat.value);
+      });
+
+      selFormat.addEventListener("change", async () => {
+        if (!scanner) return;
+        await scanner.updateRuntimeSettings(selTemplate.value);
+        await changeCodeFormat(selFormat.value);
+      });
+
+      iptZoom.addEventListener("change", () => {
+        if (!scanner) return;
+        scanner.setZoom(parseFloat(iptZoom.value));
+      });
+
+      document
+        .querySelector("#btn-zoom-out")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+          let value = scanner.getZoom() - step;
+          value = value < 1 ? 1 : value;
+          scanner.setZoom(value);
+          iptZoom.value = scanner.getZoom();
+        });
+
+      document
+        .querySelector("#btn-zoom-in")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+          let value = scanner.getZoom() + step;
+          value = value > 10 ? 10 : value;
+          scanner.setZoom(value);
+          iptZoom.value = scanner.getZoom();
+        });
+
+      document
+        .querySelector("#btn-torch")
+        .addEventListener("click", async () => {
+          if (!scanner) return;
+
+          if (torchOn) {
+            await scanner.turnOffTorch();
+            torchOn = false;
+          } else {
+            await scanner.turnOnTorch();
+            torchOn = true;
+          }
+        });
+    </script>
+  </body>
+</html>

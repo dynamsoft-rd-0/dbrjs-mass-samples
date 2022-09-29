@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.12/dist/dbr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@3.0.1/dist/dce.js"></script>
+</head>
+<body>
+  <label>if show result text: </label>
+  <select id="select-show-result-text">
+    <option value="true">true</option>
+    <option value="false">false</option>
+  </select>
+  <br>
+  <button id="btn-switch-mode">pause scanning and edit result</button>
+  <label id="label-current-mode">current mode: viewer</label>
+  <div id="div-ui-container" style="margin-top: 50px; height: 75vh;"></div>
+  <script>
+    const labelCurrentMode = document.querySelector("#label-current-mode");
+    const btnSwitchMode = document.querySelector("#btn-switch-mode");
+
+    let reader, cameraEnhancer;
+    let layer;
+    let showResultText = true;
+
+    (async()=>{
+      cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance();
+      reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+      await reader.setImageSource(cameraEnhancer, {resultsHighlightBaseShapes:Dynamsoft.DCE.DrawingItem});
+      document.querySelector("#div-ui-container").appendChild(cameraEnhancer.getUIElement());
+      await reader.startScanning();
+
+      reader.onImageRead = (results)=>{
+        console.log("----image read ↓-----");
+        console.log(results);
+        layer.clearDrawingItems();
+        if(showResultText) {
+          for(let result of results){
+            const loc = result.localizationResult;
+            const text = new Dynamsoft.DCE.DrawingItem.DT_Text(result.barcodeText, loc.x1, loc.y1-22);
+            layer.addDrawingItem(text);
+          }
+        }
+        console.log("----image read ↑-----");
+      };
+
+      reader.onUniqueRead = (txt, result)=>{
+        console.log("----Unique read ↓-----");
+        console.log(txt);
+        console.log(result);
+        console.log("----Unique read ↑-----");
+      };
+
+      layer = cameraEnhancer.createDrawingLayer();
+      const styleId = cameraEnhancer.createDrawingStyle({fontSize: 20});
+      layer.setDrawingStyle(styleId);
+    })();
+
+    document.querySelector("#select-show-result-text").addEventListener("change", function() {
+      showResultText = (this.value === "true");
+    });
+
+    document.querySelector("#btn-switch-mode").addEventListener("click", function() {
+      if(!cameraEnhancer || !cameraEnhancer.isOpen() || !layer) return;
+      if(layer.getMode() === "viewer") {
+        reader.pauseScanning({keepResultsHighlighted: true});
+        layer.setMode("editor");
+        labelCurrentMode.innerText = "current mode: editor";
+        btnSwitchMode.innerHTML = "finish editing and resume scanning";
+      } else {
+        reader.resumeScanning();
+        layer.setMode("viewer");
+        labelCurrentMode.innerText = "current mode: viewer";
+        btnSwitchMode.innerHTML = "pause scanning and edit result";
+      }
+    });
+  </script>
+</body>
+</html>

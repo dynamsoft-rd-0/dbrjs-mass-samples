@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>auto_scroll_results</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@3.0.1/dist/dce.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.2.13/dist/dbr.js"></script>
+    <style>
+      #div-results-container {
+        position: absolute;
+        left: 50%;
+        top: 75%;
+        width: 50%;
+        height: 20%;
+        overflow: auto;
+        transform: translateX(-50%);
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+      }
+      #div-results-container:hover {
+        scrollbar-color: #888 transparent;
+      }
+      #div-results-container::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      #div-results-container::-webkit-scrollbar-track {
+        border-radius: 5px;
+      }
+      #div-results-container::-webkit-scrollbar-thumb {
+        display: none;
+        background: #888;
+        border-radius: 5px;
+      }
+      #div-results-container:hover::-webkit-scrollbar-thumb {
+        display: block;
+        background: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="btn-enable-auto-scroll">enable auto scroll</button>
+    <button id="btn-disable-auto-scroll">disable auto scroll</button>
+    <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
+    <script>
+      let enhancer, reader;
+      let autoScrollIntervalId;
+
+      let resultsContainer = document.createElement("div");
+      resultsContainer.id = "div-results-container";
+
+      (async () => {
+        enhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance();
+        reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+        await reader.setImageSource(enhancer, {
+          resultsHighlightBaseShapes: Dynamsoft.DCE.DrawingItem,
+        });
+        document
+          .querySelector("#div-ui-container")
+          .appendChild(enhancer.getUIElement());
+        document.querySelector(".dce-video-container").append(resultsContainer);
+
+        reader.onUniqueRead = (txt) => {
+          const el = document.createElement("div");
+          el.style.textAlign = "center";
+          el.innerText = txt;
+          resultsContainer.append(el);
+        };
+
+        await reader.startScanning();
+      })();
+
+      document
+        .querySelector("#btn-enable-auto-scroll")
+        .addEventListener("click", () => {
+          autoScrollIntervalId && clearInterval(autoScrollIntervalId);
+          autoScrollIntervalId = setInterval(() => {
+            resultsContainer.scrollTop++;
+          }, 50);
+        });
+
+      document
+        .querySelector("#btn-disable-auto-scroll")
+        .addEventListener("click", () => {
+          autoScrollIntervalId && clearInterval(autoScrollIntervalId);
+        });
+    </script>
+  </body>
+</html>
