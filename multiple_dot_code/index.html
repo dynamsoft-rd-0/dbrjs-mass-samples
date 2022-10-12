@@ -65,9 +65,8 @@
           let settings = await scanner.getRuntimeSettings();
           // settings.timeout = 2000;
           settings.expectedBarcodesCount = 1;
-          // settings.barcodeFormatIds = 0;
-          settings.barcodeFormatIds_2 =
-            Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_DOTCODE;
+          settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_NULL;
+          settings.barcodeFormatIds_2 = Dynamsoft.DBR.EnumBarcodeFormat_2.BF2_DOTCODE;
           // settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
           // settings.barcodeFormatIds_2 = 0;
           // for (let format in Dynamsoft.DBR.EnumBarcodeFormat_2) {
