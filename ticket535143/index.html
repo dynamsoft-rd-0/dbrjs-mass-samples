@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DBR sample</title>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.3.1/dist/dbr.js"></script>
-    <!-- <script src="./node_modules/keillion-dynamsoft-javascript-barcode/dist/dbr.js"></script> -->
   </head>
   <body>
     <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
@@ -19,7 +18,7 @@
        */
 
       Dynamsoft.DBR.BarcodeReader.license =
-        "t0068NQAAAFvv4ODM1XSFuYU4HdD71nZzwtWCGyvkMdTkAlc+0zP41hlvXOYi0SPDq/c38VHgQpUuVmK972Qq51XbzNGNaeA=";
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwOTc3MjEzLVRYbFhaV0pRY205cVgyUmljZyIsIm9yZ2FuaXphdGlvbklEIjoiMTAwOTc3MjEzIiwiY2hlY2tDb2RlIjotMTc1ODc2MTg3MX0=";
 
       /**
        * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
@@ -77,21 +76,21 @@
 
           // Set a square region, see:
           // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
-          const sideLen =
-            Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
-          let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
-          let precentH = Math.round(
-            (sideLen / scanner.video.videoHeight) * 100
-          );
-          settings = await scanner.getRuntimeSettings();
-          settings.region = {
-            regionLeft: (100 - precentW) / 2,
-            regionRight: (100 + precentW) / 2,
-            regionTop: (100 - precentH) / 2,
-            regionBottom: (100 + precentH) / 2,
-            regionMeasuredByPercentage: true,
-          };
-          await scanner.updateRuntimeSettings(settings);
+          // const sideLen =
+          //   Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
+          // let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
+          // let precentH = Math.round(
+          //   (sideLen / scanner.video.videoHeight) * 100
+          // );
+          // settings = await scanner.getRuntimeSettings();
+          // settings.region = {
+          //   regionLeft: (100 - precentW) / 2,
+          //   regionRight: (100 + precentW) / 2,
+          //   regionTop: (100 - precentH) / 2,
+          //   regionBottom: (100 + precentH) / 2,
+          //   regionMeasuredByPercentage: true,
+          // };
+          // await scanner.updateRuntimeSettings(settings);
         } catch (ex) {
           let errMsg;
           if (ex.message.includes("network connection error")) {
