@@ -125,6 +125,7 @@
             await scanner.updateRuntimeSettings("balance");
             settings = await scanner.getRuntimeSettings();
             settings.deblurLevel = 9;
+            settings.expectedBarcodesCount = 2;
             settings.deblurModes[0] =
               Dynamsoft.DBR.EnumDeblurMode.DM_DEEP_ANALYSIS;
             settings.localizationModes = [
