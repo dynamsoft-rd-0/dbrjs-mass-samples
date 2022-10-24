@@ -10,8 +10,9 @@
   <body>
     <label for="selelct-template">Scan Mode: </label>
     <select name="" id="selelct-template">
-      <option value="speed">speed</option>
-      <option value="coverage">coverage</option>
+      <option value="speed">Speed</option>
+      <option value="coverage">Coverage</option>
+      <option value="special">A setting for Trucks'nB</option>
     </select>
     <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
     <textarea
@@ -19,10 +20,10 @@
       style="width: 100%; height: 20vh; margin-top: 20px"
     ></textarea>
 
-    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       eruda.init();
-    </script>
+    </script> -->
 
     <script>
       /** LICENSE ALERT - README
@@ -30,7 +31,7 @@
        */
 
       Dynamsoft.DBR.BarcodeReader.license =
-        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwOTc3MjEzLVRYbFhaV0pRY205cVgyUmljZyIsIm9yZ2FuaXphdGlvbklEIjoiMTAwOTc3MjEzIiwiY2hlY2tDb2RlIjotMTc1ODc2MTg3MX0=";
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMzcxNzgyLVRYbFhaV0pRY205cVgyUmljZyIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMzcxNzgyIiwiY2hlY2tDb2RlIjo2NjY5NjI1MDF9";
 
       /**
        * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
@@ -106,25 +107,57 @@
 
       const updateTemplate = async (template) => {
         if (!scanner) return;
+        let settings;
         switch (template) {
           case "speed":
             await scanner.updateRuntimeSettings("speed");
+            settings = await scanner.getRuntimeSettings();
+            settings.deblurLevel = 9;
+            await scanner.updateRuntimeSettings(settings);
             break;
           case "coverage":
             await scanner.updateRuntimeSettings("coverage");
+            settings = await scanner.getRuntimeSettings();
+            settings.deblurLevel = 9;
+            await scanner.updateRuntimeSettings(settings);
+            break;
+          case "special":
+            await scanner.updateRuntimeSettings("balance");
+            settings = await scanner.getRuntimeSettings();
+            settings.deblurLevel = 9;
+            settings.deblurModes[0] =
+              Dynamsoft.DBR.EnumDeblurMode.DM_DEEP_ANALYSIS;
+            settings.localizationModes = [
+              Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY,
+              Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+            ];
+            settings.furtherModes.imagePreprocessingModes = [
+              Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GRAY_SMOOTH,
+              Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GENERAL,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+            ];
+            await scanner.updateRuntimeSettings(settings);
             break;
           default:
             break;
         }
-        const settings = await scanner.getRuntimeSettings();
-        settings.deblurLevel = 9;
-        await scanner.updateRuntimeSettings(settings);
       };
 
       document
         .querySelector("#selelct-template")
-        .addEventListener("change", async function() {
-          if(!scanner) return;
+        .addEventListener("change", async function () {
+          if (!scanner) return;
           updateTemplate(this.value);
         });
     </script>
