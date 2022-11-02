@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" style="width:100%;margin:0;padding:0;">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/omggif"></script>
+<script>
+    (async()=>{
+        // https://stackoverflow.com/questions/60691364/extract-frames-from-gif-using-a-light-browser-js-libary-like-omggif
+        const rep = await fetch('danceQR.gif');
+        const arrayBuffer = await rep.arrayBuffer();
+        const reader = new GifReader(new Uint8Array(arrayBuffer));
+        const info = reader.frameInfo(0);
+        const canvas = document.createElement('canvas');
+        canvas.width = info.width;
+        canvas.height = info.height;
+        const ctx2d = canvas.getContext('2d');
+        for(let i = 0, iMax = reader.numFrames() - 1; i < iMax; ++i){
+            const imageData = new ImageData(info.width, info.height);
+            reader.decodeAndBlitFrameRGBA(i, imageData.data);
+            for(let data = imageData.data, j = 0, jMax = data.byteLength; j < jMax; ++j){
+                if(data[j++]>50 || data[j++]>50 || data[j++]>50){
+                    data[j] = 0;
+                }
+            }
+            const _canvas = document.createElement('canvas');
+            _canvas.width = info.width;
+            _canvas.height = info.height;
+            _canvas.getContext('2d').putImageData(imageData, 0, 0);
+            //document.body.appendChild(_canvas);
+            ctx2d.drawImage(_canvas, 0, 0);
+        }
+        document.body.appendChild(canvas);
+    })();
+</script>
+</body>
+</html>
