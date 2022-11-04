@@ -8,6 +8,13 @@
     <!-- <script src="./node_modules/dynamsoft-javascript-barcode/dist/dbr.js"></script> -->
   </head>
   <body>
+    <label for="selelct-template">Template: </label>
+    <select name="" id="selelct-template">
+      <option value="template1">Template1</option>
+      <option value="template2">Template2</option>
+      <option value="template3">Template3</option>
+    </select>
+    <br />
     <button id="btn-torch">torch</button>
     <label for="" id="lable-torch"></label>
     <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
@@ -124,16 +131,102 @@
         }
       })();
 
-      btnTorch.addEventListener("click", async()=>{
-        if(!scanner) return;
-        if(torchOn) {
-          await scanner.turnOffTorch();
-          labelTorch.innerText = "off";
-          torchOn = false;
-        } else {
-          await scanner.turnOnTorch();
-          labelTorch.innerText = "on";
-          torchOn = true;
+      const updateTemplate = async (template) => {
+        if (!scanner) return;
+        let settings;
+        switch (template) {
+          case "template1":
+            await scanner.updateRuntimeSettings("speed");
+            settings = await scanner.getRuntimeSettings();
+            settings.deblurModes[0] =
+              Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
+            settings.deblurModes[1] =
+              Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
+            await scanner.updateRuntimeSettings(settings);
+            break;
+          case "template2":
+            await scanner.updateRuntimeSettings("speed");
+            settings = await scanner.getRuntimeSettings();
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
+            settings.barcodeFormatIds_2 = 0;
+            settings.expectedBarcodesCount = 1;
+            settings.minResultConfidence = 0;
+            settings.localizationModes = [
+              Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY, 
+              Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, 
+              0, 
+              0,
+              0, 
+              0, 
+              0, 
+              0
+            ];
+            settings.deblurLevel = 9;
+            settings.deblurModes[0] = Dynamsoft.DBR.EnumDeblurMode.DM_DIRECT_BINARIZATION;
+            settings.deblurModes[1] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
+            settings.deblurModes[2] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
+            settings.barcodeZoneMinDistanceToImageBorders = 0;
+            settings.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GENERAL;
+            settings.furtherModes.imagePreprocessingModes[1] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
+            settings.furtherModes.imagePreprocessingModes[2] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GRAY_SMOOTH;
+            settings.timeout = 1000000;
+            await scanner.updateRuntimeSettings(settings);
+            break;
+          case "template3":
+            await scanner.updateRuntimeSettings("speed");
+            settings = await scanner.getRuntimeSettings();
+            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
+            settings.barcodeFormatIds_2 = 0;
+            settings.expectedBarcodesCount = 1;
+            settings.minResultConfidence = 0;
+            settings.localizationModes = [
+              Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY, 
+              Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, 
+              0, 
+              0,
+              0, 
+              0, 
+              0, 
+              0
+            ];
+            settings.deblurLevel = 9;
+            settings.deblurModes[0] = Dynamsoft.DBR.EnumDeblurMode.DM_DIRECT_BINARIZATION;
+            settings.deblurModes[1] = Dynamsoft.DBR.EnumDeblurMode.DM_DEEP_ANALYSIS;
+            settings.deblurModes[2] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
+            settings.deblurModes[3] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
+            settings.barcodeZoneMinDistanceToImageBorders = 0;
+            settings.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GENERAL;
+            settings.furtherModes.imagePreprocessingModes[1] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
+            settings.furtherModes.imagePreprocessingModes[2] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GRAY_SMOOTH;
+            settings.timeout = 1000000;
+            await scanner.updateRuntimeSettings(settings);
+            break;
+          default:
+            break;
+        }
+      };
+
+      document
+        .querySelector("#selelct-template")
+        .addEventListener("change", async function () {
+          if (!scanner) return;
+          updateTemplate(this.value);
+        });
+
+      btnTorch.addEventListener("click", async () => {
+        if (!scanner) return;
+        try {
+          if (torchOn) {
+            await scanner.turnOffTorch();
+            labelTorch.innerText = "off";
+            torchOn = false;
+          } else {
+            await scanner.turnOnTorch();
+            labelTorch.innerText = "on";
+            torchOn = true;
+          }
+        } catch (e) {
+          labelTorch.innerText = "Not supported.";
         }
       });
     </script>
