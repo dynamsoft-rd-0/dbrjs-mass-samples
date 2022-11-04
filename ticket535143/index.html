@@ -8,6 +8,8 @@
     <!-- <script src="./node_modules/dynamsoft-javascript-barcode/dist/dbr.js"></script> -->
   </head>
   <body>
+    <button id="btn-torch">torch</button>
+    <label for="" id="lable-torch"></label>
     <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
     <textarea
       id="textarea-results"
@@ -35,7 +37,9 @@
        */
 
       const textareaResults = document.querySelector("#textarea-results");
-
+      const btnTorch = document.querySelector("#btn-torch");
+      const labelTorch = document.querySelector("#lable-torch");
+      let torchOn = false;
       let scanner;
 
       (async () => {
@@ -78,6 +82,7 @@
           await scanner.updateRuntimeSettings(settings);
 
           await scanner.setResolution(1920, 1080);
+          scanner.maxCvsSideLength = 4096;
 
           // const scanSettings = await scanner.getScanSettings();
           // scanSettings.whenToPlaySoundforSuccessfulRead = "frame";
@@ -118,6 +123,19 @@
           alert(errMsg);
         }
       })();
+
+      btnTorch.addEventListener("click", async()=>{
+        if(!scanner) return;
+        if(torchOn) {
+          await scanner.turnOffTorch();
+          labelTorch.innerText = "off";
+          torchOn = false;
+        } else {
+          await scanner.turnOnTorch();
+          labelTorch.innerText = "on";
+          torchOn = true;
+        }
+      });
     </script>
   </body>
 </html>
