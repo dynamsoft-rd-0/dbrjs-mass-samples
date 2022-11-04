@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" style="background:green">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/omggif"></script>
+<script>
+    (async()=>{
+        // https://stackoverflow.com/questions/60691364/extract-frames-from-gif-using-a-light-browser-js-libary-like-omggif
+        const rep = await fetch('danceQR.gif');
+        const arrayBuffer = await rep.arrayBuffer();
+        const reader = new GifReader(new Uint8Array(arrayBuffer));
+        const info = reader.frameInfo(0);
+        const canvas = document.createElement('canvas');
+        canvas.width = info.width;
+        canvas.height = info.height;
+        const ctx2d = canvas.getContext('2d');
+        ctx2d.fillStyle = 'white';
+        ctx2d.fillRect(0,0,info.width,info.height);
+        const imageData = ctx2d.getImageData(0,0,info.width,info.height);
+        const data = imageData.data;
+        for(let i = 0, iMax = reader.numFrames() - 1, arr = new Uint8Array(info.width * info.height * 4); i < iMax; ++i){
+            reader.decodeAndBlitFrameRGBA(i, arr);
+            for(let j = 0, jMax = data.byteLength; j < jMax; j = j+4){
+                if(arr[j] < 50 && arr[j+1] < 50 && arr[j+2] < 50 && 255 === arr[j+3]){
+                    data[j] = arr[j];
+                    data[j+1] = arr[j+1];
+                    data[j+2] = arr[j+2];
+                }
+            }
+        }
+        ctx2d.putImageData(imageData,0,0);
+        document.body.appendChild(canvas);
+    })();
+</script>
+</body>
+</html>
