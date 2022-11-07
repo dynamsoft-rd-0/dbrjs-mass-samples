@@ -83,10 +83,9 @@
             regionBottom: 75,
             regionMeasuredByPercentage: true,
           };
-          settings.deblurModes[0] =
-            Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
-          settings.deblurModes[1] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
           await scanner.updateRuntimeSettings(settings);
+
+          await this.updateTemplate('template1');
 
           await scanner.setResolution(1920, 1080);
           scanner.maxCvsSideLength = 4096;
