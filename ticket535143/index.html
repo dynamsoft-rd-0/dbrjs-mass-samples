@@ -85,7 +85,7 @@
           };
           await scanner.updateRuntimeSettings(settings);
 
-          await updateTemplate('template1');
+          await updateTemplate("template1");
 
           await scanner.setResolution(1920, 1080);
           scanner.maxCvsSideLength = 4096;
@@ -146,59 +146,152 @@
           case "template2":
             await scanner.updateRuntimeSettings("speed");
             settings = await scanner.getRuntimeSettings();
-            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
-            settings.barcodeFormatIds_2 = 0;
-            settings.expectedBarcodesCount = 1;
-            settings.minResultConfidence = 0;
-            settings.localizationModes = [
-              Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY, 
-              Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, 
-              0, 
-              0,
-              0, 
-              0, 
-              0, 
-              0
-            ];
             settings.deblurLevel = 9;
-            settings.deblurModes[0] = Dynamsoft.DBR.EnumDeblurMode.DM_DIRECT_BINARIZATION;
-            settings.deblurModes[1] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
-            settings.deblurModes[2] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
             settings.barcodeZoneMinDistanceToImageBorders = 0;
-            settings.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GENERAL;
-            settings.furtherModes.imagePreprocessingModes[1] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
-            settings.furtherModes.imagePreprocessingModes[2] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GRAY_SMOOTH;
-            settings.timeout = 1000000;
+            settings.localizationModes = [2, 16, 4, 8, 0, 0, 0, 0];
             await scanner.updateRuntimeSettings(settings);
+
+            await scanner.initRuntimeSettingsWithString(`{ 
+	"FormatSpecificationArray" : [{
+		"BarcodeFormatIds": [
+		  "BF_ALL"
+		],
+		"MinResultConfidence" : 0,
+		"Name" : "f1"
+	
+	}],  
+  "ImageParameter": {    
+    "BarcodeFormatIds": [
+      "BF_ALL"
+    ],
+    "BarcodeFormatIds_2": [
+      "BF2_NULL"
+    ],
+    "DeblurLevel": 9,
+    "DeblurModes": [{
+		"Mode": "DM_DIRECT_BINARIZATION"
+	},{
+		"Mode": "DM_SHARPENING_SMOOTHING"
+	},{
+		"Mode": "DM_SHARPENING"
+	}],
+    "Description": "",
+    "ExpectedBarcodesCount": 1,
+    "LocalizationModes": [
+	 {
+            "IsOneDStacked" : 0,
+            "LibraryFileName" : "",
+            "LibraryParameters" : "",
+            "Mode" : "LM_SCAN_DIRECTLY",
+            "ScanDirection" : 0,
+            "ScanStride" : 0
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "LM_CONNECTED_BLOCKS"
+      }
+    ],
+	"FormatSpecificationNameArray" : ["f1"],
+	"ImagePreprocessingModes": [
+	  {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_GENERAL"
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_SHARPEN_SMOOTH"
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_GRAY_SMOOTH"
+      }  
+    ],
+    "MaxAlgorithmThreadCount": 1,
+    "Name": "Settings",
+    "Timeout": 1000000
+  },
+  "Version": "3.0"
+}`);
             break;
           case "template3":
             await scanner.updateRuntimeSettings("speed");
             settings = await scanner.getRuntimeSettings();
-            settings.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_ALL;
-            settings.barcodeFormatIds_2 = 0;
-            settings.expectedBarcodesCount = 1;
-            settings.minResultConfidence = 0;
-            settings.localizationModes = [
-              Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY, 
-              Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, 
-              0, 
-              0,
-              0, 
-              0, 
-              0, 
-              0
-            ];
             settings.deblurLevel = 9;
-            settings.deblurModes[0] = Dynamsoft.DBR.EnumDeblurMode.DM_DIRECT_BINARIZATION;
-            settings.deblurModes[1] = Dynamsoft.DBR.EnumDeblurMode.DM_DEEP_ANALYSIS;
-            settings.deblurModes[2] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING_SMOOTHING;
-            settings.deblurModes[3] = Dynamsoft.DBR.EnumDeblurMode.DM_SHARPENING;
             settings.barcodeZoneMinDistanceToImageBorders = 0;
-            settings.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GENERAL;
-            settings.furtherModes.imagePreprocessingModes[1] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
-            settings.furtherModes.imagePreprocessingModes[2] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_GRAY_SMOOTH;
-            settings.timeout = 1000000;
+            settings.localizationModes = [2, 16, 4, 8, 0, 0, 0, 0];
             await scanner.updateRuntimeSettings(settings);
+
+            await scanner.initRuntimeSettingsWithString(`{ 
+	"FormatSpecificationArray" : [{
+		"BarcodeFormatIds": [
+		  "BF_ALL"
+		],
+		"MinResultConfidence" : 0,
+		"Name" : "f1"
+	
+	}],  
+  "ImageParameter": {    
+    "BarcodeFormatIds": [
+      "BF_ALL"
+    ],
+    "BarcodeFormatIds_2": [
+      "BF2_NULL"
+    ],
+    "DeblurLevel": 9,
+    "DeblurModes": [{
+		"Mode": "DM_DIRECT_BINARIZATION"
+	},{
+		"Mode": "DM_DEEP_ANALYSIS"
+	},{
+		"Mode": "DM_SHARPENING_SMOOTHING"
+	},{
+		"Mode": "DM_SHARPENING"
+	}],
+    "Description": "",
+    "ExpectedBarcodesCount": 1,
+    "LocalizationModes": [
+	 {
+            "IsOneDStacked" : 0,
+            "LibraryFileName" : "",
+            "LibraryParameters" : "",
+            "Mode" : "LM_SCAN_DIRECTLY",
+            "ScanDirection" : 0,
+            "ScanStride" : 0
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "LM_CONNECTED_BLOCKS"
+      }
+    ],
+	"FormatSpecificationNameArray" : ["f1"],
+	"ImagePreprocessingModes": [
+	  {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_GENERAL"
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_SHARPEN_SMOOTH"
+      },
+      {
+        "LibraryFileName": "",
+        "LibraryParameters": "",
+        "Mode": "IPM_GRAY_SMOOTH"
+      }  
+    ],
+    "MaxAlgorithmThreadCount": 1,
+    "Name": "Settings",
+    "Timeout": 1000000
+  },
+  "Version": "3.0"
+}`);
             break;
           default:
             break;
