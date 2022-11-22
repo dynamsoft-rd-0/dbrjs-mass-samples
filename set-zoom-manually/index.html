@@ -148,6 +148,21 @@
         // await scanner.setResolution(2560, 1920);
         await scanner.updateRuntimeSettings(selTemplate.value);
 
+        let settings = await scanner.getRuntimeSettings();
+        settings.furtherModes.grayscaleTransformationModes = [
+        selInvertedBarcodes.value === "enable"
+            ? Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_INVERTED
+            : Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_ORIGINAL,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+        ];
+        await scanner.updateRuntimeSettings(settings);
+
         // Update scan setting to reduce memory usage.
         let scanSettings = await scanner.getScanSettings();
         scanSettings.captureAndDecodeInParallel = false;
@@ -166,7 +181,7 @@
           Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
         let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
         let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
-        let settings = await scanner.getRuntimeSettings();
+        settings = await scanner.getRuntimeSettings();
         settings.region = {
           regionLeft: (100 - precentW) / 2,
           regionRight: (100 + precentW) / 2,
