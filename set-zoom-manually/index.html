@@ -19,7 +19,7 @@
   <body>
     <div>
       <label for="sel-template">Template: </label>
-      <select id="sel-template">
+      <select id="sel-template" disabled>
         <option value="distance">distance</option>
         <option value="single">single</option>
         <option value="speed">speed</option>
@@ -30,7 +30,7 @@
     </div>
     <div>
       <label for="sel-barcode-format">Barcode format: </label>
-      <select id="sel-barcode-format">
+      <select id="sel-barcode-format" disabled>
         <option value="data_matrix">data matrix</option>
         <option value="all">all</option>
         <option value="1d">1d</option>
@@ -39,11 +39,12 @@
     </div>
     <div>
       <label for="sel-inverted-barcodes">Scan inverted barcodes: </label>
-      <select id="sel-inverted-barcodes">
+      <select id="sel-inverted-barcodes" disabled>
         <option value="enable">enable</option>
         <option value="disable" selected="selected">disable</option>
       </select>
     </div>
+    <div id="div-loading">Loading settings...</div>
     <br />
     <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
     <div style="width: 100%;">
@@ -80,6 +81,7 @@
       const iptZoom = document.querySelector("#ipt-zoom");
       const btnTorch = document.querySelector("#btn-torch");
       const textareaResults = document.querySelector("#textarea-results");
+      const divLoading = document.querySelector("#div-loading");
 
       const step = 1;
       let initialScale = 1;
@@ -89,6 +91,20 @@
         btnTorch.setAttribute("disabled", "true");
         alert("Torch unsupported.");
       }
+
+      const enableSelect = ()=>{
+        selFormat.removeAttribute("disabled");
+        selTemplate.removeAttribute("disabled");
+        selInvertedBarcodes.removeAttribute("disabled");
+        divLoading.style.display = "none";
+      };
+      
+      const disableSelect = ()=>{
+        selFormat.setAttribute("disabled", "disabled");
+        selTemplate.setAttribute("disabled", "disabled");
+        selInvertedBarcodes.setAttribute("disabled", "disabled");
+        divLoading.style.display = "";
+      };
 
       // Change runtime settings about code format in barcode scanner.
       const changeCodeFormat = async (format) => {
@@ -132,7 +148,7 @@
         }
         await scanner.updateRuntimeSettings(settings);
       };
-
+      
       let scanner;
       (async () => {
         scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
@@ -148,21 +164,6 @@
         // await scanner.setResolution(2560, 1920);
         await scanner.updateRuntimeSettings(selTemplate.value);
 
-        let settings = await scanner.getRuntimeSettings();
-        settings.furtherModes.grayscaleTransformationModes = [
-        selInvertedBarcodes.value === "enable"
-            ? Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_INVERTED
-            : Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_ORIGINAL,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-        ];
-        await scanner.updateRuntimeSettings(settings);
-
         // Update scan setting to reduce memory usage.
         let scanSettings = await scanner.getScanSettings();
         scanSettings.captureAndDecodeInParallel = false;
@@ -172,7 +173,7 @@
         await scanner.open();
 
         // Set initial scale.
-        scanner.setZoom(initialScale);
+        await scanner.setZoom(initialScale);
         iptZoom.value = scanner.getZoom();
 
         // Set a square region, see:
@@ -181,7 +182,7 @@
           Math.min(scanner.video.videoWidth, scanner.video.videoHeight) * 0.8;
         let precentW = Math.round((sideLen / scanner.video.videoWidth) * 100);
         let precentH = Math.round((sideLen / scanner.video.videoHeight) * 100);
-        settings = await scanner.getRuntimeSettings();
+        const settings = await scanner.getRuntimeSettings();
         settings.region = {
           regionLeft: (100 - precentW) / 2,
           regionRight: (100 + precentW) / 2,
@@ -203,22 +204,29 @@
             textareaResults.value += `${format}: ${text}\n`;
           }
         };
+
+        enableSelect();
       })();
 
       selTemplate.addEventListener("change", async () => {
         if (!scanner) return;
+        disableSelect();
         await scanner.updateRuntimeSettings(selTemplate.value);
         await changeCodeFormat(selFormat.value);
+        enableSelect();
       });
 
       selFormat.addEventListener("change", async () => {
         if (!scanner) return;
+        disableSelect();
         await scanner.updateRuntimeSettings(selTemplate.value);
         await changeCodeFormat(selFormat.value);
+        enableSelect();
       });
 
       selInvertedBarcodes.addEventListener("change", async () => {
         if (!scanner) return;
+        disableSelect();
         const settings = await scanner.getRuntimeSettings();
         settings.furtherModes.grayscaleTransformationModes = [
         selInvertedBarcodes.value === "enable"
@@ -233,11 +241,12 @@
           0,
         ];
         await scanner.updateRuntimeSettings(settings);
+        enableSelect();
       });
 
-      iptZoom.addEventListener("change", () => {
+      iptZoom.addEventListener("change", async () => {
         if (!scanner) return;
-        scanner.setZoom(parseFloat(iptZoom.value));
+        await scanner.setZoom(parseFloat(iptZoom.value));
       });
 
       document
@@ -246,7 +255,7 @@
           if (!scanner) return;
           let value = scanner.getZoom() - step;
           value = value < 1 ? 1 : value;
-          scanner.setZoom(value);
+          await scanner.setZoom(value);
           iptZoom.value = scanner.getZoom();
         });
 
@@ -256,7 +265,7 @@
           if (!scanner) return;
           let value = scanner.getZoom() + step;
           value = value > 10 ? 10 : value;
-          scanner.setZoom(value);
+          await scanner.setZoom(value);
           iptZoom.value = scanner.getZoom();
         });
 
