@@ -37,6 +37,13 @@
         <option value="2d">2d</option>
       </select>
     </div>
+    <div>
+      <label for="sel-inverted-barcodes">Scan inverted barcodes: </label>
+      <select id="sel-inverted-barcodes">
+        <option value="enable">enable</option>
+        <option value="disable" selected="selected">disable</option>
+      </select>
+    </div>
     <br />
     <div id="div-ui-container" style="width: 100%; height: 70vh"></div>
     <div style="width: 100%;">
@@ -69,6 +76,7 @@
 
       const selFormat = document.querySelector("#sel-barcode-format");
       const selTemplate = document.querySelector("#sel-template");
+      const selInvertedBarcodes = document.querySelector("#sel-inverted-barcodes");
       const iptZoom = document.querySelector("#ipt-zoom");
       const btnTorch = document.querySelector("#btn-torch");
       const textareaResults = document.querySelector("#textarea-results");
@@ -192,6 +200,24 @@
         if (!scanner) return;
         await scanner.updateRuntimeSettings(selTemplate.value);
         await changeCodeFormat(selFormat.value);
+      });
+
+      selInvertedBarcodes.addEventListener("change", async () => {
+        if (!scanner) return;
+        const settings = await scanner.getRuntimeSettings();
+        settings.furtherModes.grayscaleTransformationModes = [
+        selInvertedBarcodes.value === "enable"
+            ? Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_INVERTED
+            : Dynamsoft.DBR.EnumGrayscaleTransformationMode.GTM_ORIGINAL,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+        ];
+        await scanner.updateRuntimeSettings(settings);
       });
 
       iptZoom.addEventListener("change", () => {
