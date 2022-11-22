@@ -13,6 +13,7 @@
       <option value="template1">Template1</option>
       <option value="template2">Template2</option>
       <option value="template3">Template3</option>
+      <option value="template4">Template4</option>
     </select>
     <br />
     <button id="btn-torch">torch</button>
@@ -292,6 +293,66 @@
   },
   "Version": "3.0"
 }`);
+            break;
+          case "template4":
+            await scanner.updateRuntimeSettings("speed");
+            settings = await scanner.getRuntimeSettings();
+            settings.deblurLevel = 9;
+            settings.barcodeZoneMinDistanceToImageBorders = 0;
+            settings.localizationModes = [2, 16, 4, 8, 0, 0, 0, 0];
+            await scanner.updateRuntimeSettings(settings);
+
+            await scanner.initRuntimeSettingsWithString(`{ 
+	"FormatSpecificationArray" : [{
+	"BarcodeFormatIds": [
+	"BF_ALL"
+	    ],
+	"MinResultConfidence" : 10,
+	"Name" : "f1"
+	  }],  
+	"ImageParameter": {    
+	"BarcodeFormatIds": [
+	"BF_ONED",
+	"BF_QR_CODE"
+	    ],
+	"BarcodeFormatIds_2": [
+	"BF2_NULL"
+	    ],
+	"DeblurLevel": 9,
+	"DeblurModes": [
+	      {
+	"Mode": "DM_DEEP_ANALYSIS"
+	    },{
+	"Mode": "DM_SHARPENING_SMOOTHING"
+	    },{
+	"Mode": "DM_SHARPENING"
+	    }],
+	"Description": "",
+	"ExpectedBarcodesCount": 1,
+	"LocalizationModes": [
+	      {
+	"LibraryFileName": "",
+	"LibraryParameters": "",
+	"Mode": "LM_LINES"
+	      },
+	      {
+	"LibraryFileName": "",
+	"LibraryParameters": "",
+	"Mode": "LM_CONNECTED_BLOCKS"
+	      }
+	    ],
+	"FormatSpecificationNameArray" : ["f1"],
+	"ImagePreprocessingModes": [
+	    {
+	"Mode": "IPM_SKIP"
+	    }
+	    ],
+	"MaxAlgorithmThreadCount": 4,
+	"Name": "Settings",
+	"Timeout": 2000
+	  },
+	"Version": "3.0"
+	}`);
             break;
           default:
             break;
