@@ -7,8 +7,8 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>Set zoom manually</title>
-    <!-- Note: it is a Development version, not Production version. -->
-    <script src="https://cdn.jsdelivr.net/npm/keillion-dynamsoft-javascript-barcode@0.20220901170527.0/dist/dbr.js"></script>
+    <!-- Note: it is not Production version. -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.4.0-iv-202211222141/dist/dbr.js"></script>
 
     <!-- It is a plugin which can show console in mobile browser. -->
     <!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
@@ -196,7 +196,7 @@
 
         // Set initial scale.
         await scanner.setZoom(initialScale);
-        iptZoom.value = scanner.getZoom();
+        iptZoom.value = scanner.dce.getZoomSettings().factor;
 
         // Set a square region, see:
         // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
@@ -242,20 +242,20 @@
         .querySelector("#btn-zoom-out")
         .addEventListener("click", async () => {
           if (!scanner) return;
-          let value = scanner.getZoom() - step;
+          let value = scanner.dce.getZoomSettings().factor - step;
           value = value < 1 ? 1 : value;
           await scanner.setZoom(value);
-          iptZoom.value = scanner.getZoom();
+          iptZoom.value = scanner.dce.getZoomSettings().factor;
         });
 
       document
         .querySelector("#btn-zoom-in")
         .addEventListener("click", async () => {
           if (!scanner) return;
-          let value = scanner.getZoom() + step;
+          let value = scanner.dce.getZoomSettings().factor + step;
           value = value > 10 ? 10 : value;
           await scanner.setZoom(value);
-          iptZoom.value = scanner.getZoom();
+          iptZoom.value = scanner.dce.getZoomSettings().factor;
         });
 
       document
