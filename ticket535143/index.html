@@ -16,6 +16,16 @@
       <option value="template4">Template4</option>
     </select>
     <br />
+    <label for="ipt-images">decode images: </label>
+    <input
+      type="file"
+      name=""
+      id="ipt-images"
+      accept=".jpg,.jpeg,.icon,.gif,.svg,.webp,.png,.bmp"
+      multiple="true"
+      disabled
+    />
+    <br>
     <button id="btn-torch">torch</button>
     <label for="" id="lable-torch"></label>
     <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
@@ -46,6 +56,7 @@
 
       const textareaResults = document.querySelector("#textarea-results");
       const btnTorch = document.querySelector("#btn-torch");
+      const iptImages = document.querySelector("#ipt-images");
       const labelTorch = document.querySelector("#lable-torch");
       let torchOn = false;
       let scanner;
@@ -100,6 +111,8 @@
            * After that, the library starts to scan the frame images continuously.
            */
           await scanner.open();
+
+          iptImages.removeAttribute("disabled");
 
           // Set a square region, see:
           // https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/advanced-usage.html?ver=latest#always-draw-a-square-as-the-scan-region
@@ -302,7 +315,7 @@
             settings.localizationModes = [2, 16, 4, 8, 0, 0, 0, 0];
             await scanner.updateRuntimeSettings(settings);
 
-            await scanner.initRuntimeSettingsWithString(`{ 
+            await scanner.initRuntimeSettingsWithString(`{
 	"FormatSpecificationArray" : [{
 	"BarcodeFormatIds": [
 	"BF_ALL"
@@ -365,6 +378,42 @@
           if (!scanner) return;
           updateTemplate(this.value);
         });
+
+      iptImages.addEventListener("change", async () => {
+        if (!scanner) return;
+        if (!iptImages.files.length) return;
+        textareaResults.value = "";
+        const startTimeStamp = Date.now();
+        let success = 0,
+          fail = 0;
+        for (let file of iptImages.files) {
+          const results = await scanner.decode(file);
+          if (results.length) {
+            success++;
+            // console.log("succeed: ");
+            for (let result of results) {
+              const format = result.barcodeFormat
+                ? result.barcodeFormatString
+                : result.barcodeFormatString_2;
+              const text = result.barcodeText;
+              textareaResults.value += `${format}: ${text}\n`;
+            }
+            console.log(results);
+          } else {
+            fail++;
+            textareaResults.value += `${file.name} failed\n`;
+            console.log(`${file.name} failed.`);
+          }
+        }
+        const timeCost = Date.now() - startTimeStamp;
+        textareaResults.value += `time cost: ${timeCost}\n`;
+        textareaResults.value += `succeed: ${success}\n`;
+        textareaResults.value += `failed: ${fail}`;
+        console.log("time cost: " + timeCost);
+        console.log(`succeed: ${success}`);
+        console.log(`failed: ${fail}`);
+        iptImages.value = "";
+      });
 
       btnTorch.addEventListener("click", async () => {
         if (!scanner) return;
