@@ -1,3 +1,5 @@
+The usage of dbrjs on vito sample is not much different from that of [another vue3 sample](https://github.com/Dynamsoft/barcode-reader-javascript-samples/tree/v9.6.0/1.hello-world/6.read-video-vue3).
+
 # Vue 3 + Typescript + Vite
 
 This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.

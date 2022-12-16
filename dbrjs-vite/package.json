@@ -7,7 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "dynamsoft-javascript-barcode": "9.6.0",
+    "dynamsoft-javascript-barcode": "9.6.1-iv-202212150202",
     "vue": "^3.2.16"
   },
   "devDependencies": {
