@@ -27,7 +27,11 @@
             rs.region.regionBottom = 65;
             rs.region.regionMeasuredByPercentage = 1;
             await scanner.updateRuntimeSettings(rs);
-            scanner.resultHighlightingTimeout = 100;
+            let ss = await scanner.getScanSettings();
+            ss.whenToPlaySoundforSuccessfulRead = 'frame';
+            ss.oneDRememberFrameCount = 1;
+            await scanner.updateScanSettings(ss);
+            if(null != scanner.resultHighlightingTimeout){scanner.resultHighlightingTimeout = 100;}
             scanner.onFrameRead = results => {
                 if (results.length > 0) console.log(results);
             };
