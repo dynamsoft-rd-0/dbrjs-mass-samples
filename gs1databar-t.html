@@ -16,12 +16,12 @@
             let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
             let rs = await scanner.getRuntimeSettings();
             // gs1databars do not contains connected blocks, so we need lines to detect
-            //rs.localizationModes = [Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, Dynamsoft.DBR.EnumLocalizationMode.LM_LINES, 0,0,0,0,0,0];
-            rs.region.regionLeft = 5;
-            rs.region.regionTop = 30;
-            rs.region.regionRight = 95;
-            rs.region.regionBottom = 70;
-            rs.region.regionMeasuredByPercentage = 1;
+            rs.localizationModes = [Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, Dynamsoft.DBR.EnumLocalizationMode.LM_LINES, 0,0,0,0,0,0];
+            // rs.region.regionLeft = 5;
+            // rs.region.regionTop = 30;
+            // rs.region.regionRight = 95;
+            // rs.region.regionBottom = 70;
+            // rs.region.regionMeasuredByPercentage = 1;
             await scanner.updateRuntimeSettings(rs);
             scanner.onFrameRead = results => {
                 if (results.length > 0) console.log(results);
