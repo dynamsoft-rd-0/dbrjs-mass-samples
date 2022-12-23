@@ -22,9 +22,9 @@
             // gs1databars do not contains connected blocks, so we need lines to detect
             rs.localizationModes = [Dynamsoft.DBR.EnumLocalizationMode.LM_CONNECTED_BLOCKS, Dynamsoft.DBR.EnumLocalizationMode.LM_SCAN_DIRECTLY, Dynamsoft.DBR.EnumLocalizationMode.LM_LINES, 0,0,0,0,0];
             rs.region.regionLeft = 5;
-            rs.region.regionTop = 30;
+            rs.region.regionTop = 35;
             rs.region.regionRight = 95;
-            rs.region.regionBottom = 70;
+            rs.region.regionBottom = 65;
             rs.region.regionMeasuredByPercentage = 1;
             await scanner.updateRuntimeSettings(rs);
             scanner.resultHighlightingTimeout = 100;
