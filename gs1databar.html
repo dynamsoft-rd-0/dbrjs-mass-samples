@@ -29,7 +29,7 @@
             await scanner.updateRuntimeSettings(rs);
             let ss = await scanner.getScanSettings();
             ss.whenToPlaySoundforSuccessfulRead = 'frame';
-            ss.oneDRememberFrameCount = 1;
+            ss.oneDRememberFrameCount = 1; // If there is a wrong decoding, it is recommended to comment out this line.
             await scanner.updateScanSettings(ss);
             if(null != scanner.resultHighlightingTimeout){scanner.resultHighlightingTimeout = 100;}
             scanner.onFrameRead = results => {
