@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+    <button id='btn-single-frame-mode' style="z-index:1;font-size:24px;background-color:white;color:black;position:relative;margin-left:50%;transform:translateX(-50%);">Not Focus? Click Me</button>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.2/dist/dbr.js"></script>
+    <script>
+        // Specifies a license, you can visit https://www.dynamsoft.com/customer/license/trialLicense?ver=9.6.2&utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
+        Dynamsoft.DBR.BarcodeScanner.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
+        // Initializes and uses the SDK
+        (async () => {
+            self.scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            scanner.onFrameRead = results => {
+                if (results.length > 0) console.log(results);
+            };
+            scanner.onUniqueRead = (txt, result) => {
+                alert(txt);
+            };
+            await scanner.show();
+        })();
+
+        document.getElementById('btn-single-frame-mode').addEventListener('click',async()=>{
+            await scanner.close();
+            scanner.singleFrameMode = true;
+            await scanner.show();
+        });
+    </script>
+</body>
+
+</html>
