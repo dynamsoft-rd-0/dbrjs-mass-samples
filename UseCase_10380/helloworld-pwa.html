@@ -64,15 +64,15 @@
             console.log(txt);
           };
 
-          let settings = await scanner.getRuntimeSettings();
-          settings.region = {
-            regionLeft: 20,
-            regionTop: 20,
-            regionRight: 75,
-            regionBottom: 75,
-            regionMeasuredByPercentage: 1,
-          };
-          await scanner.updateRuntimeSettings(settings);
+          // let settings = await scanner.getRuntimeSettings();
+          // settings.region = {
+          //   regionLeft: 20,
+          //   regionTop: 20,
+          //   regionRight: 75,
+          //   regionBottom: 75,
+          //   regionMeasuredByPercentage: 1,
+          // };
+          // await scanner.updateRuntimeSettings(settings);
 
           const container = document.querySelector("#container");
           await scanner.setUIElement(container);
