@@ -50,6 +50,7 @@
         try {
           // Pass inner parameters when creating instance.
           scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance(null, {useHowler: false});
+          
           // scanner.ifShowScanRegionMask = false;
 
           scanner.onFrameRead = (results) => {
