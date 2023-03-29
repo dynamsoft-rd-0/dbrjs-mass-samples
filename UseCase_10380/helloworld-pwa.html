@@ -55,12 +55,13 @@
           scanner.onFrameRead = (results) => {
             console.log("Barcodes on one frame:");
             for (let result of results) {
+              console.log(result);
               const format = result.barcodeFormatString;
               console.log(format + ": " + result.barcodeText);
             }
           };
           scanner.onUniqueRead = (txt, result) => {
-            console.log(format + ": " + txt);
+            console.log(txt);
           };
 
           let settings = await scanner.getRuntimeSettings();
