@@ -47,17 +47,14 @@
            * There can be multiple barcodes on one image.
            */
           scanner.onFrameRead = (results) => {
-            if(results.length) console.log(results);
+            if (results.length) console.log(results);
           };
-
-          /**
-           * 'open()' opens the camera.
-           * After that, the library starts to scan the frame images continuously.
-           */
-          await scanner.open();
 
           // Detect iPhone 14 Pro/iPhone 14 Pro Max and change to ultra wide camera.
           {
+            const environment =
+              await Dynamsoft.DBR.BarcodeReader.detectEnvironment();
+            console.log(environment.OS);
             const getDeviceResolution = () => {
               const width = window.devicePixelRatio * window.screen.width;
               const height = window.devicePixelRatio * window.screen.height;
@@ -66,10 +63,11 @@
             const deviceResolution = getDeviceResolution();
             console.log(JSON.stringify(deviceResolution));
             if (
-              (deviceResolution.width == 1179 &&
+              environment.OS === "iPhone" &&
+              ((deviceResolution.width == 1179 &&
                 deviceResolution.height == 2556) ||
-              (deviceResolution.width == 1290 &&
-                deviceResolution.height == 2796)
+                (deviceResolution.width == 1290 &&
+                  deviceResolution.height == 2796))
             ) {
               const rearCameraKeywords = [
                 "back",
@@ -169,6 +167,12 @@
               }
             }
           }
+
+          /**
+           * 'open()' opens the camera.
+           * After that, the library starts to scan the frame images continuously.
+           */
+          await scanner.open();
         } catch (ex) {
           let errMsg;
           if (ex.message.includes("network connection error")) {
