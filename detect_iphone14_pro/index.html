@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.20/dist/dbr.js"></script>
+  </head>
+  <body>
+    <div id="div-ui-container" style="width: 100%; height: 80vh"></div>
+
+    <!-- 'Eruda' help show console in phone -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda/eruda.min.js"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <script>
+      /** LICENSE ALERT - README
+       * To use the library, you need to first specify a license key using the API "license" as shown below.
+       */
+
+      Dynamsoft.DBR.BarcodeReader.license =
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwNjk3OTA1LTEwMDcyMzMzNiIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL2Nvbm5hcy5keW5hbXNvZnQuY29tLyIsIm9yZ2FuaXphdGlvbklEIjoiMTAwNjk3OTA1Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Nvbm5hcy5keW5hbXNvZnQuY29tLyIsImNoZWNrQ29kZSI6LTk4MTA4MzMzOH0=";
+
+      /**
+       * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
+       * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+       * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.3.1&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+       * LICENSE ALERT - THE END
+       */
+
+      let scanner;
+
+      (async () => {
+        try {
+          scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+
+          // Get ui by 'getUIElement()' and append it to DOM.
+          document
+            .querySelector("#div-ui-container")
+            .append(scanner.getUIElement());
+
+          /**
+           * 'onFrameRead' is triggered after the library finishes reading a frame image.
+           * There can be multiple barcodes on one image.
+           */
+          scanner.onFrameRead = (results) => {
+            if(results.length) console.log(results);
+          };
+
+          /**
+           * 'open()' opens the camera.
+           * After that, the library starts to scan the frame images continuously.
+           */
+          await scanner.open();
+
+          // Detect iPhone 14 Pro/iPhone 14 Pro Max and change to ultra wide camera.
+          {
+            const getDeviceResolution = () => {
+              const width = window.devicePixelRatio * window.screen.width;
+              const height = window.devicePixelRatio * window.screen.height;
+              return { width, height };
+            };
+            const deviceResolution = getDeviceResolution();
+            console.log(JSON.stringify(deviceResolution));
+            if (
+              (deviceResolution.width == 1179 &&
+                deviceResolution.height == 2556) ||
+              (deviceResolution.width == 1290 &&
+                deviceResolution.height == 2796)
+            ) {
+              const rearCameraKeywords = [
+                "back",
+                "後置",
+                "后置",
+                "背面",
+                "خلفية",
+                "Задна",
+                "posterior",
+                "zadní",
+                "bagside",
+                "rück",
+                "Πίσω",
+                "trasera",
+                "taka",
+                "arrière",
+                "אחורית",
+                "बैक",
+                "stražnja",
+                "Hátsó",
+                "belakang",
+                "posteriore",
+                "aртқы",
+                "후면",
+                "bak",
+                "achterzijde",
+                "tylny",
+                "traseira",
+                "spate",
+                "Задняя",
+                "задней",
+                "zadná",
+                "baksidan",
+                "bakre",
+                "านหลัง",
+                "arka",
+                "sau",
+              ];
+              const ultraWideCameraKeywords = [
+                "ultra wide",
+                "超廣角",
+                "超广角",
+                "超広角",
+                "عريضة جدًا",
+                "свръхширокоъгълна",
+                "ultra gran angular",
+                "ultra širokoúhlý",
+                "ultravidvinkel",
+                "ultra-weitwinkelkamera",
+                "υπερευρεία",
+                "ultralaajakulmainen",
+                "très grand angle",
+                "ultra grand angle",
+                "אולטרה רחבה",
+                "अल्ट्रा वाइड",
+                "ultra široka",
+                "ultraszéles látószögű",
+                "ultra lebar",
+                "ultra-grandangolo",
+                "ультра кең бұрышты",
+                "울트라 와이드",
+                "ultralebar",
+                "ultrabrede",
+                "ultraszerokokątny",
+                "ultra-angular",
+                "ultra grande angular",
+                "ultra‑superangular",
+                "сверхширокоугольная",
+                "ultraširokouhlá",
+                "ultravidvinkelkamera",
+                "มุมกว้างอัลตร้า",
+                "ultra geniş",
+                "надширококутна",
+                "cực rộng",
+              ];
+              const cameras = await scanner.getAllCameras();
+              let backUltraWideCamera;
+              for (let camera of cameras) {
+                const label = camera.label.toLowerCase();
+                if (
+                  rearCameraKeywords.some((keyword) =>
+                    label.includes(keyword)
+                  ) &&
+                  ultraWideCameraKeywords.some((keyword) =>
+                    label.includes(keyword)
+                  )
+                ) {
+                  backUltraWideCamera = camera;
+                  break;
+                }
+              }
+              console.log(JSON.stringify(backUltraWideCamera));
+              if (backUltraWideCamera) {
+                await scanner.setCurrentCamera(backUltraWideCamera);
+              } else {
+                await scanner.setCurrentCamera(cameras[3]);
+              }
+            }
+          }
+        } catch (ex) {
+          let errMsg;
+          if (ex.message.includes("network connection error")) {
+            errMsg =
+              "Failed to connect to Dynamsoft License Server: network connection error. Check your Internet connection or contact Dynamsoft Support (support@dynamsoft.com) to acquire an offline license.";
+          } else {
+            errMsg = ex.message || ex;
+          }
+          console.error(errMsg);
+          alert(errMsg);
+        }
+      })();
+    </script>
+  </body>
+</html>
