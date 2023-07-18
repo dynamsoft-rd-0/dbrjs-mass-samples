@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <label style="position:fixed;left:0;bottom:0;z-index:1;">
+        <input id="ipt-useSpecialRuntimeSettings" type="checkbox">Use Special RuntimeSettings
+    </label>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.20/dist/dbr.js"></script>
+    <script>
+        // Specifies a license, you can visit https://www.dynamsoft.com/customer/license/trialLicense?ver=9.6.20&utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
+        Dynamsoft.DBR.BarcodeScanner.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
+        // Initializes and uses the SDK
+        let scanner = null;
+        let bUseSpecialRuntimeSettings = false;
+        (async () => {
+            scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            scanner.onFrameRead = results => {
+                if (results.length > 0) console.log(results);
+            };
+            scanner.onUniqueRead = (txt, result) => {
+                alert(txt);
+            };
+            await scanner.updateRuntimeSettings("speed");
+            if(bUseSpecialRuntimeSettings){ await useSpecialRuntimeSettings(); }
+            await chooseBetterCamera4IPhone14Pro(scanner);
+            await scanner.show();
+        })();
+
+        document.getElementById('ipt-useSpecialRuntimeSettings').addEventListener('change', async function(){
+            bUseSpecialRuntimeSettings = this.checked;
+            if(scanner){
+                if(bUseSpecialRuntimeSettings){
+                    await useSpecialRuntimeSettings();
+                }else{
+                    await scanner.updateRuntimeSettings("speed");
+                }
+            }
+        });
+
+        const useSpecialRuntimeSettings = async()=>{
+            let rs = await scanner.getRuntimeSettings();
+            rs.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_PDF417;
+            rs.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
+            rs.localizationModes[2] = Dynamsoft.DBR.EnumLocalizationMode.LM_STATISTICS;
+            scanner.deblurLevel = 5;
+            await scanner.updateRuntimeSettings(rs);
+            await scanner.setModeArgument("ImagePreprocessingModes",0,"SharpenBlockSizeX","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",0,"SharpenBlockSizeY","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",0,"SmoothBlockSizeX","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",0,"SmoothBlockSizeY","3");
+            await scanner.setModeArgument("BinarizationModes",0,"BlockSizeX","10");
+            await scanner.setModeArgument("BinarizationModes",0,"BlockSizeY","10");
+            await scanner.setModeArgument("BinarizationModes",0,"EnableFillBinaryVacancy","1");
+            await scanner.setModeArgument("BinarizationModes",0,"ThresholdCompensation","20");
+        };
+
+        const chooseBetterCamera4IPhone14Pro = async(scanner)=>{
+            const environment =
+              await Dynamsoft.DBR.BarcodeReader.detectEnvironment();
+            console.log(environment.OS);
+            const getDeviceResolution = () => {
+              const width = window.devicePixelRatio * window.screen.width;
+              const height = window.devicePixelRatio * window.screen.height;
+              return { width, height };
+            };
+            const deviceResolution = getDeviceResolution();
+            console.log(JSON.stringify(deviceResolution));
+            if (
+              environment.OS === "iPhone" &&
+              ((deviceResolution.width == 1179 &&
+                deviceResolution.height == 2556) ||
+                (deviceResolution.width == 1290 &&
+                  deviceResolution.height == 2796))
+            ) {
+              const rearCameraKeywords = [
+                "back",
+                "後置",
+                "后置",
+                "背面",
+                "خلفية",
+                "Задна",
+                "posterior",
+                "zadní",
+                "bagside",
+                "rück",
+                "Πίσω",
+                "trasera",
+                "taka",
+                "arrière",
+                "אחורית",
+                "बैक",
+                "stražnja",
+                "Hátsó",
+                "belakang",
+                "posteriore",
+                "aртқы",
+                "후면",
+                "bak",
+                "achterzijde",
+                "tylny",
+                "traseira",
+                "spate",
+                "Задняя",
+                "задней",
+                "zadná",
+                "baksidan",
+                "bakre",
+                "านหลัง",
+                "arka",
+                "sau",
+              ];
+              const ultraWideCameraKeywords = [
+                "ultra wide",
+                "超廣角",
+                "超广角",
+                "超広角",
+                "عريضة جدًا",
+                "свръхширокоъгълна",
+                "ultra gran angular",
+                "ultra širokoúhlý",
+                "ultravidvinkel",
+                "ultra-weitwinkelkamera",
+                "υπερευρεία",
+                "ultralaajakulmainen",
+                "très grand angle",
+                "ultra grand angle",
+                "אולטרה רחבה",
+                "अल्ट्रा वाइड",
+                "ultra široka",
+                "ultraszéles látószögű",
+                "ultra lebar",
+                "ultra-grandangolo",
+                "ультра кең бұрышты",
+                "울트라 와이드",
+                "ultralebar",
+                "ultrabrede",
+                "ultraszerokokątny",
+                "ultra-angular",
+                "ultra grande angular",
+                "ultra‑superangular",
+                "сверхширокоугольная",
+                "ultraširokouhlá",
+                "ultravidvinkelkamera",
+                "มุมกว้างอัลตร้า",
+                "ultra geniş",
+                "надширококутна",
+                "cực rộng",
+              ];
+              const cameras = await scanner.getAllCameras();
+              let backUltraWideCamera;
+              for (let camera of cameras) {
+                const label = camera.label.toLowerCase();
+                if (
+                  rearCameraKeywords.some((keyword) =>
+                    label.includes(keyword)
+                  ) &&
+                  ultraWideCameraKeywords.some((keyword) =>
+                    label.includes(keyword)
+                  )
+                ) {
+                  backUltraWideCamera = camera;
+                  break;
+                }
+              }
+              console.log(JSON.stringify(backUltraWideCamera));
+              if (backUltraWideCamera) {
+                await scanner.setCurrentCamera(backUltraWideCamera);
+              } else {
+                await scanner.setCurrentCamera(cameras[3]);
+              }
+            }
+        };
+    </script>
+</body>
+
+</html>
