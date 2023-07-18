@@ -18,11 +18,16 @@
         let bUseSpecialRuntimeSettings = false;
         (async () => {
             scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            let lastFrameTime = Date.now();
+            let lastDecodeCost = 0;
             scanner.onFrameRead = results => {
-                if (results.length > 0) console.log(results);
+              let now = Date.now();
+              lastDecodeCost = now - lastFrameTime;
+              lastFrameTime = now;
+              if (results.length > 0) console.log(results);
             };
             scanner.onUniqueRead = (txt, result) => {
-                alert(txt);
+              alert(`decode time: ${lastDecodeCost}ms\ntxt: ${txt}`);
             };
             await useRuntimeSettings();
             await chooseBetterCamera4IPhone14Pro(scanner);
