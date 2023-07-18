@@ -24,34 +24,41 @@
             scanner.onUniqueRead = (txt, result) => {
                 alert(txt);
             };
-            await scanner.updateRuntimeSettings("speed");
-            if(bUseSpecialRuntimeSettings){ await useSpecialRuntimeSettings(); }
+            await useRuntimeSettings();
             await chooseBetterCamera4IPhone14Pro(scanner);
             await scanner.show();
+            await scanner.setResolution(1920, 1080);
         })();
 
         document.getElementById('ipt-useSpecialRuntimeSettings').addEventListener('change', async function(){
             bUseSpecialRuntimeSettings = this.checked;
-            if(scanner){
-                if(bUseSpecialRuntimeSettings){
-                    await useSpecialRuntimeSettings();
-                }else{
-                    await scanner.updateRuntimeSettings("speed");
-                }
-            }
+            await useRuntimeSettings();
         });
 
-        const useSpecialRuntimeSettings = async()=>{
+        const useRuntimeSettings = async()=>{
+            if(!scanner){ return; }
+
+            // https://www.dynamsoft.com/barcode-reader/docs/core/programming/usecases/scan-and-parse-AAMVA.html?ver=9.6.20&utm_source=github&&lang=js
+            await scanner.updateRuntimeSettings("dense");
             let rs = await scanner.getRuntimeSettings();
+            // Sets the barcode type to PDF417.
             rs.barcodeFormatIds = Dynamsoft.DBR.EnumBarcodeFormat.BF_PDF417;
-            rs.furtherModes.imagePreprocessingModes[0] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
-            rs.localizationModes[2] = Dynamsoft.DBR.EnumLocalizationMode.LM_STATISTICS;
-            scanner.deblurLevel = 5;
+            // Sets the scale-up mode.
+            rs.scaleUpModes[0] = Dynamsoft.DBR.EnumScaleUpMode.SUM_LINEAR_INTERPOLATION;
             await scanner.updateRuntimeSettings(rs);
-            await scanner.setModeArgument("ImagePreprocessingModes",0,"SharpenBlockSizeX","3");
-            await scanner.setModeArgument("ImagePreprocessingModes",0,"SharpenBlockSizeY","3");
-            await scanner.setModeArgument("ImagePreprocessingModes",0,"SmoothBlockSizeX","3");
-            await scanner.setModeArgument("ImagePreprocessingModes",0,"SmoothBlockSizeY","3");
+            // Fine-tunes some arguments of the first mode in `scaleUpModes`
+            scanner.setModeArgument("scaleUpModes", 0, "AcuteAngleWithXThreshold", "0");
+            scanner.setModeArgument("scaleUpModes", 0, "ModuleSizeThreshold", "3");
+            scanner.setModeArgument("scaleUpModes", 0, "TargetModuleSize", "8");
+            
+            if(!bUseSpecialRuntimeSettings){ return; }
+            rs.furtherModes.imagePreprocessingModes[1] = Dynamsoft.DBR.EnumImagePreprocessingMode.IPM_SHARPEN_SMOOTH;
+            //rs.localizationModes[2] = Dynamsoft.DBR.EnumLocalizationMode.LM_STATISTICS;
+            await scanner.updateRuntimeSettings(rs);
+            await scanner.setModeArgument("ImagePreprocessingModes",1,"SharpenBlockSizeX","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",1,"SharpenBlockSizeY","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",1,"SmoothBlockSizeX","3");
+            await scanner.setModeArgument("ImagePreprocessingModes",1,"SmoothBlockSizeY","3");
             await scanner.setModeArgument("BinarizationModes",0,"BlockSizeX","10");
             await scanner.setModeArgument("BinarizationModes",0,"BlockSizeY","10");
             await scanner.setModeArgument("BinarizationModes",0,"EnableFillBinaryVacancy","1");
