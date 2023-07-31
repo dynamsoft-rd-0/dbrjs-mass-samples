@@ -121,7 +121,8 @@
               let goodCamera;
               let goodLv = 0;
               for (let camera of cameras) {
-                const label = camera.label.toLowerCase();
+                // const label = camera.label.toLowerCase();
+                const label = camera.label;
                 if(backTripleCameraKeywords.some(k=>label.includes(k))){
                   goodCamera = camera;
                   goodLv = 4;
