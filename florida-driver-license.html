@@ -4,11 +4,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .div-collect-oricvs-container canvas{width:30vw;height:30vh;}
+    </style>
   </head>
 <body>
-    <label style="position:fixed;left:0;bottom:0;z-index:1;">
-        <input id="ipt-useSpecialRuntimeSettings" type="checkbox">Use Special RuntimeSettings
-    </label>
+    <div id="div-collect-oricvs-container" class="div-collect-oricvs-container" style="width:90vw;height:90vh;display:flex;flex-wrap:wrap"></div>
+    <div style="position:fixed;left:0;bottom:0;z-index:1;background:white;">
+      <label>
+          <input id="ipt-useSpecialRuntimeSettings" type="checkbox">Use Special RuntimeSettings
+      </label>
+      <p>) After some frames, you can close the video by clicking 'X' in the upper right corner, then long touch images to save them.</p>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.21/dist/dbr.js"></script>
     <script>
         // Specifies a license, you can visit https://www.dynamsoft.com/customer/license/trialLicense?ver=9.6.20&utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
@@ -18,13 +25,19 @@
         let bUseSpecialRuntimeSettings = false;
         (async () => {
             scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+            scanner.ifSaveOriginalImageInACanvas = true;
             let lastFrameTime = Date.now();
             let lastDecodeCost = 0;
+            const divCollectOricvsContainer = document.getElementById('div-collect-oricvs-container');
             scanner.onFrameRead = results => {
               let now = Date.now();
               lastDecodeCost = now - lastFrameTime;
               lastFrameTime = now;
               if (results.length > 0) console.log(results);
+              divCollectOricvsContainer.append(scanner.getOriginalImageInACanvas());
+              // You can also convert canvas to blob then upload to server to collect them.
+              // Refer: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob https://github.com/Dynamsoft/barcode-reader-javascript-samples/tree/v9.6.21/5.others/debug
+              if(divCollectOricvsContainer.children.length > 9){ divCollectOricvsContainer.children[0].remove(); }
             };
             scanner.onUniqueRead = (txt, result) => {
               alert(`decode time: ${lastDecodeCost}ms\ntxt: ${txt}`);
