@@ -9,7 +9,7 @@
     <label style="position:fixed;left:0;bottom:0;z-index:1;">
         <input id="ipt-useSpecialRuntimeSettings" type="checkbox">Use Special RuntimeSettings
     </label>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.20/dist/dbr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.21/dist/dbr.js"></script>
     <script>
         // Specifies a license, you can visit https://www.dynamsoft.com/customer/license/trialLicense?ver=9.6.20&utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
         Dynamsoft.DBR.BarcodeScanner.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
@@ -30,9 +30,8 @@
               alert(`decode time: ${lastDecodeCost}ms\ntxt: ${txt}`);
             };
             await useRuntimeSettings();
-            await chooseBetterCamera4IPhone14Pro(scanner);
+            await scanner.setResolution(4032, 3024);
             await scanner.show();
-            await scanner.setResolution(1920, 1080);
         })();
 
         document.getElementById('ipt-useSpecialRuntimeSettings').addEventListener('change', async function(){
@@ -70,86 +69,6 @@
             await scanner.setModeArgument("BinarizationModes",0,"ThresholdCompensation","20");
         };
 
-        const chooseBetterCamera4IPhone14Pro = async(scanner)=>{
-            const environment =
-              await Dynamsoft.DBR.BarcodeReader.detectEnvironment();
-            console.log(environment.OS);
-            const getDeviceResolution = () => {
-              const width = window.devicePixelRatio * window.screen.width;
-              const height = window.devicePixelRatio * window.screen.height;
-              return { width, height };
-            };
-            const deviceResolution = getDeviceResolution();
-            console.log(JSON.stringify(deviceResolution));
-            if (
-              // iPhone 14 Pro or iPhone 14 Pro Max
-              environment.OS === "iPhone" &&
-              ((deviceResolution.width == 1179 &&
-                deviceResolution.height == 2556) ||
-                (deviceResolution.width == 1290 &&
-                  deviceResolution.height == 2796))
-            ) {
-              const backCameraKeywords = [
-                "Back Camera",
-                "Caméra arrière",
-                "后置相机",
-                "背面カメラ",
-                //TODO
-              ];
-              const backUltraWideCameraKeywords = [
-                "Back Ultra Wide Camera",
-                "Appareil photo ultra grand angle arrière",
-                "后置超广角相机",
-                "背面超広角カメラ",
-                //TODO
-              ];
-              const backDualWideCameraKeywords = [
-                "Back Dual Wide Camera",
-                "Double appareil photo grand angle arrière",
-                "后置双广角镜头",
-                "背面デュアル広角カメラ",
-                //TODO
-              ];
-              const backTripleCameraKeywords = [
-                "Back Triple Camera",
-                "Triple appareil photo arrière",
-                "后置三镜头",
-                "背面トリプルカメラ",
-                //TODO
-              ];
-              const cameras = await scanner.getAllCameras();
-              let goodCamera;
-              let goodLv = 0;
-              for (let camera of cameras) {
-                // const label = camera.label.toLowerCase();
-                const label = camera.label;
-                if(backTripleCameraKeywords.some(k=>label.includes(k))){
-                  goodCamera = camera;
-                  goodLv = 4;
-                  break;
-                }
-                if(goodLv < 3 && backDualWideCameraKeywords.some(k=>label.includes(k))){
-                  goodCamera = camera;
-                  goodLv = 3;
-                  continue;
-                }
-                if(goodLv < 2 && backUltraWideCameraKeywords.some(k=>label.includes(k))){
-                  goodCamera = camera;
-                  goodLv = 2;
-                  continue;
-                }
-                if(goodLv < 1 && backCameraKeywords.some(k=>label.includes(k))){
-                  goodCamera = camera;
-                  goodLv = 1;
-                  continue;
-                }
-              }
-              console.log(JSON.stringify(goodCamera));
-              if (goodCamera) {
-                await scanner.setCurrentCamera(goodCamera);
-              }
-            }
-        };
     </script>
 </body>
 
