@@ -41,7 +41,7 @@
             // try {
                 normalizer = await Dynamsoft.DDN.DocumentNormalizer.createInstance();
 
-                error = await normalizer.setRuntimeSettings("{\"ImageParameterArray\":[{\"Name\":\"DN_1\",\"MaxThreadCount\":4,\"BinarizationModes\":[{\"Mode\":\"BM_LOCAL_BLOCK\",\"ThresholdCompensation\":5,\"BlockSizeX\":3,\"BlockSizeY\":3,\"MorphOperation\":\"Close\",\"MorphOperationKernelSizeX\":9,\"MorphOperationKernelSizeY\":9,\"EnableFillBinaryVacancy\":0}],\"ScaleDownThreshold\":800}]}");
+                error = await normalizer.setRuntimeSettings('{"ImageParameterArray":[{"Name":"DN_1","MaxThreadCount":4,"BinarizationModes":[{"Mode":"BM_LOCAL_BLOCK","ThresholdCompensation":5,"BlockSizeX":3,"BlockSizeY":3,"MorphOperation":"Close","MorphOperationKernelSizeX":9,"MorphOperationKernelSizeY":9,"EnableFillBinaryVacancy":0}],"ScaleDownThreshold":800,"NormalizerParameterName":"NormalizerParameter"}],"NormalizerParameterArray":[{"ColourMode":"ICM_COLOUR","ContentType":"CT_DOCUMENT","Name":"NormalizerParameter"}]}');
                 console.log(error);
             const scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
             scanner.maxCvsSideLength = 4096;
