@@ -12,76 +12,68 @@
 
 <body>
     Loading...
-        <button id="confirmQuadForNormalization">Edit Boundaries</button>
-        <button id="normalizeWithConfirmedQuad">Normalize and Capture</button>
-        <div id="div-ui-container" style="margin-top: 10px;height: 70vh;"></div>
-        <div id="normalized-result"></div>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@3.2.0/dist/dce.js"></script>
+    <button id="confirmQuadForNormalization">Edit Boundaries</button>
+    <button id="normalizeWithConfirmedQuad">Normalize and Capture</button>
+    <div id="div-ui-container" style="margin-top: 10px;height: 70vh;"></div>
+    <div id="normalized-result"></div>
 <script src="https://npm.scannerproxy.com/cdn/@scannerproxy/ddnjs@0.20230817135300.0/dist/ddn.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.20/dist/dbr.js"></script>
-    <script>
-    </script>
-    <script>
-        /* Thanks for Code from Ethan */
-        
-        /** LICENSE ALERT - README 
-         * To use the library, you need to first specify a license key using the API "license" as shown below.
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.20/dist/dbr.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+<script>
+    /* Thanks for Code from Ethan */
+    
+    /** LICENSE ALERT - README 
+     * To use the library, you need to first specify a license key using the API "license" as shown below.
+     */
+
+    Dynamsoft.DDN.DocumentNormalizer.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmtiZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjoyNTc4OTA0Njh9";
+    Dynamsoft.DBR.BarcodeReader.license = 'DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmljZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjotMTUyODMwNzQ1NX0=';
+    /** 
+     * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
+     * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+     * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.6.20&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+     * LICENSE ALERT - THE END 
+     */
+    
+    (async function () {
+        normalizer = await Dynamsoft.DDN.DocumentNormalizer.createInstance();
+
+        let error = await normalizer.setRuntimeSettings('{"ImageParameterArray":[{"Name":"DN_1","MaxThreadCount":4,"BinarizationModes":[{"Mode":"BM_LOCAL_BLOCK","ThresholdCompensation":5,"BlockSizeX":3,"BlockSizeY":3,"MorphOperation":"Close","MorphOperationKernelSizeX":9,"MorphOperationKernelSizeY":9,"EnableFillBinaryVacancy":0}],"ScaleDownThreshold":800,"NormalizerParameterName":"NormalizerParameter"}],"NormalizerParameterArray":[{"ColourMode":"ICM_COLOUR","ContentType":"CT_DOCUMENT","Name":"NormalizerParameter"}]}');
+        console.log(error);
+        const scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+        scanner.maxCvsSideLength = 4096;
+        normalizer.maxCvsSideLength = 4096;
+        scanner.setResolution(4032, 3024);
+        scanner.onFrameRead = async results => {
+            console.log("Barcodes on one frame:");
+            for (let res of results) {
+                console.log("Unique Code Found: ", res);
+                image = scanner.getOriginalImageInACanvas();
+                // console.log(image);
+                let quads =  await normalizer.detectQuad(image);
+
+                for(let quad of quads){
+                    let normalizedImageResult =  await normalizer.normalize(image, {
+                        quad: quad.location
+                    });
+                    let resultImg = await normalizedImageResult.image.toCanvas();
+                    console.log(`resultImg ${resultImg.width}x${resultImg.height}`);
+                    document.getElementById("normalized-result").appendChild(resultImg);
+                
+                    scanner.hide()
+                }
+            }
+        };
+
+        /**
+         * 'show()' opens the camera and shows the video stream on the page. 
+         * After that, the library starts to scan the frame images continuously.
          */
+        scanner.ifSaveOriginalImageInACanvas = true;
+        await scanner.show();
 
-            Dynamsoft.DDN.DocumentNormalizer.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmtiZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjoyNTc4OTA0Njh9";
-            Dynamsoft.DBR.BarcodeReader.license = 'DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmljZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjotMTUyODMwNzQ1NX0=';
-  /** 
-         * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
-         * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
-         * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.6.20&utm_source=github#specify-the-license or contact support@dynamsoft.com.
-         * LICENSE ALERT - THE END 
-         */
-        
-        (async function () {
-            // try {
-                normalizer = await Dynamsoft.DDN.DocumentNormalizer.createInstance();
-
-                error = await normalizer.setRuntimeSettings('{"ImageParameterArray":[{"Name":"DN_1","MaxThreadCount":4,"BinarizationModes":[{"Mode":"BM_LOCAL_BLOCK","ThresholdCompensation":5,"BlockSizeX":3,"BlockSizeY":3,"MorphOperation":"Close","MorphOperationKernelSizeX":9,"MorphOperationKernelSizeY":9,"EnableFillBinaryVacancy":0}],"ScaleDownThreshold":800,"NormalizerParameterName":"NormalizerParameter"}],"NormalizerParameterArray":[{"ColourMode":"ICM_COLOUR","ContentType":"CT_DOCUMENT","Name":"NormalizerParameter"}]}');
-                console.log(error);
-            const scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
-            scanner.maxCvsSideLength = 4096;
-            normalizer.maxCvsSideLength = 4096;
-            scanner.setResolution(4032, 3024);
-            let enhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance();
-            scanner.onFrameRead = async results => {
-                console.log("Barcodes on one frame:");
-                for (let res of results) {
-                            console.log("Unique Code Found: ", res);
-                            image = scanner.getOriginalImageInACanvas();
-                            // console.log(image);
-                            let quads =  await normalizer.detectQuad(image);
-        
-                            for(let quad of quads){
-                            // normalizer.confirmQuadForNormalization();
-                            let normalizedImageResult =  await normalizer.normalize(image, {
-                                quad: quad.location
-                            });
-                            let resultImg = await normalizedImageResult.image.toCanvas();
-                                // const popup = window.open("", "Popup", "width=500,height=500");
-                                // const img = popup.document.createElement("img");
-                                // img.src = resultImg.toDataURL();
-                                // popup.document.body.appendChild(img);
-                                document.getElementById("normalized-result").appendChild(resultImg);
-                            
-                                scanner.hide()
-                        }
-                    }
-            };
-
-                /**
-                 * 'show()' opens the camera and shows the video stream on the page. 
-                 * After that, the library starts to scan the frame images continuously.
-                 */
-                scanner.ifSaveOriginalImageInACanvas = true;
-                await scanner.show();
-
-        })();
-    </script>
+    })();
+</script>
 </body>
 
 </html>
