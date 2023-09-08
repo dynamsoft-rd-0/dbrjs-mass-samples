@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open camera and scan</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.21/dist/dbr.js"></script>
+  </head>
+  <body>
+    <button id="btn-open-camera">open camera</button>
+    <button id="btn-start-scan">start scan</button>
+    <div
+      id="div-ui-container"
+      style="margin-top: 5px; width: 90vw; height: 50vh; border: 1px solid red"
+    >
+      <div
+        class="dce-video-container"
+        style="position: relative; width: 100%; height: 100%"
+      ></div>
+    </div>
+    <textarea
+      id="div-result-container"
+      style="width: 90vw; height: 20vh; margin-top: 20px"
+    ></textarea>
+
+    <script>
+      let scanner;
+      const resultContainer = document.querySelector("#div-result-container");
+
+      const initScanner = async () => {
+        if (scanner) return;
+
+        /** LICENSE ALERT - README
+         * To use the library, you need to first specify a license key using the API "license" as shown below.
+         */
+
+        Dynamsoft.DBR.BarcodeReader.license =
+          "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmljZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjotMTUyODMwNzQ1NX0=";
+
+        /**
+         * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
+         * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+         * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.6.21&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+         * LICENSE ALERT - THE END
+         */
+
+        scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+        scanner.updateRuntimeSettings("speed");
+
+        // 'onFrameRead' fires after the library finishes scanning a frame.
+        scanner.onFrameRead = (results) => {
+          if (!results.length) return;
+
+          console.log(results);
+          resultContainer.value = "";
+          for (let result of results) {
+            const format = result.barcodeFormatString;
+            const text = result.barcodeText;
+            resultContainer.value += `${format}: ${text}\n`;
+          }
+          // Pause continuous scanning and clear the highlighted barcodes.
+          scanner.pauseScan();
+          // Close camera.
+          scanner.close();
+        };
+        await scanner.setUIElement(document.querySelector("#div-ui-container"));
+      };
+
+      document.querySelector("#btn-open-camera").onclick = async () => {
+        resultContainer.value = "opening...";
+
+        await initScanner();
+        // Open camera without decoding.
+        await scanner.openVideo();
+
+        resultContainer.value = "";
+      };
+
+      document.querySelector("#btn-start-scan").onclick = async () => {
+        if (!scanner) return;
+
+        // Resume the decoding process.
+        scanner.resumeScan();
+      };
+    </script>
+  </body>
+</html>
