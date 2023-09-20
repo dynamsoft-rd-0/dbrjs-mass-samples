@@ -75,6 +75,9 @@
 
           scanner.setVideoFit("cover");
           await scanner.show();
+
+          // Hide scan laser in default UI.
+          document.querySelector(".dce-scanarea").style.display = "none";
         } catch (ex) {
           let errMsg;
           if (ex.message.includes("network connection error")) {
