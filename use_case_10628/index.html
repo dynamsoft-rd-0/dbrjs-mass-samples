@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.30/dist/dbr.js"></script>
+  </head>
+  <body>
+    <!-- 'eruda' help show console in phone -->
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+
+    <script>
+      let scanner;
+
+      /** LICENSE ALERT - README
+       * To use the library, you need to first specify a license key using the API "license" as shown below.
+       */
+
+      Dynamsoft.DBR.BarcodeReader.license =
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAxMTcwOTE0LVRYbFhaV0pRY205cVgyUmljZyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAxMTcwOTE0Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjotMTUyODMwNzQ1NX0=";
+
+      /**
+       * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dbr&package=js to get your own trial license good for 30 days.
+       * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+       * For more information, see https://www.dynamsoft.com/barcode-reader/programming/javascript/user-guide/?ver=9.6.30&utm_source=github#specify-the-license or contact support@dynamsoft.com.
+       * LICENSE ALERT - THE END
+       */
+
+      (async function () {
+        try {
+          scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+          /**
+           * 'onFrameRead' is triggered after the library finishes reading a frame image.
+           * There can be multiple barcodes on one image.
+           */
+          scanner.onFrameRead = (results) => {
+            console.log("Barcodes on one frame:");
+            for (let result of results) {
+              const format = result.barcodeFormatString;
+              console.log(format + ": " + result.barcodeText);
+            }
+          };
+          /**
+           * 'onUniqueRead' is  triggered only when a 'new' barcode is found.
+           * The amount of time that the library 'remembers' a barcode is defined by
+           * "duplicateForgetTime" in "ScanSettings". By default it is set to 3000 ms.
+           */
+          scanner.onUniqueRead = (txt, result) => {
+            alert(txt);
+            console.log("Unique Code Found: ", result);
+          };
+
+          let scanSettings = await scanner.getScanSettings();
+          scanSettings.captureAndDecodeInParallel = false;
+          scanSettings.intervalTime = 1000; // Scan the video every 1s, instead of scanning continuously.
+          await scanner.updateScanSettings(scanSettings);
+
+          let runtimeSettings = await scanner.getRuntimeSettings();
+          runtimeSettings.region = {
+            regionLeft: 0,
+            regionRight: 100,
+            regionTop: 30,
+            regionBottom: 70,
+            regionMeasuredByPercentage: 1,
+          }; // Set a scan region, instead of always scanning the whole video.
+          await scanner.updateRuntimeSettings(runtimeSettings);
+
+          // An internal API to disable reading frames in WebGL.
+          scanner._dce._bWebGLSupported = false;
+
+          scanner.setVideoFit("cover");
+          await scanner.show();
+        } catch (ex) {
+          let errMsg;
+          if (ex.message.includes("network connection error")) {
+            errMsg =
+              "Failed to connect to Dynamsoft License Server: network connection error. Check your Internet connection or contact Dynamsoft Support (support@dynamsoft.com) to acquire an offline license.";
+          } else {
+            errMsg = ex.message || ex;
+          }
+          console.error(errMsg);
+          alert(errMsg);
+        }
+      })();
+    </script>
+  </body>
+</html>
