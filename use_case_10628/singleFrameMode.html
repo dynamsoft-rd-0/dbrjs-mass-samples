@@ -40,6 +40,9 @@
 
           scanner.setVideoFit("cover");
           scanner.singleFrameMode = "camera";
+          scanner.onUniqueRead = (txt, result) => {
+              alert(txt);
+          };
 
           await scanner.show();
         } catch (ex) {
