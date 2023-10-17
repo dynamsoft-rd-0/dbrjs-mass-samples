@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #ipt-txt{width:400px;}
+    </style>
+</head>
+<body>
+    <select id='sel-format'></select><br>
+    <input id='ipt-txt'><button id='btn-generate'>generate</button><br>
+    <canvas id='cvs-target'></canvas><br>
+    <button id='btn-decode'>decode</button>
+    <p id='p-decode-result'></p>
+    <script src='https://cdn.jsdelivr.net/npm/bwip-js@4.1.1/dist/bwip-js-min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/bwip-js@4.1.1/lib/symdesc.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.31/dist/dbr.js"></script>
+    <script>
+        const selFormat = document.getElementById('sel-format');
+        const iptTxt = document.getElementById('ipt-txt');
+        const btnGenerate = document.getElementById('btn-generate');
+        const cvsTarget = document.getElementById('cvs-target');
+        const btnDecode = document.getElementById('btn-decode');
+        const pDecodeResult = document.getElementById('p-decode-result');
+        
+        for(let format in symdesc){
+            let op = document.createElement('option');
+            op.innerText = symdesc[format].desc;
+            op.value = format;
+            selFormat.append(op);
+        }
+
+        selFormat.addEventListener('change',function(){
+            let format = this.value;
+            let info = symdesc[format];
+            iptTxt.value = info.text;
+        });
+
+        selFormat.value = 'ean13';
+        iptTxt.value = symdesc[selFormat.value].text;
+
+        btnGenerate.addEventListener('click',()=>{
+            try{
+                bwipjs.toCanvas(cvsTarget, {
+                    // most set background, otherwise it will be transparent, which can't be decoded
+                    backgroundcolor: 'ffffff', 
+                    //scaleX: 4, //optional
+                    bcid: selFormat.value,
+                    text: iptTxt.value,
+                    //padding: 20, //optional
+                });
+            }catch(ex){
+                console.error(ex);
+                alert(ex.message || ex);
+            }
+        });
+
+        let pReader = (async()=>{
+            // decoding still image use BarcodeReader, decoding video use BarcodeScanner
+            let reader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+            // for machine generated barcode, `speed` is enough
+            await reader.updateRuntimeSettings("speed");
+            return reader;
+        })();
+        btnDecode.addEventListener('click',async()=>{
+            let reader = await pReader;
+            let results = await reader.decode(cvsTarget);
+            console.log(results);
+            if(results.length){
+                let r = results[0];
+                pDecodeResult.innerText = (r.barcodeFormat?r.barcodeFormatString:r.barcodeFormatString_2) + ': '+ r.barcodeText;
+            }else{
+                pDecodeResult.innerText = 'No result';
+            }
+        });
+    </script>
+    
+</body>
+</html>
