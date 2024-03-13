@@ -11,7 +11,7 @@
       // Initializes and uses the SDK
       (async () => {
           let scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
-          scanner.dce.cameraOpenTimeout = 10000; // 10s tiemout, default 4s
+          scanner.dce.cameraOpenTimeout = 60000; // 10s tiemout, default 4s
           scanner.onFrameRead = results => {
               if (results.length > 0) console.log(results);
           };

@@ -14,7 +14,7 @@
 
     let view = await Dynamsoft.DCE.CameraView.createInstance();
     let cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(view);
-    cameraEnhancer.cameraOpenTimeout = 10000; // 10s tiemout, default 4s
+    cameraEnhancer.cameraOpenTimeout = 60000; // 10s tiemout, default 4s
     document.querySelector("#cameraViewContainer").append(view.getUIElement());
     router.setInput(cameraEnhancer);
 
