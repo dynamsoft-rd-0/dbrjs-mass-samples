@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>camera_test</title>
+    <script src="dmCamera.js"></script>
+  </head>
+  <body>
+    <button id="btn-open">open</button>
+    <br />
+    <div style="width: 100%; height: 50vh">
+      <video
+        autoplay="true"
+        muted="true"
+        playsinline="true"
+        style="
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          background-color: aliceblue;
+        "
+      ></video>
+    </div>
+    <div>
+      <label for="select-camera">camera: </label>
+      <select name="" id="select-camera"></select>
+      <br />
+      <label for="select-resolution">resolution: </label>
+      <select name="" id="select-resolution">
+        <option value="got-resolution" selected>1920*1080</option>
+        <option value="3840*2160">3840*2160</option>
+        <!-- <option value="4096*2160">4096*2160</option> -->
+        <option value="1920*1080">1920*1080</option>
+        <option value="1280*720">1280*720</option>
+        <option value="640*480">640*480</option>
+      </select>
+    </div>
+
+    <!-- <script src="../node_modules/eruda/eruda.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+    <script class="init-eruda">
+      eruda.init();
+    </script>
+
+    <script>
+      // Dynamsoft.utils.CameraManager._onLog = console.log;
+      console.log(`version: ${Dynamsoft.utils.CameraManager.version}`);
+      console.log(
+        `browserInfo: ${JSON.stringify(
+          Dynamsoft.utils.CameraManager.browserInfo
+        )}`
+      );
+      console.log(`navigator.platform: ${navigator.platform}`);
+      console.log(`navigator.userAgent: ${navigator.userAgent}`);
+
+      const video = document.querySelector("video");
+      const btnOpen = document.querySelector("#btn-open");
+      const cameraSelection = document.querySelector("#select-camera");
+      const resolutionSelection = document.querySelector("#select-resolution");
+
+      let camera;
+
+      const initCamera = () => {
+        if (camera) return;
+        camera = new Dynamsoft.utils.CameraManager();
+        camera.setVideoEl(video);
+        // camera.setMediaStreamConstraints({video: {facingMode: { ideal: "environment" },}});
+        // camera.setResolution(1920, 1080, true);
+        // camera.videoSrc = "./video.mp4";
+        // camera.cameraOpenTimeout = 1999;
+        // camera.selectIOSRearMainCameraAsDefault = true;
+        // camera.ifSaveLastUsedCamera = true;
+
+        // --------------------events ↓------------------------------
+        video.addEventListener("play", () => {
+          console.log("video native play event triggered.");
+        });
+        video.addEventListener("playing", () => {
+          console.log("video native playing event triggered.");
+        });
+        video.addEventListener("canplay", () => {
+          console.log("video native canplay event triggered.");
+        });
+        video.addEventListener("loadstart", () => {
+          console.log("video native loadstart event triggered.");
+        });
+        video.addEventListener("loadedmetadata", () => {
+          console.log("video native loadedmetadata event triggered.");
+        });
+        video.addEventListener("loadeddata", () => {
+          console.log("video native loadeddata event triggered.");
+        });
+        video.addEventListener("seeked", () => {
+          console.log("video native seeked event triggered.");
+        });
+        video.addEventListener("seeking", () => {
+          console.log("video native seeking event triggered.");
+        });
+        video.addEventListener("waiting", () => {
+          console.log("video native waiting event triggered.");
+        });
+        video.addEventListener("progress", () => {
+          console.log("video native progress event triggered.");
+        });
+        video.addEventListener("pause", () => {
+          console.log("video native pause event triggered.");
+        });
+        video.addEventListener("abort", (event) => {
+          console.log("video native abort event triggered.");
+        });
+        video.addEventListener("error", (event) => {
+          console.log("video native error event triggered.");
+          console.log(video.error);
+          console.log(video.error.code);
+          console.log(video.error.message);
+        });
+        camera.on("before:open", () => {
+          // video.style.opacity = 0;
+          console.log("before:open triggered.");
+        });
+        camera.on("opened", () => {
+          // video.style.opacity = 0;
+          console.log("opened triggered.");
+        });
+        camera.on("before:close", () => {
+          // video.style.opacity = 0;
+          console.log("before:close triggered.");
+        });
+        camera.on("closed", () => {
+          // video.style.opacity = 0;
+          console.log("closed triggered.");
+        });
+        camera.on("before:camera:change", () => {
+          // video.style.opacity = 0;
+          console.log("before:camera:change triggered.");
+        });
+        camera.on("camera:changed", () => {
+          // video.style.opacity = 0;
+          console.log("camera:changed triggered.");
+        });
+        camera.on("before:resolution:change", () => {
+          // video.style.opacity = 0;
+          console.log("before:resolution:change triggered.");
+        });
+        camera.on("resolution:changed", () => {
+          // video.style.opacity = 0;
+          console.log("resolution:changed triggered.");
+        });
+        camera.on("played", () => {
+          // video.style.opacity = 1;
+          console.log("played triggered.");
+        });
+        camera.on("resumed", () => {
+          // video.style.opacity = 1;
+          console.log("resumed triggered.");
+        });
+        camera.on("paused", () => {
+          // video.style.opacity = 1;
+          console.log("paused triggered.");
+        });
+        camera.on("tapfocus", () => {
+          // video.style.opacity = 1;
+          console.log("tapfocus triggered.");
+        });
+        // --------------------events ↑------------------------------
+      };
+
+      const renderCameras = async () => {
+        if (!camera) return;
+        const cameraList = await camera.getCameras();
+        cameraSelection.innerText = "";
+        for (let camera of cameraList) {
+          const option = document.createElement("option");
+          option.innerText = camera.label;
+          option.value = camera.deviceId;
+          cameraSelection.add(option);
+        }
+
+        const renderCurCamera = () => {
+          if (!camera) return;
+          const curCamera = camera.getCamera();
+          for (let option of cameraSelection.options) {
+            if (option.value == curCamera.deviceId) {
+              cameraSelection.value = option.value;
+              break;
+            }
+          }
+        };
+
+        const renderCurResolution = () => {
+          if (!camera) return;
+          const curResolution = camera.getResolution();
+
+          resolutionSelection.item(
+            0
+          ).innerText = `${curResolution.width}*${curResolution.height}`;
+          resolutionSelection.selectedIndex = 0;
+        };
+
+        camera.on("played", () => {
+          renderCurCamera();
+          renderCurResolution();
+        });
+      };
+
+      initCamera();
+      renderCameras();
+
+      btnOpen.addEventListener("click", async () => {
+        if (!camera) initCamera();
+        await camera.open();
+      });
+
+      cameraSelection.addEventListener("change", async () => {
+        if (!camera) return;
+        await camera.setCamera(cameraSelection.value);
+      });
+
+      resolutionSelection.addEventListener("change", async () => {
+        if (!camera) return;
+        const str = resolutionSelection.value;
+        const index = str.indexOf("*");
+        const width = parseInt(str.slice(0, index)),
+          height = parseInt(str.slice(index + 1));
+        await camera.setResolution(width, height);
+      });
+    </script>
+  </body>
+</html>
