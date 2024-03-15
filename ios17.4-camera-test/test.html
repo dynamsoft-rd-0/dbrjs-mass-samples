@@ -66,8 +66,8 @@
         if (camera) return;
         camera = new Dynamsoft.utils.CameraManager();
         camera.setVideoEl(video);
-        // camera.setMediaStreamConstraints({video: {facingMode: { ideal: "environment" },}});
-        // camera.setResolution(1920, 1080, true);
+        camera.setMediaStreamConstraints({video: {facingMode: { ideal: "environment" },}});
+        camera.setResolution(1920, 1080, false);
         // camera.videoSrc = "./video.mp4";
         // camera.cameraOpenTimeout = 1999;
         // camera.selectIOSRearMainCameraAsDefault = true;
@@ -169,8 +169,11 @@
 
       const renderCameras = async () => {
         if (!camera) return;
+
         const renderAllCamera = async()=>{
           const cameraList = await camera.getCameras();
+          console.log('await camera.getCameras():');
+          console.log(cameraList);
           cameraSelection.innerText = "";
           for (let camera of cameraList) {
             const option = document.createElement("option");
@@ -195,9 +198,7 @@
           if (!camera) return;
           const curResolution = camera.getResolution();
 
-          resolutionSelection.item(
-            0
-          ).innerText = `${curResolution.width}*${curResolution.height}`;
+          resolutionSelection.item(0).innerText = `${curResolution.width}*${curResolution.height}`;
           resolutionSelection.selectedIndex = 0;
         };
 

@@ -56,10 +56,11 @@
     await router.startCapturing("ReadSingleBarcode");
 
     
-
-    if(Dynamsoft.DCE.CameraEnhancer._onLog){
-      Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
-    }
+    setTimeout(()=>{
+      if(Dynamsoft.DCE.CameraEnhancer._onLog){
+        Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
+      }
+    },5000);
   })();
 </script>
 </body>
