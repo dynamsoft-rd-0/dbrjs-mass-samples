@@ -169,14 +169,16 @@
 
       const renderCameras = async () => {
         if (!camera) return;
-        // const cameraList = await camera.getCameras();
-        // cameraSelection.innerText = "";
-        // for (let camera of cameraList) {
-        //   const option = document.createElement("option");
-        //   option.innerText = camera.label;
-        //   option.value = camera.deviceId;
-        //   cameraSelection.add(option);
-        // }
+        const renderAllCamera = async()=>{
+          const cameraList = await camera.getCameras();
+          cameraSelection.innerText = "";
+          for (let camera of cameraList) {
+            const option = document.createElement("option");
+            option.innerText = camera.label;
+            option.value = camera.deviceId;
+            cameraSelection.add(option);
+          }
+        };
 
         const renderCurCamera = () => {
           if (!camera) return;
@@ -199,7 +201,8 @@
           resolutionSelection.selectedIndex = 0;
         };
 
-        camera.on("played", () => {
+        camera.on("played", async() => {
+          await renderAllCamera();
           renderCurCamera();
           renderCurResolution();
         });
