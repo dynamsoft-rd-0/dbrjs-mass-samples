@@ -35,11 +35,6 @@
 
     const resultsContainer = document.querySelector("#results");
     router.addResultReceiver({ onDecodedBarcodesReceived: (result) => {
-
-      if(Dynamsoft.DCE.CameraEnhancer._onLog){
-        Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
-      }
-      
       if (result.barcodeResultItems.length > 0) {
         resultsContainer.textContent = '';
         for (let item of result.barcodeResultItems) {
@@ -59,6 +54,12 @@
 
     await cameraEnhancer.open();
     await router.startCapturing("ReadSingleBarcode");
+
+    
+
+    if(Dynamsoft.DCE.CameraEnhancer._onLog){
+      Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
+    }
   })();
 </script>
 </body>
