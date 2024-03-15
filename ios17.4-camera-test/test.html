@@ -169,14 +169,14 @@
 
       const renderCameras = async () => {
         if (!camera) return;
-        const cameraList = await camera.getCameras();
-        cameraSelection.innerText = "";
-        for (let camera of cameraList) {
-          const option = document.createElement("option");
-          option.innerText = camera.label;
-          option.value = camera.deviceId;
-          cameraSelection.add(option);
-        }
+        // const cameraList = await camera.getCameras();
+        // cameraSelection.innerText = "";
+        // for (let camera of cameraList) {
+        //   const option = document.createElement("option");
+        //   option.innerText = camera.label;
+        //   option.value = camera.deviceId;
+        //   cameraSelection.add(option);
+        // }
 
         const renderCurCamera = () => {
           if (!camera) return;
