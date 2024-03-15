@@ -14,7 +14,15 @@
 <script src="https://cdn.jsdelivr.net/npm/iv-dynamsoft-camera-enhancer@4.0.2-iv-202403151422/dist/dce.js"></script>
 <div id="cameraViewContainer" style="width: 100%; height: 60vh"></div>
 <textarea id="results" style="width: 100%; min-height: 10vh; font-size: 3vmin; overflow: auto" disabled></textarea>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+<script class="init-eruda">
+  eruda.init();
+</script>
+
 <script>
+  Dynamsoft.DCE.CameraEnhancer._onLog = console.log; // add log
+
   Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
   (async () => {
     let router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
@@ -27,6 +35,11 @@
 
     const resultsContainer = document.querySelector("#results");
     router.addResultReceiver({ onDecodedBarcodesReceived: (result) => {
+
+      if(Dynamsoft.DCE.CameraEnhancer._onLog){
+        Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
+      }
+      
       if (result.barcodeResultItems.length > 0) {
         resultsContainer.textContent = '';
         for (let item of result.barcodeResultItems) {
