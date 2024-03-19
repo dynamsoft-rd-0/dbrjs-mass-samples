@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.0.21/dist/dbr.bundle.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-core@3.0.33/dist/core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-license@3.0.40/dist/license.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-utility@1.0.21/dist/utility.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.0.21/dist/dbr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-router@2.0.32/dist/cvr.js"></script>
+<!-- we use a inner version of camera enhancer -->
+<script src="https://cdn.jsdelivr.net/npm/iv-dynamsoft-camera-enhancer@4.0.2-iv-202403151422/dist/dce.js"></script>
+
+<div id="cameraViewContainer" style="width:100%;height:60vh;position:fixed;left:0;top:20px;display:none;"></div>
+<button id="btn-scan">scan</button>
+<textarea id="results" style="width: 100%; min-height: 10vh; font-size: 3vmin; overflow: auto" disabled></textarea>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+<script class="init-eruda">
+  eruda.init();
+</script>
+
+<script>
+  Dynamsoft.DCE.CameraEnhancer._onLog = console.log; // add log
+
+  Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+  
+  document.querySelector('#btn-scan').addEventListener('click', async()=>{
+    document.querySelector("#cameraViewContainer").style.display = '';
+
+    let router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+
+    let view = await Dynamsoft.DCE.CameraView.createInstance();
+    let cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(view);
+    //cameraEnhancer.cameraOpenTimeout = 60000;
+    document.querySelector("#cameraViewContainer").append(view.getUIElement());
+    router.setInput(cameraEnhancer);
+
+    const resultsContainer = document.querySelector("#results");
+    router.addResultReceiver({ onDecodedBarcodesReceived: (result) => {
+      if (result.barcodeResultItems.length > 0) {
+        resultsContainer.textContent = '';
+        for (let item of result.barcodeResultItems) {
+          resultsContainer.textContent += `${item.formatString}: ${item.text}\n\n`;
+        }
+      }
+    }});
+
+    let filter = new Dynamsoft.Utility.MultiFrameResultCrossFilter();
+    filter.enableResultCrossVerification(
+      Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE, true
+    );
+    filter.enableResultDeduplication(
+      Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE, true
+    );
+    await router.addResultFilter(filter);
+
+    await cameraEnhancer.open();
+    await router.startCapturing("ReadSingleBarcode");
+
+    
+    setTimeout(()=>{
+      if(Dynamsoft.DCE.CameraEnhancer._onLog){
+        Dynamsoft.DCE.CameraEnhancer._onLog = null; // remove log
+      }
+    },1000);
+  });
+</script>
+</body>
+</html>
