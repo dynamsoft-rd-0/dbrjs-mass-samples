@@ -1,5 +1,5 @@
 <template>
-	<div style="position:relative;width:100%;height:100%;min-width:100px;min-height:100px;background:#ddd;">
+	<div style="position:fixed;left:0;top:0;width:100vw;height:100vh;min-width:100px;min-height:100px;background:#ddd;">
 		<svg class="dce-bg-loading"
 			style="display:none;position:absolute;left:0;top:0;right:0;bottom:0;margin:auto;width:40%;height:40%;fill:#aaa;animation:1s linear infinite dce-rotate;"
 			viewBox="0 0 1792 1792">
@@ -13,8 +13,8 @@
 		<div class="dce-video-container" style="position:absolute;left:0;top:0;width:100%;height:100%;"></div>
 		<div class="dce-scanarea" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;">
 		</div>
-		<svg class="mydbr-switch-camera" style="position:absolute;left:8px;top:8px;width:32px;height:32px;fill:#fff;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. --><path d="M213.1 64.8L202.7 96H128c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H437.3L426.9 64.8C420.4 45.2 402.1 32 381.4 32H258.6c-20.7 0-39 13.2-45.5 32.8zM448 256c0 8.8-7.2 16-16 16H355.3c-6.2 0-11.3-5.1-11.3-11.3c0-3 1.2-5.9 3.3-8L371 229c-13.6-13.4-31.9-21-51-21c-19.2 0-37.7 7.6-51.3 21.3L249 249c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l19.7-19.7C257.4 172.7 288 160 320 160c31.8 0 62.4 12.6 85 35l23.7-23.7c2.1-2.1 5-3.3 8-3.3c6.2 0 11.3 5.1 11.3 11.3V256zM192 320c0-8.8 7.2-16 16-16h76.7c6.2 0 11.3 5.1 11.3 11.3c0 3-1.2 5.9-3.3 8L269 347c13.6 13.4 31.9 21 51 21c19.2 0 37.7-7.6 51.3-21.3L391 327c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-19.7 19.7C382.6 403.3 352 416 320 416c-31.8 0-62.4-12.6-85-35l-23.7 23.7c-2.1 2.1-5 3.3-8 3.3c-6.2 0-11.3-5.1-11.3-11.3V320z"/></svg>
-		<img class="mydbr-switch-torch" style="position:absolute;left:50%;bottom:30%;transform:translateX(-50%);width:32px;height:32px;user-select:none;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAByElEQVR4nO3bO4vUUBTA8eMLwULXQlBBBFnsRFhsLEQWBMXF7SwUBBtF8LGFhX4FsfBriB/DB7ZWgq9CUbZY7BRFxJ/EjTDo6rKZnbmT5PzhFjkEkvPPPedmkklEkiRJkjQG07iCW2Me1TGnoyQ4ha/KUR37ZEkBj5XnUUkBb0tnX51DCiiFnAF6XwJzOFt4zBUrgSR+9YGdOFBo7Cp+EbAfHwssf99wNCYBnMGPMQu4HpME7o0x+QcxaWALnowh+VfYEZMI9mFphMl/wUxMMjg9wn5wOdoA7owg+fvRFrAZD9cx+RfYHm0Cu7G4TnV/ONqI5Xv1YVmINmO4p0avsSnaDC4MIeB2tB3sGULAkegC+NRQwFR0AXxoKKDd9f8bvP9Hgp9Xea+wMToq4CVOVFe4/hE1i+d9EbCEvSvsM7WCqE4KuDsQv4Sb2FBvL/RBwLk6dnAgNlvHjvVBwHwdm1kllgLkDJAlEF1A9gDZBOUq8NeSt3XgHd+2Pi2D5/+z3/E+CHiDG9Uz/j/GVTzrg4C1kAKiC8gZIEtAM7IEogvIEpAloOc94GmD5N9FV7D8t5m1fFjxHRejp5/WXMOh0uebJEmSRA/4CbZx5kF4k0edAAAAAElFTkSuQmCC">
+		<svg class="mydbr-switch-camera" style="position:absolute;left:8px;top:8px;width:32px;height:32px;fill:#fff;background:rgba(0,0,0,0.2);border-radius:6px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. --><path d="M213.1 64.8L202.7 96H128c-35.3 0-64 28.7-64 64V416c0 35.3 28.7 64 64 64H512c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H437.3L426.9 64.8C420.4 45.2 402.1 32 381.4 32H258.6c-20.7 0-39 13.2-45.5 32.8zM448 256c0 8.8-7.2 16-16 16H355.3c-6.2 0-11.3-5.1-11.3-11.3c0-3 1.2-5.9 3.3-8L371 229c-13.6-13.4-31.9-21-51-21c-19.2 0-37.7 7.6-51.3 21.3L249 249c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l19.7-19.7C257.4 172.7 288 160 320 160c31.8 0 62.4 12.6 85 35l23.7-23.7c2.1-2.1 5-3.3 8-3.3c6.2 0 11.3 5.1 11.3 11.3V256zM192 320c0-8.8 7.2-16 16-16h76.7c6.2 0 11.3 5.1 11.3 11.3c0 3-1.2 5.9-3.3 8L269 347c13.6 13.4 31.9 21 51 21c19.2 0 37.7-7.6 51.3-21.3L391 327c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-19.7 19.7C382.6 403.3 352 416 320 416c-31.8 0-62.4-12.6-85-35l-23.7 23.7c-2.1 2.1-5 3.3-8 3.3c-6.2 0-11.3-5.1-11.3-11.3V320z"/></svg>
+		<img class="mydbr-switch-torch" style="position:absolute;left:50%;bottom:30%;transform:translateX(-50%);width:32px;height:32px;background:rgba(0,0,0,0.2);border-radius:6px;user-select:none;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAByElEQVR4nO3bO4vUUBTA8eMLwULXQlBBBFnsRFhsLEQWBMXF7SwUBBtF8LGFhX4FsfBriB/DB7ZWgq9CUbZY7BRFxJ/EjTDo6rKZnbmT5PzhFjkEkvPPPedmkklEkiRJkjQG07iCW2Me1TGnoyQ4ha/KUR37ZEkBj5XnUUkBb0tnX51DCiiFnAF6XwJzOFt4zBUrgSR+9YGdOFBo7Cp+EbAfHwssf99wNCYBnMGPMQu4HpME7o0x+QcxaWALnowh+VfYEZMI9mFphMl/wUxMMjg9wn5wOdoA7owg+fvRFrAZD9cx+RfYHm0Cu7G4TnV/ONqI5Xv1YVmINmO4p0avsSnaDC4MIeB2tB3sGULAkegC+NRQwFR0AXxoKKDd9f8bvP9Hgp9Xea+wMToq4CVOVFe4/hE1i+d9EbCEvSvsM7WCqE4KuDsQv4Sb2FBvL/RBwLk6dnAgNlvHjvVBwHwdm1kllgLkDJAlEF1A9gDZBOUq8NeSt3XgHd+2Pi2D5/+z3/E+CHiDG9Uz/j/GVTzrg4C1kAKiC8gZIEtAM7IEogvIEpAloOc94GmD5N9FV7D8t5m1fFjxHRejp5/WXMOh0uebJEmSRA/4CbZx5kF4k0edAAAAAElFTkSuQmCC">
 		<div style="position:absolute;right:0;bottom:0;">Icons by Font Awesome and Icon8</div>
 		<!-- The "Powered by Dynamsoft" logo can be easily removed by eliminating the following line. -->
 		<div class="dce-msg-poweredby" style="position:absolute;left:50%;bottom:10%;transform:translateX(-50%);pointer-events:none;">
@@ -99,10 +99,6 @@
 		@keyframes dce-rotate {
 			from { transform: rotate(0turn); }
 			to { transform: rotate(1turn); }
-		}
-		@keyframes dce-scanlight {
-			from { top: 0; }
-			to { top: 97%; }
 		}
 	</style>
 </template>
