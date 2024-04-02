@@ -110,7 +110,7 @@
                     grayValue += image.bytes[i+1];
                     grayValue += image.bytes[i+2];
                 }
-                grayValue /= image.bytes.length * 3;
+                grayValue /= image.bytes.length / 4 * 3;
             }else{
                 console.error('Unknown image pixel type');
                 return;
