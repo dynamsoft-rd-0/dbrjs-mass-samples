@@ -89,6 +89,7 @@
             if(bNotSupportTorch){
                 clearInterval(taskDetectDrak);
                 taskDetectDrak = null;
+                return;
             }
 
             if(bTorch || !cameraEnhancer.isOpen()){ return; }
