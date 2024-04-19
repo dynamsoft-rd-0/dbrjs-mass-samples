@@ -10,13 +10,20 @@
   let router;
   let cameraEnhancer;
   let view;
-  (async()=>{
+  document.querySelector('button').addEventListener('click',async () => {
+
+
+
+    
+    // before load resources
     await Dynamsoft.Core.CoreModule.loadWasm(["dbr"]);
     router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
     view = await Dynamsoft.DCE.CameraView.createInstance();
     // after this done, all resources has been loaded
-  })();
-  document.querySelector('button').addEventListener('click',async () => {
+
+
+
+
     cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(view);
     document.querySelector("#cameraViewContainer").append(view.getUIElement());
     router.setInput(cameraEnhancer);
