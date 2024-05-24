@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.42-beta-202404252029/dist/dbr.js"></script>
+    <script>
+        // Specifies a license, you can visit https://www.dynamsoft.com/customer/license/trialLicense?ver=9.6.40&utm_source=github&product=dbr&package=js to get your own trial license good for 30 days. 
+        Dynamsoft.DBR.BarcodeScanner.license = 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9';
+        // Initializes and uses the SDK
+        (async () => {
+            let scanner = self.scanner = await Dynamsoft.DBR.BarcodeScanner.createInstance();
+
+            // debug image
+            let processingCount = 0;
+
+            scanner.onFrameRead = async results => {
+                if (results.length > 0) console.log(results);
+                
+                //// collect image for debug, example server can be find in: 
+                //// https://github.com/Dynamsoft/barcode-reader-javascript-samples/tree/9.x/5.others/debug
+                //// This way you can more easily check whether the picture is too blurry
+
+                /**
+                 * The barcode reading speed is very fast, we must limit 
+                 * the number of uploaded frames (4), so that it is feasible.
+                 */
+                if (processingCount < 4) {
+                    ++processingCount;
+                    try {
+                        /**
+                         * The original image is the one the reader worked on,
+                         * we can collect it for futher testing and debugging.
+                         */
+                        let cvs = scanner.getOriginalImageInACanvas();
+                        let fd = new FormData();
+                        if (cvs != null) {
+                            let blob = cvs.convertToBlob ?
+                                await cvs.convertToBlob() :
+                                await new Promise(resolve => {
+                                    cvs.toBlob(blob => resolve(blob));
+                                });
+                            fd.append("img", blob);
+                            await fetch("====server url====", {
+                                method: "POST",
+                                body: fd
+                            });
+                        }
+                    } catch (ex) {
+                        console.error(ex);
+                    }
+                    --processingCount;
+                }
+
+            };
+            scanner.onUniqueRead = (txt, result) => {
+                alert(txt);
+            };
+
+            // debug image
+            scanner.ifSaveOriginalImageInACanvas = true;
+
+            await scanner.show();
+
+            try{
+                let cameraSettings = await scanner.getCameraSettings();
+                let capabilities = await scanner.getCapabilities();
+                console.log(cameraSettings);
+                console.log(capabilities);
+
+                await scanner.applyConstraints({advanced: [{ exposureMode: "manual" }]});
+                {
+                    let aimExposureTime = 40; // 40ms or (1/25)s
+                    // y = ax + b  =====> 40 = step * x + min
+                    let x = Math.round((aimExposureTime - capabilities.exposureTime.min) / capabilities.exposureTime.step);
+                    aimExposureTime = capabilities.exposureTime.step * x + capabilities.exposureTime.min;
+                    await scanner.applyConstraints({advanced: [{ exposureTime: aimExposureTime }]});
+                }
+
+                //// if too dark, you need adjust your brightness to a good value
+                // await scanner.applyConstraints({advanced: [{ brightness: 200 }]});
+            }catch(ex){
+                // debug error
+                alert(ex.message);
+            }
+        })();
+    </script>
+</body>
+
+</html>
