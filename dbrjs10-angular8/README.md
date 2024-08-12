@@ -1,6 +1,6 @@
 # Dbrjs10Angular8
 
-Notice: because angular9 is too old, you may need use `-f` when you run `npm install`.
+Notice: because angular8 is too old, you may need use `-f` when you run `npm install`.
 
 We include SDK by `<script>` in `src/index.html`
 ```
