@@ -7,17 +7,24 @@
 </head>
 <body>
 <script>
-  (async()=>{
+  let funcTestNetwork = async(friendlyName,url)=>{
     try{
-      let rep = await fetch('https://mdls.dynamsoftonline.com/lts/test');
+      let rep = await Promise.race([
+        fetch(url),
+        new Promise((rs,rj)=>setTimeout(()=>{rj(Error('5s timeout'))},5000))
+      ]) ;
       if(!rep.ok){
-        alert(`httpcode: ${rep.status}`);
+        alert(`[${friendlyName}] httpcode: ${rep.status}`);
       }else{
-        alert(`message: ${await rep.text()}`);
+        alert(`[${friendlyName}] message: ${await rep.text()}`);
       }
     }catch(ex){
-      alert(`name: ${ex.name}, message: ${ex.message}`);
+      alert(`[${friendlyName}] name: ${ex.name}, message: ${ex.message}`);
     }
+  }
+  (async()=>{
+    funcTestNetwork('DLS2', 'https://mlts.dynamsoft.com/lts/test');
+    funcTestNetwork('DLS3', 'https://mdls.dynamsoftonline.com/lts/test');
   })();
 </script>
 </body>
