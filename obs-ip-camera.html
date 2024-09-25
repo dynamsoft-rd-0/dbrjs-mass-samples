@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button id="btn-scan">scan</button>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.2.1000/dist/dbr.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/Dynamsoft/easy-barcode-scanner@10.2.1009/dist/easy-barcode-scanner.js"
+    data-license=""></script>
+  <script>
+    let scanner, pScanner;
+    document.getElementById('btn-scan').addEventListener('click',async()=>{
+      try{
+        scanner = await (pScanner || (pScanner = EasyBarcodeScanner.createInstance()));
+
+        let barcodeSettings = await scanner._cvRouter.getSimplifiedSettings('ReadBarcodes_SpeedFirst');
+        barcodeSettings.barcodeSettings.barcodeFormatIds = 0x04000000;
+        barcodeSettings.barcodeSettings.deblurModes = [0x80,0x8,0,0,0,0,0,0,0];
+        barcodeSettings.barcodeSettings.localizationModes = [2,0,0,0,0,0,0,0];
+        barcodeSettings.barcodeSettings.scaleDownThreshold = 99999;
+        barcodeSettings.barcodeSettings.expectedBarcodesCount = 999;
+        scanner._cvRouter.updateSettings('ReadBarcodes_SpeedFirst', barcodeSettings);
+
+        // pls match OBS output resolution
+        // { width: 1920, height: 1080 }
+        // { width: 2560, height: 1440 }
+        // don't change media source size
+        // right click media source -> transform -> reset transform
+        scanner._cameraEnhancer.setResolution({ width: 1920, height: 1080 });
+
+        await scanner.open();
+      }catch(ex){
+        let errMsg = ex.message || ex;
+        console.error(errMsg);
+        alert(errMsg);
+      }
+    });
+  </script>
+</body>
+</html>
