@@ -17,84 +17,83 @@
       try{
         scanner = await (pScanner || (pScanner = EasyBarcodeScanner.createInstance()));
 
-        scanner._cvRouter.initSettings('{
-    "BarcodeReaderTaskSettingOptions": [
-        {
-            "BarcodeFormatIds": [
-                "BF_QR_CODE"
-            ],
-            "DeblurModes": [
+        scanner._cvRouter.initSettings(`{
+            "BarcodeReaderTaskSettingOptions": [
                 {
-                    "Mode": "DM_BASED_ON_LOC_BIN"
-                },
-                {
-                    "Mode": "DM_DIRECT_BINARIZATION"
-                },
-                {
-                    "Mode": "DM_THRESHOLD_BINARIZATION"
+                    "BarcodeFormatIds": [
+                        "BF_QR_CODE"
+                    ],
+                    "DeblurModes": [
+                        {
+                            "Mode": "DM_BASED_ON_LOC_BIN"
+                        },
+                        {
+                            "Mode": "DM_SMOOTHING"
+                        }
+                    ],
+                    "ExpectedBarcodesCount": 999,
+                    "LocalizationModes": [
+                        {
+                            "Mode": "LM_CONNECTED_BLOCKS"
+                        }
+                    ],
+                    "Name": "task-read-barcodes",
+                    "StartSection": "ST_REGION_PREDETECTION",
+                    "TerminateSetting": {
+                        "Section": "ST_NULL",
+                        "Stage": "IRUT_NULL"
+                    }
                 }
             ],
-            "ExpectedBarcodesCount": 999,
-            "LocalizationModes": [
+            "CaptureVisionTemplates": [
                 {
-                    "Mode": "LM_CONNECTED_BLOCKS"
+                    "ImageROIProcessingNameArray": [
+                        "roi-read-barcodes"
+                    ],
+                    "Name": "ReadBarcodes_Default"
                 }
             ],
-            "Name": "task-read-barcodes",
-            "StartSection": "ST_REGION_PREDETECTION",
-            "TerminateSetting": {
-                "Section": "ST_NULL",
-                "Stage": "IRUT_NULL"
-            }
-        }
-    ],
-    "CaptureVisionTemplates": [
-        {
-            "ImageROIProcessingNameArray": [
-                "roi-read-barcodes"
-            ],
-            "Name": "ReadBarcodes_Default"
-        }
-    ],
-    "ImageParameterOptions": [
-        {
-            "BinarizationModes": [
+            "ImageParameterOptions": [
                 {
-                    "BinarizationThreshold": -1,
-                    "BlockSizeX": 39,
-                    "BlockSizeY": 39,
-                    "EnableFillBinaryVacancy": 1,
-                    "ThresholdCompensation": 10
+                    "BinarizationModes": [
+                        {
+                            "BinarizationThreshold": -1,
+                            "BlockSizeX": 39,
+                            "BlockSizeY": 39,
+                            "EnableFillBinaryVacancy": 0,
+                            "ThresholdCompensation": 10
+                        }
+                    ],
+                    "GrayscaleTransformationModes": [
+                        {
+                            "Mode": "GTM_ORIGINAL"
+                        }
+                    ],
+                    "Name": "ip-read-barcodes",
+                    "ScaleDownThreshold": 9999,
+                    "ScaleUpModes": [
+                        {
+                            "AcuteAngleWithXThreshold": -1,
+                            "LetterHeightThreshold": 0,
+                            "Mode": "SUM_AUTO",
+                            "ModuleSizeThreshold": 0,
+                            "TargetLetterHeight": 0,
+                            "TargetModuleSize": 0
+                        }
+                    ]
                 }
             ],
-            "GrayscaleTransformationModes": [
+            "TargetROIDefOptions": [
                 {
-                    "Mode": "GTM_ORIGINAL"
-                }
-            ],
-            "Name": "ip-read-barcodes",
-            "ScaleDownThreshold": 5000,
-            "ScaleUpModes": [
-                {
-                    "AcuteAngleWithXThreshold": -1,
-                    "LetterHeightThreshold": 0,
-                    "Mode": "SUM_AUTO",
-                    "ModuleSizeThreshold": 0,
-                    "TargetLetterHeight": 0,
-                    "TargetModuleSize": 0
+                    "Name": "roi-read-barcodes",
+                    "TaskSettingNameArray": [
+                        "task-read-barcodes"
+                    ]
                 }
             ]
-        }
-    ],
-    "TargetROIDefOptions": [
-        {
-            "Name": "roi-read-barcodes",
-            "TaskSettingNameArray": [
-                "task-read-barcodes"
-            ]
-        }
-    ]
-}')
+        }`)
+        scanner.templateName = 'ReadBarcodes_Default';
+        
         // let barcodeSettings = await scanner._cvRouter.getSimplifiedSettings('ReadBarcodes_SpeedFirst');
         // barcodeSettings.barcodeSettings.barcodeFormatIds = 0x04000000;
         // barcodeSettings.barcodeSettings.deblurModes = [0x80,0x8,0,0,0,0,0,0,0];
