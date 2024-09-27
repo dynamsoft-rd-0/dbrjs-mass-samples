@@ -18,11 +18,12 @@
     document.getElementById('btn-scan').addEventListener('click',async()=>{
       try{
         scanner = await (pScanner || (pScanner = EasyBarcodeScanner.createInstance()));
-        updateBarcodeSettings();
+        await updateBarcodeSettings();
 
         // pls match OBS output resolution
         // { width: 1920, height: 1080 }
         // { width: 2560, height: 1440 }
+        // { width: 2688, height: 1520 }
         // don't change media source size
         // right click media source -> transform -> reset transform
         scanner._cameraEnhancer.setResolution({ width: 1920, height: 1080 });
@@ -38,19 +39,25 @@
     });
     
     document.getElementById('ipt-file').addEventListener('change',async function(){
-      scanner = await (pScanner || (pScanner = EasyBarcodeScanner.createInstance()));
-      updateBarcodeSettings();
 
       let file = this.files[0];
       this.value = '';
+
+      scanner = await (pScanner || (pScanner = EasyBarcodeScanner.createInstance()));
+      await updateBarcodeSettings();
+
+      // let irr = new Dynamsoft.CVR.IntermediateResultReceiver();
+      // irr.onLocalizedBarcodesReceived = r=>console.log('localized barcode',r);
+      // scanner._cvRouter.getIntermediateResultManager().addResultReceiver(irr);
+
+      let beforeTime = Date.now();
       let rs = await scanner._cvRouter.capture(file,scanner.templateName);
+      console.log('cost', Date.now() - beforeTime);
       console.log(rs);
     });
 
-
-    // TODO: https://www.dynamsoft.com/capture-vision/docs/core/parameters/reference/image-parameter/binarization-modes.html?product=dbr
-    function updateBarcodeSettings(){
-        scanner._cvRouter.initSettings(`{
+    async function updateBarcodeSettings(){
+        await scanner._cvRouter.initSettings(`{
             "BarcodeReaderTaskSettingOptions": [
                 {
                     "BarcodeFormatIds": [
@@ -71,11 +78,23 @@
                         }
                     ],
                     "Name": "task-read-barcodes",
-                    "StartSection": "ST_REGION_PREDETECTION",
-                    "TerminateSetting": {
-                        "Section": "ST_NULL",
-                        "Stage": "IRUT_NULL"
-                    }
+                    "SectionImageParameterArray": [
+                        {
+                            "ContinueWhenPartialResultsGenerated": 1,
+                            "ImageParameterName": "ip-read-barcodes",
+                            "Section": "ST_REGION_PREDETECTION"
+                        },
+                        {
+                            "ContinueWhenPartialResultsGenerated": 1,
+                            "ImageParameterName": "ip-read-barcodes",
+                            "Section": "ST_BARCODE_LOCALIZATION"
+                        },
+                        {
+                            "ContinueWhenPartialResultsGenerated": 1,
+                            "ImageParameterName": "ip-read-barcodes",
+                            "Section": "ST_BARCODE_DECODING"
+                        }
+                    ]
                 }
             ],
             "CaptureVisionTemplates": [
@@ -92,10 +111,20 @@
                         {
                             "Mode": "BM_LOCAL_BLOCK",
                             "BinarizationThreshold": -1,
-                            "BlockSizeX": 39,
-                            "BlockSizeY": 39,
+                            "BlockSizeX": 25,
+                            "BlockSizeY": 25,
                             "EnableFillBinaryVacancy": 0,
                             "ThresholdCompensation": 10
+                        }
+                    ],
+                    "GrayscaleEnhancementModes": [
+                        {
+                            "Mode": "GEM_SHARPEN_SMOOTH",
+                            "Sensitivity": -1,
+                            "SharpenBlockSizeX": 3,
+                            "SharpenBlockSizeY": 3,
+                            "SmoothBlockSizeX": 3,
+                            "SmoothBlockSizeY": 3
                         }
                     ],
                     "GrayscaleTransformationModes": [
@@ -104,17 +133,7 @@
                         }
                     ],
                     "Name": "ip-read-barcodes",
-                    "ScaleDownThreshold": 9999,
-                    "ScaleUpModes": [
-                        {
-                            "AcuteAngleWithXThreshold": -1,
-                            "LetterHeightThreshold": 0,
-                            "Mode": "SUM_AUTO",
-                            "ModuleSizeThreshold": 0,
-                            "TargetLetterHeight": 0,
-                            "TargetModuleSize": 0
-                        }
-                    ]
+                    "ScaleDownThreshold": 9999
                 }
             ],
             "TargetROIDefOptions": [
@@ -125,9 +144,11 @@
                     ]
                 }
             ]
-        }`)
+        }`);
         scanner.templateName = 'ReadBarcodes_Default';
     }
+
+                
   </script>
 </body>
 </html>
