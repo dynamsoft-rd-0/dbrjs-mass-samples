@@ -68,7 +68,10 @@
                             "Mode": "DM_BASED_ON_LOC_BIN"
                         },
                         {
-                            "Mode": "DM_SMOOTHING"
+                            "Mode": "DM_SHARPENING_SMOOTHING"
+                        },
+                        {
+                            "Mode": "DM_DEEP_ANALYSIS"
                         }
                     ],
                     "ExpectedBarcodesCount": 999,
@@ -125,6 +128,14 @@
                             "SharpenBlockSizeY": 3,
                             "SmoothBlockSizeX": 3,
                             "SmoothBlockSizeY": 3
+                        }
+                    ],
+                    "ScaleUpModes": [
+                        {
+                            "Mode": "SUM_LINEAR_INTERPOLATION",
+                            "AcuteAngleWithXThreshold": 0,
+                            "ModuleSizeThreshold": 4,
+                            "TargetModuleSize": 6
                         }
                     ],
                     "GrayscaleTransformationModes": [
