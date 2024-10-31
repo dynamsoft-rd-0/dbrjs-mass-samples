@@ -7,9 +7,14 @@
 </head>
 <body>
   <button id="btn-scan">scan</button><br>
-  test image: <input id="ipt-file" type="file">
-  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.2.1000/dist/dbr.bundle.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/Dynamsoft/easy-barcode-scanner@10.2.1009/dist/easy-barcode-scanner.js"
+  test image: <input id="ipt-file" type="file"><br>
+  use which template: <select id="sel-template">
+    <option value="template1">SHARPENING_SMOOTHING + DEEP_ANALYSIS</option>
+    <option value="template2">THRESHOLD_BINARIZATION + GRAY_EQUALIZATION + SHARPENING_SMOOTHING + DEEP_ANALYSIS</option>
+  </select>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.4.2002-beta-202410300433/dist/dbr.bundle.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.4.2002-beta-202410310215/dist/dbr.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/Dynamsoft/easy-barcode-scanner@10.4.2002/dist/easy-barcode-scanner.js"
     data-license=""></script>
   <script>
     // refer https://github.com/Dynamsoft/easy-barcode-scanner
@@ -28,7 +33,11 @@
         // right click media source -> transform -> reset transform
         scanner._cameraEnhancer.setResolution({ width: 1920, height: 1080 });
 
-        scanner.onUniqueRead = txt=>console.log(txt);
+        scanner._filter.enableLatestOverlapping("barcode", true);
+        scanner._cvRouter.addResultFilter(scanner._filter);
+
+        //scanner.onUniqueRead = txt=>console.log(txt);
+        scanner.onFrameRead = results=>console.log(results);
 
         await scanner.open();
       }catch(ex){
@@ -57,108 +66,241 @@
     });
 
     async function updateBarcodeSettings(){
-        await scanner._cvRouter.initSettings(`{
-            "BarcodeReaderTaskSettingOptions": [
-                {
-                    "BarcodeFormatIds": [
-                        "BF_QR_CODE"
-                    ],
-                    "DeblurModes": [
-                        {
-                            "Mode": "DM_BASED_ON_LOC_BIN"
-                        },
-                        {
-                            "Mode": "DM_SHARPENING_SMOOTHING"
-                        },
-                        {
-                            "Mode": "DM_DEEP_ANALYSIS"
-                        }
-                    ],
-                    "ExpectedBarcodesCount": 999,
-                    "LocalizationModes": [
-                        {
-                            "Mode": "LM_CONNECTED_BLOCKS"
-                        }
-                    ],
-                    "Name": "task-read-barcodes",
-                    "SectionImageParameterArray": [
-                        {
-                            "ContinueWhenPartialResultsGenerated": 1,
-                            "ImageParameterName": "ip-read-barcodes",
-                            "Section": "ST_REGION_PREDETECTION"
-                        },
-                        {
-                            "ContinueWhenPartialResultsGenerated": 1,
-                            "ImageParameterName": "ip-read-barcodes",
-                            "Section": "ST_BARCODE_LOCALIZATION"
-                        },
-                        {
-                            "ContinueWhenPartialResultsGenerated": 1,
-                            "ImageParameterName": "ip-read-barcodes",
-                            "Section": "ST_BARCODE_DECODING"
-                        }
-                    ]
-                }
-            ],
-            "CaptureVisionTemplates": [
-                {
-                    "ImageROIProcessingNameArray": [
-                        "roi-read-barcodes"
-                    ],
-                    "Name": "ReadBarcodes_Default"
-                }
-            ],
-            "ImageParameterOptions": [
-                {
-                    "BinarizationModes": [
-                        {
-                            "Mode": "BM_LOCAL_BLOCK",
-                            "BinarizationThreshold": -1,
-                            "BlockSizeX": 11,
-                            "BlockSizeY": 11,
-                            "EnableFillBinaryVacancy": 1,
-                            "ThresholdCompensation": 10
-                        }
-                    ],
-                    "GrayscaleEnhancementModes": [
-                        {
-                            "Mode": "GEM_SHARPEN_SMOOTH",
-                            "Sensitivity": -1,
-                            "SharpenBlockSizeX": 3,
-                            "SharpenBlockSizeY": 3,
-                            "SmoothBlockSizeX": 3,
-                            "SmoothBlockSizeY": 3
-                        }
-                    ],
-                    "ScaleUpModes": [
-                        {
-                            "Mode": "SUM_LINEAR_INTERPOLATION",
-                            "AcuteAngleWithXThreshold": 0,
-                            "ModuleSizeThreshold": 4,
-                            "TargetModuleSize": 6
-                        }
-                    ],
-                    "GrayscaleTransformationModes": [
-                        {
-                            "Mode": "GTM_ORIGINAL"
-                        }
-                    ],
-                    "Name": "ip-read-barcodes",
-                    "ScaleDownThreshold": 9999
-                }
-            ],
-            "TargetROIDefOptions": [
-                {
-                    "Name": "roi-read-barcodes",
-                    "TaskSettingNameArray": [
-                        "task-read-barcodes"
-                    ]
-                }
-            ]
-        }`);
+        await scanner._cvRouter.initSettings(mapTemplate[document.getElementById('sel-template').value]);
         scanner.templateName = 'ReadBarcodes_Default';
     }
 
+    const mapTemplate = {};
+    mapTemplate.template1 = `{
+    "BarcodeReaderTaskSettingOptions": [
+        {
+            "BarcodeFormatIds": [
+                "BF_QR_CODE"
+            ],
+            "DeblurModes": [
+                {
+                    "Mode": "DM_BASED_ON_LOC_BIN"
+                },
+                {
+                    "Mode": "DM_SHARPENING_SMOOTHING"
+                },
+                {
+                    "Mode": "DM_DEEP_ANALYSIS"
+                }
+            ],
+            "ExpectedBarcodesCount": 999,
+            "LocalizationModes": [
+                {
+                    "Mode": "LM_CONNECTED_BLOCKS"
+                }
+            ],
+            "Name": "task-read-barcodes",
+            "SectionImageParameterArray": [
+                {
+                    "ContinueWhenPartialResultsGenerated": 1,
+                    "ImageParameterName": "ip-read-barcodes",
+                    "Section": "ST_REGION_PREDETECTION"
+                },
+                {
+                    "ContinueWhenPartialResultsGenerated": 1,
+                    "ImageParameterName": "ip-read-barcodes",
+                    "Section": "ST_BARCODE_LOCALIZATION"
+                },
+                {
+                    "ContinueWhenPartialResultsGenerated": 1,
+                    "ImageParameterName": "ip-read-barcodes",
+                    "Section": "ST_BARCODE_DECODING"
+                }
+            ]
+        }
+    ],
+    "CaptureVisionTemplates": [
+        {
+            "ImageROIProcessingNameArray": [
+                "roi-read-barcodes"
+            ],
+            "Name": "ReadBarcodes_Default"
+        }
+    ],
+    "ImageParameterOptions": [
+        {
+            "BinarizationModes": [
+                {
+                    "Mode": "BM_LOCAL_BLOCK",
+                    "BinarizationThreshold": -1,
+                    "BlockSizeX": 11,
+                    "BlockSizeY": 11,
+                    "EnableFillBinaryVacancy": 1,
+                    "ThresholdCompensation": 10
+                }
+            ],
+            "GrayscaleEnhancementModes": [
+                {
+                    "Mode": "GEM_SHARPEN_SMOOTH",
+                    "Sensitivity": -1,
+                    "SharpenBlockSizeX": 3,
+                    "SharpenBlockSizeY": 3,
+                    "SmoothBlockSizeX": 3,
+                    "SmoothBlockSizeY": 3
+                }
+            ],
+            "ScaleUpModes": [
+                {
+                    "Mode": "SUM_LINEAR_INTERPOLATION",
+                    "AcuteAngleWithXThreshold": 0,
+                    "ModuleSizeThreshold": 4,
+                    "TargetModuleSize": 6
+                }
+            ],
+            "GrayscaleTransformationModes": [
+                {
+                    "Mode": "GTM_ORIGINAL"
+                }
+            ],
+            "Name": "ip-read-barcodes",
+            "ScaleDownThreshold": 9999
+        }
+    ],
+    "TargetROIDefOptions": [
+        {
+            "Name": "roi-read-barcodes",
+            "TaskSettingNameArray": [
+                "task-read-barcodes"
+            ]
+        }
+    ]
+}`;
+    mapTemplate.template2 = `{
+    "CaptureVisionTemplates":[
+        {
+            "Name":"ReadBarcodes_Default",
+            "ImageROIProcessingNameArray":[
+                "TA_0"
+            ],
+            "MaxParallelTasks":1,
+            "Timeout":10000
+        }
+    ],
+    "TargetROIDefOptions":[
+        {
+            "Name":"TA_0",
+            "TaskSettingNameArray":[
+                "BR_0"
+            ]
+
+        }
+    ],
+    "BarcodeReaderTaskSettingOptions":[
+        {
+            "Name":"BR_0",
+            "ExpectedBarcodesCount":999,
+            "BarcodeFormatIds":[
+                "BF_QR_CODE"
+            ],
+            "BarcodeFormatSpecificationNameArray":["FP_1"],
+            "LocalizationModes":[
+                {"Mode":"LM_CONNECTED_BLOCKS"},
+                {"Mode":"LM_SCAN_DIRECTLY"},
+                {"Mode":"LM_STATISTICS"},
+                {"Mode":"LM_LINES"}
+            ],
+            "DeblurModes":[
+                {"Mode":"DM_BASED_ON_LOC_BIN"},
+                {"Mode":"DM_THRESHOLD_BINARIZATION"},
+                {"Mode":"DM_DIRECT_BINARIZATION"},
+                {"Mode":"DM_DEEP_ANALYSIS"},
+                {"Mode":"DM_SMOOTHING"},
+                {"Mode":"DM_GRAY_EQUALIZATION"},
+                {"Mode":"DM_SHARPENING_SMOOTHING"}
+            ],
+            "DeformationResistingModes":[
+                {"Mode":"DRM_SKIP"},
+                {"Mode":"DRM_BROAD_WARP"}
+            ],
+
+            "SectionImageParameterArray":[
+                {
+                    "ImageParameterName":"IP_0",
+                    "Section":"ST_BARCODE_LOCALIZATION"
+                },
+                {
+                    "ImageParameterName":"IP_1",
+                    "Section":"ST_BARCODE_DECODING"
+                }
+            ]
+        }
+    ],
+    "BarcodeFormatSpecificationOptions":[
+        {
+            "Name":"FP_1",
+            "BarcodeFormatIds":[
+                "BF_QR_CODE"
+            ],
+            "BarcodeWidthRangeArray":
+            [
+                {
+                    "MinValue":40,
+                    "MaxValue":1000
+                }
+            ],
+            "BarcodeHeightRangeArray":
+            [
+                {
+                    "MinValue":40,
+                    "MaxValue":1000
+                }
+            ],
+            "MinResultConfidence":30
+        }
+    ],
+    "ImageParameterOptions":[
+        {
+            "Name":"IP_0",
+            "GrayscaleEnhancementModes":
+            [
+                {
+                    "Mode":"GEM_GENERAL"
+                },
+                {
+                    "Mode":"GEM_GRAY_SMOOTH",
+                    "SmoothBlockSizeX":3,
+                    "SmoothBlockSizeY":3
+                }
+            ],
+            "BinarizationModes":[
+                {
+                    "Mode":"BM_LOCAL_BLOCK",
+                    "BlockSizeX":11,
+                    "BlockSizeY":11,
+                    "EnableFillBinaryVacancy":0,
+                    "ThresholdCompensation":25
+                },
+                {
+                    "Mode":"BM_LOCAL_BLOCK",
+                    "BlockSizeX":21,
+                    "BlockSizeY":21,
+                    "EnableFillBinaryVacancy":0,
+                    "ThresholdCompensation":35
+                },
+                {
+                    "Mode":"BM_LOCAL_BLOCK",
+                    "BlockSizeX":21,
+                    "BlockSizeY":21,
+                    "EnableFillBinaryVacancy":0,
+                    "ThresholdCompensation":45
+                }
+            ],
+            "TextureDetectionModes":[
+                {"Mode":"TDM_SKIP"}
+            ],
+            "ScaleDownThreshold":99999
+        },
+        {
+            "Name":"IP_1",
+            "ScaleDownThreshold":99999
+        }
+    ]
+}`;
                 
   </script>
 </body>
