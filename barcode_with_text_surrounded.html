@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Recognize labels & barcodes with Dynamsoft Capture Vision.">
+    <meta name="keywords" content="barcode & label recognizing">
+    <title>Recognize barcode & accompanied text</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.6.1000/dist/dcv.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda/eruda.min.js"></script>
+    <script>eruda.init();</script>
+</head>
+
+<body>
+    <h1 style="font-size: 1.5em;">Recognize text and barcode from a Camera</h1>
+    <button id="btn-open-recognize" onclick="startCapturing()">Start Capturing</button>
+    <span id="text-loading" style="display: none; color: red;margin-left: 10px;vertical-align: middle;">Loading Model...</span>
+    <div id="div-ui-container" style="margin-top: 10px;height: 700px;"></div>
+    Results:
+    <br>
+    <div id="div-results-container" style="width: 100%; height: 10vh; overflow: auto;"></div>
+    <script>
+        let router = null;
+        let cameraEnhancer = null;
+        let promiseCVRReady = null;
+
+        const cameraViewContainer = document.querySelector("#div-ui-container");
+        const resultsContainer = document.querySelector("#div-results-container");
+        const textLoading = document.querySelector("#text-loading");
+
+        /** LICENSE ALERT - README
+         * To use the library, you need to first specify a license key using the API "license" as shown below.
+         */
+        Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+        /** 
+         * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=github&product=dlr&package=js to get your own trial license good for 30 days. 
+         * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+         * For more information, see https://www.dynamsoft.com/label-recognition/programming/javascript/user-guide.html?ver=latest#specify-the-license or contact support@dynamsoft.com.
+         * LICENSE ALERT - THE END 
+         */
+
+        Dynamsoft.DLR.LabelRecognizerModule.onDataLoadProgressChanged = (modelPath, tag, progress) => {
+            if (tag === "starting") {
+                textLoading.style.display = "inline";
+            } else if (tag === "completed") {
+                textLoading.style.display = "none";
+            };
+        }
+
+        /**
+         * Preloads the `DBR` & ''DLR module
+         */
+        Dynamsoft.Core.CoreModule.loadWasm(["DLR","DBR"]);
+
+        /**
+         * Creates a CameraEnhancer instance for later use.
+         */
+        async function initDCE() {
+            const view = await Dynamsoft.DCE.CameraView.createInstance();
+            cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(view);
+            cameraViewContainer.append(view.getUIElement());
+            cameraEnhancer.setScanRegion({x: 10,y: 45,width: 80,height: 10,isMeasuredInPercentage: true,})
+        }
+
+        /**
+         * Creates a CaptureVisionRouter instance and configure the task to recognize text.
+         * Also, make sure the original image is returned after it has been processed.
+         */
+        let cvrReady = (async function initCVR() {
+            await initDCE();
+            router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+            router.setInput(cameraEnhancer);
+            let settings = {
+              "CaptureVisionTemplates": [
+                {
+                  "Name": "ReadBarcode&AccompanyText",
+                  "ImageROIProcessingNameArray": [
+                    "roi-read-barcodes-only","roi-read-text-top"
+                  ]
+                }
+              ],
+              "TargetROIDefOptions": [
+                {
+                  "Name": "roi-read-barcodes-only",
+                  "TaskSettingNameArray": ["task-read-barcodes"]
+                },
+                {
+                  "Name": "roi-read-text-top",
+                  "TaskSettingNameArray": ["task-read-text"],
+                  "Location":
+                  {
+                    "ReferenceObjectFilter" : {
+                      "ReferenceTargetROIDefNameArray": ["roi-read-barcodes-only"]
+                    },
+                    "Offset": {
+                      "MeasuredByPercentage": 1,
+                      "FirstPoint": [-50, -100],
+                      "SecondPoint": [150, -100],
+                      "ThirdPoint": [150, 0],
+                      "FourthPoint": [-50, 0]
+                  }
+                  }
+                }
+              ],
+              "CharacterModelOptions": [
+                {
+                  "Name": "NumberUppercase",
+                  "CharSet": {
+                      "AddSpecialChars":[" ",":"]
+                  }
+                }
+              ],
+              "ImageParameterOptions": [
+                {
+                  "Name": "ip-read-text",
+                  "TextDetectionMode": {
+                    "Mode": "TTDM_LINE",
+                    "CharHeightRange": [
+                      20,
+                      1000,
+                      1
+                    ],
+                    "Direction": "HORIZONTAL",
+                    "Sensitivity": 7
+                  }
+                }
+              ],
+              "TextLineSpecificationOptions": [
+                {
+                  "Name": "tls-numberuppercase",
+                  "CharacterModelName": "NumberUppercase",
+                  "CharHeightRange": [5, 1000, 1],
+                  "BinarizationModes": [
+                    {
+                      "BlockSizeX": 30,
+                      "BlockSizeY": 30,
+                      "Mode": "BM_LOCAL_BLOCK",
+                      "MorphOperation": "Close"
+                    }
+                  ]
+                }, 
+                {
+                  "Name": "tls-modelno",
+                  "BaseTextLineSpecificationName": "tls-numberuppercase",
+                  "StringRegExPattern": "(MODEL NO:)[A-Z0-9 ]*"
+                },
+                {
+                  "Name": "tls-serialno",
+                  "BaseTextLineSpecificationName": "tls-numberuppercase",
+                  "StringRegExPattern": "(SERIAL NO:)[A-Z0-9 ]*"
+                },
+                {
+                  "Name": "tls-ssid",
+                  "BaseTextLineSpecificationName": "tls-numberuppercase",
+                  "StringRegExPattern": "(SSID:)[A-Z0-9 ]*"
+                },
+                {
+                  "Name": "tls-onumac",
+                  "BaseTextLineSpecificationName": "tls-numberuppercase",
+                  "StringRegExPattern": "(ONU MAC:)[A-Z0-9 ]*"
+                },
+                {
+                  "Name": "tls-matmac",
+                  "BaseTextLineSpecificationName": "tls-numberuppercase",
+                  "StringRegExPattern": "(MTA MAC:)[A-Z0-9 ]*"
+                }
+              ],
+              "BarcodeReaderTaskSettingOptions": [
+                {
+                  "Name": "task-read-barcodes"
+                }
+              ],
+              "LabelRecognizerTaskSettingOptions": [
+                {
+                  "Name": "task-read-text",
+                  "TextLineSpecificationNameArray": [
+                    "tls-modelno",
+                    "tls-serialno",
+                    "tls-ssid",
+                    "tls-onumac",
+                    "tls-matmac"
+                  ],
+                  "SectionImageParameterArray": [
+                    {
+                      "Section": "ST_REGION_PREDETECTION",
+                      "ImageParameterName": "ip-read-text"
+                    },
+                    {
+                      "Section": "ST_TEXT_LINE_LOCALIZATION",
+                      "ImageParameterName": "ip-read-text"
+                    },
+                    {
+                      "Section": "ST_TEXT_LINE_RECOGNITION",
+                      "ImageParameterName": "ip-read-text"
+                    }
+                  ]
+                }
+              ]
+            }
+            await router.initSettings(settings);
+            /* Defines the result receiver for the task.*/
+            const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
+            resultReceiver.onRecognizedTextLinesReceived = (result) => {
+                if (!result.textLineResultItems.length) return;
+                resultsContainer.innerHTML = "";
+                //console.log(result);
+                for (let item of result.textLineResultItems) {
+                    resultsContainer.innerHTML += `[text]: ${item.text.split(':')[0] + ":"} <br><hr>[barcode]: ${item.referencedItem.text}<br><hr>`;
+                }
+            };
+            await router.addResultReceiver(resultReceiver);
+
+            // Filter out unchecked and duplicate results.
+            const filter = new Dynamsoft.Utility.MultiFrameResultCrossFilter();
+            filter.enableResultCrossVerification(Dynamsoft.Core.EnumCapturedResultItemType.CRIT_TEXT_LINE, true); // Filter out unchecked text lines.
+            // Filter out duplicate text lines within 3 seconds.
+            filter.enableResultDeduplication(Dynamsoft.Core.EnumCapturedResultItemType.CRIT_TEXT_LINE, true);
+            filter.setDuplicateForgetTime(Dynamsoft.Core.EnumCapturedResultItemType.CRIT_TEXT_LINE, 3000);
+            await router.addResultFilter(filter);
+        })();
+
+        async function startCapturing() {
+            try {
+                await (promiseCVRReady = promiseCVRReady || (async () => {
+                    await cvrReady;
+                    /* Starts streaming the video. */
+                    await cameraEnhancer.open();
+                    /* Uses the template "ReadBarcode&AccompanyText" to start a recognize task. */
+                    await router.startCapturing("ReadBarcode&AccompanyText");
+                })());
+            } catch (ex) {
+                let errMsg = ex.message || ex;
+                console.error(errMsg);
+                alert(errMsg);
+            }
+        }
+    </script>
+</body>
+
+</html>
