@@ -63,6 +63,15 @@
             cameraEnhancer.setScanRegion({x: 10,y: 45,width: 80,height: 10,isMeasuredInPercentage: true,})
         }
 
+        function extractPrefix(input) {
+            const regex = /^(MODEL NO|SERIAL NO|SSID|ONU MAC|MTA MAC):.+$/;
+            if (regex.test(input)) {
+                return input.split(":")[0];
+            } else {
+                return null;
+            }
+        }
+        
         /**
          * Creates a CaptureVisionRouter instance and configure the task to recognize text.
          * Also, make sure the original image is returned after it has been processed.
@@ -206,7 +215,7 @@
                 resultsContainer.innerHTML = "";
                 //console.log(result);
                 for (let item of result.textLineResultItems) {
-                    resultsContainer.innerHTML += `[text]: ${item.text.split(':')[0] + ":"} <br><hr>[barcode]: ${item.referencedItem.text}<br><hr>`;
+                    resultsContainer.innerHTML += `[text]: ${extractPrefix(item.text)} <br><hr>[barcode]: ${item.referencedItem.text}<br><hr>`;
                 }
             };
             await router.addResultReceiver(resultReceiver);
