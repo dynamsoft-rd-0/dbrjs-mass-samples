@@ -47,6 +47,10 @@
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.4.3100/dist/dbr.bundle.js" integrity="sha384-aS4pUFQQRe8K7ctw7GpOAI29DFnupbhqg1cOpwcjDYWbl0Au7ZF9p2jjqigZwmVb" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/Dynamsoft/easy-barcode-scanner@10.4.3100/dist/easy-barcode-scanner.js" integrity="sha384-vyc43mXQ4+6FQO3Uo7bawjmEdDS4ugyYubNDCd9Q4UV6p7ZcFHvUDsn5j+CjPYWH" crossorigin="anonymous"></script>
     <script nonce="JustForTest">
+        
+        //// self host need to specific
+        // Dynamsoft.Core.CoreModule.engineResourcePaths.rootDirectory = '/assets/'
+
         EasyBarcodeScanner.scan().then(txt=>alert(txt)).catch(ex=>alert(ex.message || ex));
     </script>
 </body>
