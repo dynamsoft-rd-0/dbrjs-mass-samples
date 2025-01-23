@@ -20,11 +20,11 @@ function ImageCapture() {
       // ensure cvRouter is created only once
       const cvRouter = await (pCvRouter.current = pCvRouter.current || CaptureVisionRouter.createInstance());
       if (isDestroyed.current) return;
+      await cvRouter.initSettings("./template.json");
 
       let _resultText = "";
       for (let file of files) {
-        // Decode selected image with 'ReadBarcodes_ReadRateFirst' template.
-        const result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
+        const result = await cvRouter.capture(file, "Read_Curved_QRCode");
         console.log(result);
         if (isDestroyed.current) return;
 

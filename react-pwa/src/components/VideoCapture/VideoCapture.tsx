@@ -41,6 +41,8 @@ function VideoCapture() {
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
+        await cvRouter.initSettings("./template.json");
+
         cvRouter.setInput(cameraEnhancer);
 
         // Define a callback for results.
@@ -75,7 +77,7 @@ function VideoCapture() {
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
-        await cvRouter.startCapturing("ReadSingleBarcode");
+        await cvRouter.startCapturing("Read_Curved_QRCode");
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }

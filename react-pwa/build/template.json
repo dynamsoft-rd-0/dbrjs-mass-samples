@@ -1,0 +1,67 @@
+{
+  "BarcodeReaderTaskSettingOptions": [
+    {
+      "BarcodeFormatIds": [
+        "BF_QR_CODE"
+      ],
+      "ExpectedBarcodesCount": 1,
+      "Name": "task-read-barcodes",
+      "DeformationResistingModes": [
+        {
+          "Mode": "DRM_DEWRINKLE"
+        },
+        {
+          "Mode": "DRM_BROAD_WARP"
+        }
+      ],
+      "LocalizationModes": [
+        {
+          "Mode": "LM_SCAN_DIRECTLY"
+        },
+        {
+          "Mode": "LM_CONNECTED_BLOCKS"
+        }
+      ],
+      "SectionImageParameterArray": [
+        {
+          "ImageParameterName": "ip-read-barcodes",
+          "Section": "ST_REGION_PREDETECTION"
+        },
+        {
+          "ImageParameterName": "ip-read-barcodes",
+          "Section": "ST_BARCODE_LOCALIZATION"
+        },
+        {
+          "ImageParameterName": "ip-read-barcodes",
+          "Section": "ST_BARCODE_DECODING"
+        }
+      ]
+    }
+  ],
+  "CaptureVisionTemplates": [
+    {
+      "ImageROIProcessingNameArray": [
+        "roi-read-barcodes"
+      ],
+      "Name": "Read_Curved_QRCode"
+    }
+  ],
+  "ImageParameterOptions": [
+    {
+      "GrayscaleTransformationModes": [
+        {
+          "Mode": "GTM_ORIGINAL"
+        }
+      ],
+      "Name": "ip-read-barcodes"
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "roi-read-barcodes",
+      "TaskSettingNameArray": [
+        "task-read-barcodes"
+      ]
+    }
+  ]
+}

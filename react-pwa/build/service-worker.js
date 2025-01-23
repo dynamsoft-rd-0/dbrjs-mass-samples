@@ -14,6 +14,7 @@ const cacheName = "react-pwa";
 const appShellFiles = [
   "./index.html",
   "./manifest.json",
+  "./template.json",
   `${engineResourcePaths.std}std.js`,
   `${engineResourcePaths.std}std.wasm`,
   `${engineResourcePaths.dip}dip.wasm`,
