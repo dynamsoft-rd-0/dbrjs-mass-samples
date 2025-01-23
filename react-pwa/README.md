@@ -173,7 +173,7 @@ function VideoCapture() {
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
-        await cvRouter.startCapturing("ReadSingleBarcode");
+        await cvRouter.startCapturing("Read_Curved_QRCode");
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
@@ -252,8 +252,8 @@ function ImageCapture() {
 
       let _resultText = "";
       for (let file of files) {
-        // Decode selected image with 'ReadBarcodes_ReadRateFirst' template.
-        const result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
+        // Decode selected image with 'Read_Curved_QRCode' template.
+        const result = await cvRouter.capture(file, "Read_Curved_QRCode");
         console.log(result);
         if (isDestroyed.current) return;
 
