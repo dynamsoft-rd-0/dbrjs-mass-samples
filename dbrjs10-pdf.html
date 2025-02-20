@@ -67,6 +67,7 @@
             if(!isPDF){
               // Decode selected image with 'ReadBarcodes_SpeedFirst' template.
               const result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
+              console.log(result);
               handleResult(result);
             }else{
               await decodePdf(file);
@@ -107,16 +108,11 @@
       };
 
       const handleResult = (result)=>{
-        let hasBarcode = false;
-        for (let item of result.items) {
-          if (item.type !== Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE) {
-            continue;
-          }
-          hasBarcode = true;
+        for (let item of result.barcodeResultItems) {
           resultsContainer.innerText += item.text + "\n";
           console.log(item.text);
         }
-        if (!hasBarcode) resultsContainer.innerText += "No barcode found\n";
+        if (!result.barcodeResultItems.length) resultsContainer.innerText += "No barcode found\n";
       };
     </script>
   </body>
