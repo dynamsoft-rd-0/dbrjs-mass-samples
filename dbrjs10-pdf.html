@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="description" content="Read barcodes from an image in no time with Dynamsoft Barcode Reader." />
+    <meta name="keywords" content="barcode, image" />
+    <link rel="canonical" href="https://demo.dynamsoft.com/Samples/DBR/JS/hello-world/read-an-image.html" />
+    <title>Dynamsoft Barcode Reader Sample - Hello World (Read an Image)</title>
+  </head>
+
+  <body>
+    <h1>Hello World (Read an Image)</h1>
+    <input id="input-file" type="file" multiple accept=".jpg,.jpeg,.icon,.gif,.svg,.webp,.png,.bmp,.pdf" /><br />
+    Results:<br />
+    <div id="results"></div>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.4.3100/dist/dbr.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs" type="module"></script>
+    <script type="module">
+      /** LICENSE ALERT - README
+       * To use the library, you need to first specify a license key using the API "initLicense()" as shown below.
+       */
+
+      Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+
+      /**
+       * You can visit https://www.dynamsoft.com/customer/license/trialLicense?utm_source=samples&product=dbr&package=js to get your own trial license good for 30 days.
+       * Note that if you downloaded this sample from Dynamsoft while logged in, the above license key may already be your own 30-day trial license.
+       * For more information, see https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/user-guide/index.html?ver=10.4.3100&cVer=true#specify-the-license&utm_source=samples or contact support@dynamsoft.com.
+       * LICENSE ALERT - THE END
+       */
+
+      // Optional. Preload "BarcodeReader" module for reading barcodes. It will save time on the initial decoding by skipping the module loading.
+      Dynamsoft.Core.CoreModule.loadWasm(["DBR"]);
+
+      const resultsContainer = document.querySelector("#results");
+
+      let cvRouter; // an instance of CaptureVisionRouter
+      let pCvRouter; // promise of CaptureVisionRouter
+      let pPdfjsReady; // promise of pdfjs initialization
+      let pdfScale = 4; // Modify it according to your needs
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.mjs';
+
+      document.querySelector("#input-file").addEventListener("change", async function () {
+        let /**@type {!File[]}*/files = [...this.files];
+        this.value = "";
+        resultsContainer.innerText = "";
+        try {
+          cvRouter ??= await (pCvRouter ??= Dynamsoft.CVR.CaptureVisionRouter.createInstance());
+
+          for (let file of files) {
+            if (files.length > 1) {
+              resultsContainer.innerText += `\n${file.name}:\n`;
+            }
+
+            let isPDF = false;
+            {
+              let u8 = new Uint8Array(await file.slice(0,4).arrayBuffer());
+              // pdf file starts with [0x25,0x50,0x44,0x46], known as `%PDF`
+              if(0x25 === u8[0] && 0x50 === u8[1] && 0x44 === u8[2] && 0x46 === u8[3]){
+                isPDF = true;
+                console.log(isPDF);
+              }
+            }
+
+            if(!isPDF){
+              // Decode selected image with 'ReadBarcodes_SpeedFirst' template.
+              const result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
+              handleResult(result);
+            }else{
+              await decodePdf(file);
+            }
+          }
+
+        } catch (ex) {
+          let errMsg = ex.message || ex;
+          console.error(ex);
+          alert(errMsg);
+        }
+      });
+
+      const decodePdf = async(/**@type {!File}*/file)=>{
+        const/**@type {!HTMLCanvasElement[]}*/arrPDFCanvas = [];
+
+        const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+
+        // pdfjs page index is 1 base
+        for(let iPage = 1; iPage <= pdf.numPages; ++iPage){
+          const page = await pdf.getPage(iPage);
+          const viewport = page.getViewport({scale: pdfScale});
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          const canvasContext = canvas.getContext('2d');
+          await page.render({canvasContext,viewport}).promise;
+          document.body.append(canvas); // ******for debug*********
+
+          // Decode selected image with 'ReadBarcodes_SpeedFirst' template.
+          const result = await cvRouter.capture(canvas, "ReadBarcodes_ReadRateFirst");
+          
+          if(pdf.numPages > 1){
+            resultsContainer.innerText += `\nPage ${iPage}:\n`;
+          }
+          handleResult(result);
+        }
+      };
+
+      const handleResult = (result)=>{
+        let hasBarcode = false;
+        for (let item of result.items) {
+          if (item.type !== Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE) {
+            continue;
+          }
+          hasBarcode = true;
+          resultsContainer.innerText += item.text + "\n";
+          console.log(item.text);
+        }
+        if (!hasBarcode) resultsContainer.innerText += "No barcode found\n";
+      };
+    </script>
+  </body>
+</html>
