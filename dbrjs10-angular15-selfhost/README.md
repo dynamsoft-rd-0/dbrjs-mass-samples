@@ -1,9 +1,10 @@
 ### About redirect \*.html
 
-When deploying a single-page application, HTML is often redirected.
+When deploying a single-page application, `*.html` is often redirected to `index.html`.
 
 To avoid affecting the loading of `dce.ui.html`, you can rename it to `dce.ui.html.xml`.
 
+Then in your code, you can load it like this:
 ```ts
 let cameraView = await CameraView.createInstance('dynamsoft-assets/dynamsoft-camera-enhancer@4.1.1/dist/dce.ui.html.xml');
 ```
