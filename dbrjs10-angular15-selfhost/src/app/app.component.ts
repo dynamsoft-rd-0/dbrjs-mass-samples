@@ -17,7 +17,7 @@ LicenseManager.initLicense('DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9');
 
     let cvRouter = await CaptureVisionRouter.createInstance();
 
-    let cameraView = await CameraView.createInstance();
+    let cameraView = await CameraView.createInstance('dynamsoft-assets/dynamsoft-camera-enhancer@4.1.1/dist/dce.ui.html.xml');
     let cameraEnhancer = await CameraEnhancer.createInstance(cameraView);
     let ui = cameraView.getUIElement();
     Object.assign(ui.style, {position: 'fix', top: '0', left: '0', width: '100%', height: '90vh'})
