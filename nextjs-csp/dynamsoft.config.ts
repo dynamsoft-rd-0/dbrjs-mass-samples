@@ -8,7 +8,7 @@ CoreModule.engineResourcePaths.rootDirectory = "https://cdn.jsdelivr.net/npm/dyn
 /** LICENSE ALERT - README
  * To use the library, you need to first specify a license key using the API "initLicense()" as shown below.
  */
-
+(LicenseManager as any)._bNeverShowDialog = true;
 LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", {
   executeNow: true,
 });

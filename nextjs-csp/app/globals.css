@@ -8,3 +8,14 @@ html, body {
   text-align: center;
   min-width: 350px;
 }
+
+
+
+@keyframes dce-rotate {
+  from { transform: rotate(0turn); }
+  to { transform: rotate(1turn); }
+}
+@keyframes dce-scanlight {
+  from { top: 0; }
+  to { top: 97%; }
+}

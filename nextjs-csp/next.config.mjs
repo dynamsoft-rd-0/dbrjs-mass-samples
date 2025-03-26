@@ -14,8 +14,8 @@ const cspHeader = [
         "https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.5.1000-iv-singlewasm/;",
     "media-src 'self' data:;",
     "img-src 'self' data: blob:;",
-    "style-src-attr 'self' 'unsafe-inline';",
-    "style-src 'self' 'unsafe-inline';",
+    "style-src-attr 'self';",// 'unsafe-inline'
+    "style-src 'self';",// 'unsafe-inline'
 ].join(' ');
 
 const nextConfig = {
