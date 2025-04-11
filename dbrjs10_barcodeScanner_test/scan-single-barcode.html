@@ -16,6 +16,12 @@
         showUploadImageButton: true,
       });
       (async () => {
+        const arrDataBases = await indexedDB.databases();
+        const copiedArr = Array.from(arrDataBases);
+          for (let i of copiedArr) {
+            indexedDB.deleteDatabase(i.name);
+          }
+        localStorage.clear();
         const result = await barcodeScanner.launch();
         console.log(result);
         for (let item of result.barcodeResults) {

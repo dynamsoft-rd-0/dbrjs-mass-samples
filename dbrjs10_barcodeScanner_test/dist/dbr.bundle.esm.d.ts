@@ -29,7 +29,7 @@ declare enum EnumResultStatus {
 interface BarcodeScannerConfig {
     license?: string;
     /**
-     * SM_CONTINUOUS: Only under this mode will a result view be useful.
+     * SM_MULTI_UNIQUE: Only under this mode will a result view be useful.
      * SM_SINGLE: result view is not rendered.
      */
     scanMode?: EnumScanMode;
@@ -44,7 +44,7 @@ interface BarcodeScannerConfig {
      * B: Not specified:
      *   1. If no container for either scanner or result view, then auto-create one with full viewport size
      *   2. If container specified for scanner or result view, use these containers
-     * SM_CONTINUOUS mode + both views are present in one container (A or B1)
+     * SM_MULTI_UNIQUE mode + both views are present in one container (A or B1)
      *   1. Portrait: video up with 50% fixed height; result down with 50% height, hovering toolbar and scrollable result pane
      *   2. Landscape: video left with 50% fixed width; result right with 50% width (scrollable, toolbar down, hovering)
      * SM_SINGLE mode
@@ -52,7 +52,7 @@ interface BarcodeScannerConfig {
      */
     container?: HTMLElement | string | undefined;
     /**
-     * Callback valid only when scanMode is "SM_CONTINUOUS"
+     * Callback valid only when scanMode is "SM_MULTI_UNIQUE"
      * @param result The barcode result (one at a time);
      */
     onUniqueBarcodeScanned?: (result: BarcodeResultItem) => {};
@@ -65,7 +65,7 @@ interface BarcodeScannerConfig {
      */
     scannerViewConfig?: ScannerViewConfig;
     /**
-     * result view config is only valid when the mode is SM_CONTINUOUS
+     * result view config is only valid when the mode is SM_MULTI_UNIQUE
      */
     resultViewConfig?: ResultViewConfig;
 }
