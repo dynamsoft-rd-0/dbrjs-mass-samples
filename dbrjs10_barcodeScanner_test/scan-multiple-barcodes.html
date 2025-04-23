@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="./dist/dbr.bundle.js"></script>
-    <!-- <script src="https://npm.scannerproxy.com:802/cdn/@dynamsoft/dynamsoft-barcode-reader-bundle@10.5.1000-dev-20250409173553/dist/dbr.bundle.js"></script> -->
+    <!-- <script src="https://npm.scannerproxy.com:802/cdn/@dynamsoft/dynamsoft-barcode-reader-bundle@10.5.1000-dev-20250422141447/dist/dbr.bundle.js"></script> -->
   </head>
   <body>
     <script>
@@ -26,9 +26,6 @@
         localStorage.clear();
         const result = await barcodeScanner.launch();
         console.log(result);
-        for (let item of result.barcodeResults) {
-            alert(item.text);
-        };
       })();
     </script>
   </body>

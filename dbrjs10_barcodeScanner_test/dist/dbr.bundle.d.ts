@@ -34,50 +34,23 @@ declare enum EnumResultStatus {
 
 interface BarcodeScannerConfig {
     license?: string;
-    /**
-     * SM_MULTI_UNIQUE: Only under this mode will a result view be useful.
-     * SM_SINGLE: result view is not rendered.
-     */
     scanMode?: EnumScanMode;
     templateFilePath?: string;
     utilizedTemplateNames?: UtilizedTemplateNames;
     engineResourcePaths?: EngineResourcePaths;
-    barcodeFormats?: Array<EnumBarcodeFormat>;
+    barcodeFormats?: Array<EnumBarcodeFormat> | EnumBarcodeFormat;
     duplicateForgetTime?: number;
-    /**
-     * Specifies an HTML container to hold the Views.
-     * A: Specified: Ignore view container for scanner/view.
-     * B: Not specified:
-     *   1. If no container for either scanner or result view, then auto-create one with full viewport size
-     *   2. If container specified for scanner or result view, use these containers
-     * SM_MULTI_UNIQUE mode + both views are present in one container (A or B1)
-     *   1. Portrait: video up with 50% fixed height; result down with 50% height, hovering toolbar and scrollable result pane
-     *   2. Landscape: video left with 50% fixed width; result right with 50% width (scrollable, toolbar down, hovering)
-     * SM_SINGLE mode
-     *   In single mode, the container is only for the scannerView, no result view rendered
-     */
     container?: HTMLElement | string | undefined;
-    /**
-     * Callback valid only when scanMode is "SM_MULTI_UNIQUE"
-     * @param result The barcode result (one at a time);
-     */
-    onUniqueBarcodeScanned?: (result: BarcodeResultItem) => {};
+    onUniqueBarcodeScanned?: (result: BarcodeResultItem) => void | Promise<void>;
     showResultView?: boolean;
     showUploadImageButton?: boolean;
-    /**
-     * The scanner view is just video with a close button
-     * The scanner UI has video covered (object-fit: cover;)
-     * Only detect barcode within the view
-     */
+    removePoweredByMessage?: boolean;
     scannerViewConfig?: ScannerViewConfig;
-    /**
-     * result view config is only valid when the mode is SM_MULTI_UNIQUE
-     */
     resultViewConfig?: ResultViewConfig;
+    uiPath?: string;
 }
 interface ScannerViewConfig {
     container?: HTMLElement | string | undefined;
-    cameraEnhancerUIPath?: string;
     showCloseButton?: boolean;
 }
 interface BarcodeResultViewToolbarButtonsConfig {
@@ -89,29 +62,25 @@ interface ResultViewConfig {
     toolbarButtonsConfig?: BarcodeResultViewToolbarButtonsConfig;
 }
 
-/**** New ones in DBS JS ****/
-/** Start of Shared Ones **/
 type ResultStatus = {
     code: EnumResultStatus;
-    message?: string;
+    message: string;
 };
 interface ToolbarButtonConfig {
-    label: string;
+    label?: string;
     className?: string;
     isHidden?: boolean;
 }
-/** End of Shared Ones **/
-/** Start of DBS Only Ones **/
 interface BarcodeScanResult {
     status: ResultStatus;
-    barcodeResults?: Array<BarcodeResultItem>;
+    barcodeResults: Array<BarcodeResultItem>;
     originalImageResult?: DSImageData;
     barcodeImage?: DSImageData;
 }
 interface UtilizedTemplateNames {
-    single: string;
-    multi_unique: string;
-    image: string;
+    single?: string;
+    multi_unique?: string;
+    image?: string;
 }
 
 declare class BarcodeScanner {
