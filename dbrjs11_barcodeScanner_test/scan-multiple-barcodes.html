@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./dist/dbr.bundle.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.5.3000/dist/dbr.bundle.js"></script> -->
+    <!-- <script src="https://npm.scannerproxy.com:802/cdn/@dynamsoft/dynamsoft-barcode-reader-bundle@11.0.3000-dev-20250626162739/dist/dbr.bundle.js"></script> -->
+  </head>
+  <body>
+    <script>
+      const barcodeScanner = new Dynamsoft.BarcodeScanner({
+        license: "YOUR_LICENSE_KEY_HERE",
+        // engineResourcePaths: {rootDirectory:"./dist"},
+        scannerViewConfig: {
+            showFlashButton: true,
+            cameraSwitchControl: "toggleFrontBack",
+            customHighlightForBarcode: (item) => {  // change the highlight style for all detected barcodes
+                const rectDrawingStyleId = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
+                    lineWidth: 5, fillStyle: "rgba(0, 255, 255, 0.5)", strokeStyle: "rgba(0, 255, 255, 1)",
+                });
+                const drawingItem = new Dynamsoft.DCE.RectDrawingItem(
+                    {
+                        x: item.location.points[0].x,
+                        y: item.location.points[0].y,
+                        width: item.location.points[1].x - item.location.points[0].x,
+                        height: item.location.points[2].y - item.location.points[0].y,
+                        isMeasuredInPercentage: false
+                    },
+                    rectDrawingStyleId
+                )
+                return drawingItem;
+            },
+        //   showCloseButton: true,  
+        // },
+        // resultViewConfig: {
+        //     toolbarButtonsConfig: {
+        //       clear: {
+        //           label: "Clear-all", // Changes the text label of the clear button to "Clear-all"; string is "Clear" by default
+        //           isHidden: true // Hides the clear button; false by default
+        //       },
+        //       done: {
+        //           label: "Return Home", // Changes the text label of the done button to "Return Home"; string is "Done" by default
+        //           isHidden: true // Hides the done button; false by default
+        //       }
+        //   },
+        },
+        showUploadImageButton: true,
+        scanMode: Dynamsoft.EnumScanMode.SM_MULTI_UNIQUE,
+        //showResultView: true,
+        onUniqueBarcodeScanned: (result) => {
+            console.log(result);
+        // do something with the result
+        },
+        // onInitReady: (components) => {
+        //     // do something with the foundational components
+        //     // set the scan laser to be visible in cameraView
+        //     components.cameraView.setScanLaserVisible(true);
+        //     // set the zoom factor to 3
+        //     components.cameraEnhancer.setZoom({
+        //        factor: 3
+        //     });
+        //     // set the scan region to a rectangle with percentage values by cameraEnhancer
+        //     let region = {
+        //       "x": 0,
+        //       "y": 20,
+        //       "width": 100,
+        //       "height": 60,
+        //       "isMeasuredInPercentage": true
+        //     };
+        //     components.cameraEnhancer.setScanRegion(region);
+        // },
+        onCameraOpen: (components) => {
+            // do something with the foundational components
+            console.log(components.cameraEnhancer.getResolution());
+        },
+      });
+      (async () => {
+        const arrDataBases = await indexedDB.databases();
+        const copiedArr = Array.from(arrDataBases);
+          for (let i of copiedArr) {
+            indexedDB.deleteDatabase(i.name);
+          }
+        localStorage.clear();
+        const result = await barcodeScanner.launch();
+        console.log(result);
+      })();
+    </script>
+  </body>
+</html>

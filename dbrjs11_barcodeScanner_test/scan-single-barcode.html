@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./dist/dbr.bundle.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.5.3000/dist/dbr.bundle.js"></script> -->
+    <!-- <script src="https://npm.scannerproxy.com:802/cdn/@dynamsoft/dynamsoft-barcode-reader-bundle@11.0.3000-dev-20250626162739/dist/dbr.bundle.js"></script> -->
+  </head>
+  <body>
+    <script>
+      const barcodeScanner = new Dynamsoft.BarcodeScanner({
+        license: "YOUR_LICENSE_KEY_HERE",
+        // utilizedTemplateNames:{
+        //     single: `ReadSingleBarcode`,
+        //     multi_unique: `ReadBarcodes_SpeedFirst`,
+        //     image: `ReadBarcodes_ReadRateFirst`,
+        // }
+        // engineResourcePaths: {rootDirectory:"./dist"},
+        // scannerViewConfig: {
+        //   showCloseButton: true,
+        // },
+        // showUploadImageButton: true,
+        // barcodeFormats: [Dynamsoft.DBR.EnumBarcodeFormat.BF_QR_CODE , Dynamsoft.DBR.EnumBarcodeFormat.BF_CODE_128],
+      });
+      (async () => {
+        const arrDataBases = await indexedDB.databases();
+        const copiedArr = Array.from(arrDataBases);
+          for (let i of copiedArr) {
+            indexedDB.deleteDatabase(i.name);
+          }
+        localStorage.clear();
+        const result = await barcodeScanner.launch();
+        console.log(result);
+        for (let item of result.barcodeResults) {
+            alert(item.text);
+        };
+      })();
+    </script>
+  </body>
+</html>
