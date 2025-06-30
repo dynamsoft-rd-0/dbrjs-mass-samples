@@ -15,22 +15,22 @@
         scannerViewConfig: {
             showFlashButton: true,
             cameraSwitchControl: "toggleFrontBack",
-            customHighlightForBarcode: (item) => {  // change the highlight style for all detected barcodes
-                const rectDrawingStyleId = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
-                    lineWidth: 5, fillStyle: "rgba(0, 255, 255, 0.5)", strokeStyle: "rgba(0, 255, 255, 1)",
-                });
-                const drawingItem = new Dynamsoft.DCE.RectDrawingItem(
-                    {
-                        x: item.location.points[0].x,
-                        y: item.location.points[0].y,
-                        width: item.location.points[1].x - item.location.points[0].x,
-                        height: item.location.points[2].y - item.location.points[0].y,
-                        isMeasuredInPercentage: false
-                    },
-                    rectDrawingStyleId
-                )
-                return drawingItem;
-            },
+            // customHighlightForBarcode: (item) => {  // change the highlight style for all detected barcodes
+            //     const rectDrawingStyleId = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
+            //         lineWidth: 5, fillStyle: "rgba(0, 255, 255, 0.5)", strokeStyle: "rgba(0, 255, 255, 1)",
+            //     });
+            //     const drawingItem = new Dynamsoft.DCE.RectDrawingItem(
+            //         {
+            //             x: item.location.points[0].x,
+            //             y: item.location.points[0].y,
+            //             width: item.location.points[1].x - item.location.points[0].x,
+            //             height: item.location.points[2].y - item.location.points[0].y,
+            //             isMeasuredInPercentage: false
+            //         },
+            //         rectDrawingStyleId
+            //     )
+            //     return drawingItem;
+            // },
         //   showCloseButton: true,  
         // },
         // resultViewConfig: {
