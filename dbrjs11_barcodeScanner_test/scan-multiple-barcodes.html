@@ -1,90 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="./dist/dbr.bundle.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.5.3000/dist/dbr.bundle.js"></script> -->
-    <!-- <script src="https://npm.scannerproxy.com:802/cdn/@dynamsoft/dynamsoft-barcode-reader-bundle@11.0.3000-dev-20250626162739/dist/dbr.bundle.js"></script> -->
-  </head>
-  <body>
-    <script>
-      const barcodeScanner = new Dynamsoft.BarcodeScanner({
-        license: "YOUR_LICENSE_KEY_HERE",
-        // engineResourcePaths: {rootDirectory:"./dist"},
-        scannerViewConfig: {
-            showFlashButton: true,
-            cameraSwitchControl: "toggleFrontBack",
-            // customHighlightForBarcode: (item) => {  // change the highlight style for all detected barcodes
-            //     const rectDrawingStyleId = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
-            //         lineWidth: 5, fillStyle: "rgba(0, 255, 255, 0.5)", strokeStyle: "rgba(0, 255, 255, 1)",
-            //     });
-            //     const drawingItem = new Dynamsoft.DCE.RectDrawingItem(
-            //         {
-            //             x: item.location.points[0].x,
-            //             y: item.location.points[0].y,
-            //             width: item.location.points[1].x - item.location.points[0].x,
-            //             height: item.location.points[2].y - item.location.points[0].y,
-            //             isMeasuredInPercentage: false
-            //         },
-            //         rectDrawingStyleId
-            //     )
-            //     return drawingItem;
-            // },
-        //   showCloseButton: true,  
-        // },
-        // resultViewConfig: {
-        //     toolbarButtonsConfig: {
-        //       clear: {
-        //           label: "Clear-all", // Changes the text label of the clear button to "Clear-all"; string is "Clear" by default
-        //           isHidden: true // Hides the clear button; false by default
-        //       },
-        //       done: {
-        //           label: "Return Home", // Changes the text label of the done button to "Return Home"; string is "Done" by default
-        //           isHidden: true // Hides the done button; false by default
-        //       }
-        //   },
-        },
-        showUploadImageButton: true,
-        scanMode: Dynamsoft.EnumScanMode.SM_MULTI_UNIQUE,
-        //showResultView: true,
-        onUniqueBarcodeScanned: (result) => {
-            console.log(result);
-        // do something with the result
-        },
-        // onInitReady: (components) => {
-        //     // do something with the foundational components
-        //     // set the scan laser to be visible in cameraView
-        //     components.cameraView.setScanLaserVisible(true);
-        //     // set the zoom factor to 3
-        //     components.cameraEnhancer.setZoom({
-        //        factor: 3
-        //     });
-        //     // set the scan region to a rectangle with percentage values by cameraEnhancer
-        //     let region = {
-        //       "x": 0,
-        //       "y": 20,
-        //       "width": 100,
-        //       "height": 60,
-        //       "isMeasuredInPercentage": true
-        //     };
-        //     components.cameraEnhancer.setScanRegion(region);
-        // },
-        onCameraOpen: (components) => {
-            // do something with the foundational components
-            console.log(components.cameraEnhancer.getResolution());
-        },
-      });
-      (async () => {
-        const arrDataBases = await indexedDB.databases();
-        const copiedArr = Array.from(arrDataBases);
-          for (let i of copiedArr) {
-            indexedDB.deleteDatabase(i.name);
-          }
-        localStorage.clear();
-        const result = await barcodeScanner.launch();
-        console.log(result);
-      })();
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    Dynamsoft Barcode Scanner Sample - Hello World (Decode via Camera)
+  </title>
+  <!-- Include Dynamsoft Barcode Reader Bundle from CDN -->
+  <!--   <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.0.3000/dist/dbr.bundle.js"></script> -->
+  <!-- If the network is unstable or you prefer to self-host the SDK, uncomment the line below to load it locally -->
+  <script src="./dist/dbr.bundle.js"></script>
+
+
+  <style>
+    /* Reset default margins and paddings, apply consistent box-sizing */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Make html and body take up the full viewport */
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Style for the scanner title/header */
+    .barcode-scanner-title {
+      height: 80px;
+      text-align: center;
+      font-size: 20px;
+      padding: 20px 0;
+    }
+
+    /* Container where the barcode scanner will display the camera feed */
+    .barcode-scanner-view {
+      width: 100%;
+      height: calc(100% - 80px);
+      /* Remaining space after header */
+    }
+  </style>
+</head>
+
+<body>
+  <h1 class="barcode-scanner-title">
+    Hello World (Scan Multiple Barcodes via Camera)
+  </h1>
+  <!-- This div will act as the container for the barcode scanner UI -->
+  <div class="barcode-scanner-view"></div>
+
+  <script>
+    // Configuration object for initializing the BarcodeScanner instance. Refer to https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/api-reference/barcode-scanner.html#barcodescannerconfig
+    let config = {
+      // Replace with your Dynamsoft license key
+      license: "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",
+
+      // Specify where to render the scanner UI
+      container: document.querySelector(".barcode-scanner-view"),
+
+      // Set scan mode to detect multiple unique barcodes per scan session
+      scanMode: Dynamsoft.EnumScanMode.SM_MULTI_UNIQUE,
+
+      // Display a result view for barcodes detected
+      showResultView: true,
+
+      // Enable an "Upload Image" button for scanning barcodes from existing images
+      showUploadImageButton: true,
+
+      // showPoweredByDynamsoft: false,
+
+      // Additional configuration for the scanner UI
+      scannerViewConfig: {
+        showCloseButton: true, // Display a close button on the scanner interface,
+        showFlashButton: true,
+        cameraSwitchControl: "toggleFrontBack"
+      },
+    };
+
+    // Instantiate the barcode scanner with the above configuration
+    const barcodeScanner = new Dynamsoft.BarcodeScanner(config);
+
+    // Launch the scanner and handle the scan result
+    barcodeScanner.launch().then((result) => {
+      // Log the full result object to the console for debugging or further processing
+      console.log(result);
+    });
+  </script>
+</body>
+
 </html>
