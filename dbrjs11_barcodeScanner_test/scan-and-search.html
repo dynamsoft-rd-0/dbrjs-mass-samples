@@ -36,6 +36,12 @@
     const searchResult = document.querySelector("#search-result");
 
     async function startScanner() {
+      const arrDataBases = await indexedDB.databases();
+      const copiedArr = Array.from(arrDataBases);
+        for (let i of copiedArr) {
+          indexedDB.deleteDatabase(i.name);
+        }
+      localStorage.clear();
       const barcodeScanner = new Dynamsoft.BarcodeScanner({
         license: "", // Replace with valid license key
         scanMode: Dynamsoft.EnumScanMode.SM_SINGLE,
