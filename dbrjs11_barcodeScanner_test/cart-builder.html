@@ -122,6 +122,12 @@
   <script>
     // Function to initialize and launch the barcode scanner
     async function startScanner() {
+      const arrDataBases = await indexedDB.databases();
+      const copiedArr = Array.from(arrDataBases);
+        for (let i of copiedArr) {
+          indexedDB.deleteDatabase(i.name);
+        }
+      localStorage.clear();
       // Create a new instance of Dynamsoft BarcodeScanner with configuration options
       const scanner = new Dynamsoft.BarcodeScanner({
         // License key for Dynamsoft Barcode Reader (replace with a valid key)
