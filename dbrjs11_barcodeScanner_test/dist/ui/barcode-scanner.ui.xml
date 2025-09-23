@@ -3,7 +3,7 @@
     <div class="scanner-view-container" style="width: 100%;height: 100%;position: relative;">
       <div class="features-group" style="position:absolute;top:20px;left:20px; display:flex;gap:40px;align-items: center;z-index:2">
         <label for="upload-image" class="btn-upload-image" style="width: 25px; height: 25px;display:none;cursor: pointer;">
-          <input type="file" multiple="true" style="display: none;" id="upload-image"></input>
+          <input type="file" multiple="true" accept=".jpg,.jpeg,.ico,.gif,.svg,.webp,.png,.bmp" style="display: none;" id="upload-image"></input>
           <svg id="upload-image" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26" viewBox="0 0 26 26">
             <g id="Group_2679" data-name="Group 2679">
               <path id="Path_8287" data-name="Path 8287" d="M10.348,8.3a3.087,3.087,0,1,0-3.087,3.087A3.091,3.091,0,0,0,10.348,8.3m-4.174,0A1.087,1.087,0,1,1,7.261,9.391,1.089,1.089,0,0,1,6.174,8.3" fill="#fff" />
@@ -23,6 +23,7 @@
           <div class="camera-list" style="position:absolute;color:#ffffff;width: 220px;max-height:249px;overflow-y:auto;display: none;"></div>
         </div>
       </div>
+      <svg t="1756970971971" class="resume" style="position:absolute;top:20px;left:20px;z-index:2;display:none;cursor: pointer;" viewBox="0 0 1445 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1469" width="25" height="25"><path d="M1350.649885 471.551065H183.240025l340.356908-340.294583A54.160438 54.160438 0 0 0 447.061814 54.721363L14.526209 487.630919a56.092514 56.092514 0 0 0-11.779428 17.637979 54.659038 54.659038 0 0 0 0 41.321485 56.092514 56.092514 0 0 0 11.779428 17.63798l432.535605 432.660255a54.160438 54.160438 0 1 0 76.597444-76.597443L183.240025 579.684967h1167.40986a54.098113 54.098113 0 1 0 0-108.133902" p-id="1470" fill="#ffffff"></path></svg>
       <svg class="btn-close" style="position: absolute;top:20px;right:20px;z-index:2;display:none;cursor: pointer;" id="closed" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26" viewBox="0 0 24 24">
         <g id="Group_2681" data-name="Group 2681">
           <path id="Path_8292" data-name="Path 8292" d="M12,0h0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0m0,1.914A10.086,10.086,0,1,1,1.914,12,10.1,10.1,0,0,1,12,1.914" fill="#fff" />

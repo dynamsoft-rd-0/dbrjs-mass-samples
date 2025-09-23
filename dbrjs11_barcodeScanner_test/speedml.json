@@ -1,0 +1,378 @@
+{
+  "GlobalParameter": {
+    "IntraOpNumThreads": 2
+  },
+  "CaptureVisionTemplates": [
+    {
+      "ImageROIProcessingNameArray": [
+        "default-speed"
+      ],
+      "Name": "speed",
+      "Timeout": 800
+      
+    },
+    {
+      "ImageROIProcessingNameArray": [
+        "default-speed-ml"
+      ],
+      "Name": "speed-ml",
+      "Timeout": 800
+    },
+    {
+      "ImageROIProcessingNameArray": [
+        "default-speed-ml-nos"
+      ],
+      "Name": "speed-ml-nos",
+      "Timeout": 800
+    },
+    {
+      "ImageROIProcessingNameArray": [
+        "default-speed-decoder"
+      ],
+      "Name": "speed-decoder",
+      "Timeout": 800
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "default-speed",
+      "TaskSettingNameArray": [
+        "default-speed-task"
+      ]
+    },
+    {
+      "Name": "default-speed-ml",
+      "TaskSettingNameArray": [
+        "default-speed-ml-task"
+      ]
+    },
+    {
+      "Name": "default-speed-decoder",
+      "TaskSettingNameArray": [
+        "default-speed-decoder-task"
+      ]
+    },
+    {
+      "Name": "default-speed-ml-nos",
+      "TaskSettingNameArray": [
+        "default-speed-ml-nos-task"
+      ]
+    }
+  ],
+  "BarcodeReaderTaskSettingOptions": [
+    {
+      "Name": "default-speed-task",
+      "MaxThreadsInOneTask":1,
+      "SectionArray": [
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_REGION_PREDETECTION",
+          "StageArray": [
+            {
+              "Stage": "SST_PREDETECT_REGIONS"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_LOCALIZATION",
+          "StageArray": [
+            {
+              "LocalizationModes": [
+                {
+                  "Mode": "LM_SCAN_DIRECTLY",
+                  "ScanDirection": 2
+                },
+                {
+                  "Mode": "LM_CONNECTED_BLOCKS"
+                }
+              ],
+              "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES"
+            },
+            {
+              "Stage": "SST_LOCALIZE_BARCODES"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_DECODING",
+          "StageArray": [
+            {
+              "Stage": "SST_RESIST_DEFORMATION"
+            },
+            {
+              "Stage": "SST_COMPLEMENT_BARCODE"
+            },
+            {
+              "Stage": "SST_SCALE_BARCODE_IMAGE"
+            },
+            {
+              "DeblurModes": [
+                {
+                  "Mode": "DM_BASED_ON_LOC_BIN"
+                },
+                {
+                  "Mode": "DM_THRESHOLD_BINARIZATION"
+                },
+                {
+                  "Mode": "DM_DEEP_ANALYSIS"
+                }
+              ],
+              "Stage": "SST_DECODE_BARCODES"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "default-speed-ml-nos-task",
+      "MaxThreadsInOneTask":1,
+      "SectionArray": [
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_REGION_PREDETECTION",
+          "StageArray": [
+            {
+              "Stage": "SST_PREDETECT_REGIONS"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_LOCALIZATION",
+          "StageArray": [
+            {
+              "LocalizationModes": [
+                {
+                  "Mode": "LM_CONNECTED_BLOCKS"
+                },{
+                  "Mode": "LM_NEURAL_NETWORK",
+                  "ModelNameArray": [
+                    "OneDLocalization"
+                  ]
+                }              
+              ],
+              "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES"
+            },
+            {
+              "Stage": "SST_LOCALIZE_BARCODES"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_DECODING",
+          "StageArray": [
+            {
+              "Stage": "SST_RESIST_DEFORMATION"
+            },
+            {
+              "Stage": "SST_COMPLEMENT_BARCODE"
+            },
+            {
+              "Stage": "SST_SCALE_BARCODE_IMAGE"
+            },
+            {
+              "DeblurModes": [
+                {
+                  "Mode": "DM_BASED_ON_LOC_BIN"
+                },
+                {
+                  "Mode": "DM_THRESHOLD_BINARIZATION"
+                },
+                {
+                  "Mode": "DM_NEURAL_NETWORK",
+                  "ModelNameArray": [
+                    "Code128Decoder",
+                    "EAN13Decoder"
+                  ]
+                },
+                {
+                  "Mode": "DM_DEEP_ANALYSIS"
+                }
+              ],
+              "Stage": "SST_DECODE_BARCODES"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "default-speed-ml-task",
+      "MaxThreadsInOneTask":1,
+      "SectionArray": [
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_REGION_PREDETECTION",
+          "StageArray": [
+            {
+              "Stage": "SST_PREDETECT_REGIONS"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_LOCALIZATION",
+          "StageArray": [
+            {
+              "LocalizationModes": [
+                {
+                  "Mode": "LM_SCAN_DIRECTLY",
+                  "ScanDirection": 2
+                },
+                {
+                  "Mode": "LM_CONNECTED_BLOCKS"
+                },{
+                  "Mode": "LM_NEURAL_NETWORK",
+                  "ModelNameArray": [
+                    "OneDLocalization"
+                  ]
+                }              
+              ],
+              "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES"
+            },
+            {
+              "Stage": "SST_LOCALIZE_BARCODES"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_DECODING",
+          "StageArray": [
+            {
+              "Stage": "SST_RESIST_DEFORMATION"
+            },
+            {
+              "Stage": "SST_COMPLEMENT_BARCODE"
+            },
+            {
+              "Stage": "SST_SCALE_BARCODE_IMAGE"
+            },
+            {
+              "DeblurModes": [
+                {
+                  "Mode": "DM_BASED_ON_LOC_BIN"
+                },
+                {
+                  "Mode": "DM_THRESHOLD_BINARIZATION"
+                },
+                {
+                  "Mode": "DM_NEURAL_NETWORK",
+                  "ModelNameArray": [
+                    "Code128Decoder",
+                    "EAN13Decoder"
+                  ]
+                },
+                {
+                  "Mode": "DM_DEEP_ANALYSIS"
+                }
+              ],
+              "Stage": "SST_DECODE_BARCODES"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "default-speed-decoder-task",
+      "MaxThreadsInOneTask":1,
+      "SectionArray": [
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_REGION_PREDETECTION",
+          "StageArray": [
+            {
+              "Stage": "SST_PREDETECT_REGIONS"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_LOCALIZATION",
+          "StageArray": [
+            {
+              "LocalizationModes": [
+                {
+                  "Mode": "LM_SCAN_DIRECTLY",
+                  "ScanDirection": 2
+                },
+                {
+                  "Mode": "LM_CONNECTED_BLOCKS"
+                }
+              ],
+              "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES"
+            },
+            {
+              "Stage": "SST_LOCALIZE_BARCODES"
+            }
+          ]
+        },
+        {
+          "ImageParameterName": "ip",
+          "Section": "ST_BARCODE_DECODING",
+          "StageArray": [
+            {
+              "Stage": "SST_RESIST_DEFORMATION"
+            },
+            {
+              "Stage": "SST_COMPLEMENT_BARCODE"
+            },
+            {
+              "Stage": "SST_SCALE_BARCODE_IMAGE"
+            },
+            {
+              "DeblurModes": [
+                {
+                  "Mode": "DM_BASED_ON_LOC_BIN"
+                },
+                {
+                  "Mode": "DM_THRESHOLD_BINARIZATION"
+                },
+                {
+                  "Mode": "DM_NEURAL_NETWORK",
+                  "ModelNameArray": [
+                    "Code128Decoder",
+                    "EAN13Decoder"
+                  ]
+                },
+                {
+                  "Mode": "DM_DEEP_ANALYSIS"
+                }
+              ],
+              "Stage": "SST_DECODE_BARCODES"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "CaptureVisionModelOptions": [
+    {
+      "Name": "OneDLocalization",
+      "MaxModelInstances": 1,
+      "ModelArgs": {
+        "ImageDimensionThreshold": 1000000
+      }
+    }
+  ],
+  "ImageParameterOptions": [
+    {
+      "ApplicableStages": [
+        {
+          "Stage": "SST_INPUT_COLOR_IMAGE"
+        },
+        {
+          "ImageScaleSetting": {
+            "EdgeLengthThreshold": 100000,
+            "ScaleType": "ST_SCALE_DOWN"
+          },
+          "Stage": "SST_SCALE_IMAGE"
+        }
+      ],
+      "Name": "ip"
+    }
+  ],
+  "Version": "5.1"
+}
