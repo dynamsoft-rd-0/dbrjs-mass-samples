@@ -16,7 +16,7 @@
         "default-speed-ml"
       ],
       "Name": "speed-ml",
-      "Timeout": 800
+      "Timeout": 300
     },
     {
       "ImageROIProcessingNameArray": [
@@ -218,16 +218,10 @@
             {
               "LocalizationModes": [
                 {
-                  "Mode": "LM_SCAN_DIRECTLY",
-                  "ScanDirection": 2
+                  "Mode": "LM_CONNECTED_BLOCKS"
                 },
                 {
-                  "Mode": "LM_CONNECTED_BLOCKS"
-                },{
-                  "Mode": "LM_NEURAL_NETWORK",
-                  "ModelNameArray": [
-                    "OneDLocalization"
-                  ]
+                  "Mode": "LM_SCAN_DIRECTLY"
                 }              
               ],
               "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES"
@@ -266,7 +260,8 @@
                   ]
                 },
                 {
-                  "Mode": "DM_DEEP_ANALYSIS"
+                  "Mode": "DM_DEEP_ANALYSIS",
+                  "Methods": ["OneDGeneral","TwoDGeneral"]
                 }
               ],
               "Stage": "SST_DECODE_BARCODES"
