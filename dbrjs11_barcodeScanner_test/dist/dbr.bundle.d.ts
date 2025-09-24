@@ -1437,6 +1437,7 @@ declare class CaptureVisionRouter {
     #private;
     static _onLog: (message: string) => void;
     static _defaultTemplate: string;
+    private static _isNoOnnx;
     /**
      * The maximum length of the longer side of the image to be processed. The default value is 2048 pixels in mobile devices and 4096 pixels in desktop browser.
      */
@@ -3335,6 +3336,7 @@ declare class CameraManager {
         version: number;
         OS: string;
     };
+    private static _tryToReopenTime;
     static onWarning: (message: string) => void;
     /**
      * Check if storage is available.
