@@ -4,10 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.6.1",
-    "keillion-dynamsoft-javascript-barcode": "^0.20210224000001.0",
-    "node-fetch": "^2.6.1",
-    "node-localstorage": "^2.1.6",
-    "pdfjs-dist": "^2.6.347"
+    "dynamsoft-capture-vision-for-node": "^3.0.1007",
+    "pdfjs-dist": "^5.4.149"
   }
 }

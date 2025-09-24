@@ -16,82 +16,46 @@
  * limitations under the License.
  */
 
-var Canvas = require("canvas");
-var assert = require("assert").strict;
-var pdfjsLib = require("pdfjs-dist/es5/build/pdf.js");
-
-function NodeCanvasFactory() {}
-NodeCanvasFactory.prototype = {
-    create: function NodeCanvasFactory_create(width, height) {
-        assert(width > 0 && height > 0, "Invalid canvas size");
-        var canvas = Canvas.createCanvas(width, height);
-        var context = canvas.getContext("2d");
-        return {
-            canvas,
-            context,
-        };
-    },
-
-    reset: function NodeCanvasFactory_reset(canvasAndContext, width, height) {
-        assert(canvasAndContext.canvas, "Canvas is not specified");
-        assert(width > 0 && height > 0, "Invalid canvas size");
-        canvasAndContext.canvas.width = width;
-        canvasAndContext.canvas.height = height;
-    },
-
-    destroy: function NodeCanvasFactory_destroy(canvasAndContext) {
-        assert(canvasAndContext.canvas, "Canvas is not specified");
-
-        // Zeroing the width and height cause Firefox to release graphics
-        // resources immediately, which can greatly reduce memory consumption.
-        canvasAndContext.canvas.width = 0;
-        canvasAndContext.canvas.height = 0;
-        canvasAndContext.canvas = null;
-        canvasAndContext.context = null;
-    },
-};
+const { getDocument } = require("pdfjs-dist/legacy/build/pdf.mjs");
 
 // Some PDFs need external cmaps.
-var CMAP_URL = "../../../node_modules/pdfjs-dist/cmaps/";
-var CMAP_PACKED = true;
+const CMAP_URL = "../../../node_modules/pdfjs-dist/cmaps/";
+const CMAP_PACKED = true;
+// Where the standard fonts are located.
+const STANDARD_FONT_DATA_URL =
+  "../../../node_modules/pdfjs-dist/standard_fonts/";
 
-let pdf2png = async(data)=>{
+const pdf2png = async(data)=>{
     // Load the PDF file.
-    let loadingTask = pdfjsLib.getDocument({
+    const loadingTask = getDocument({
         data,
         cMapUrl: CMAP_URL,
         cMapPacked: CMAP_PACKED,
+        standardFontDataUrl: STANDARD_FONT_DATA_URL,
     });
-    let pdfDocument = await new Promise((resolve, reject)=>{
-        loadingTask.promise.then(resolve).catch(reject);
-    });
-    let imgs = [];
+    const pdfDocument = await loadingTask.promise;
+    const imgs = [];
     for(let i = 0; i < pdfDocument.numPages; ++i){
-        let img = await new Promise((resolve)=>{
-            // Get the first page.
-            pdfDocument.getPage(1).then(function (page) {
-                // Render the page on a Node canvas with 100% scale.
-                var viewport = page.getViewport({ scale: 1.0 });
-                var canvasFactory = new NodeCanvasFactory();
-                var canvasAndContext = canvasFactory.create(
-                    viewport.width,
-                    viewport.height
-                );
-                var renderContext = {
-                    canvasContext: canvasAndContext.context,
-                    viewport,
-                    canvasFactory,
-                };
-        
-                var renderTask = page.render(renderContext);
-                renderTask.promise.then(function () {
-                    // Convert the canvas to an image buffer.
-                    var image = canvasAndContext.canvas.toBuffer();
-                    resolve(image);
-                });
-            });
-        });
+        // Get the first page.
+        const page = await pdfDocument.getPage(i + 1);
+        // Render the page on a Node canvas with 100% scale.
+        const canvasFactory = pdfDocument.canvasFactory;
+        const viewport = page.getViewport({ scale: 1.0 });
+        const canvasAndContext = canvasFactory.create(
+            viewport.width,
+            viewport.height
+        );
+        const renderContext = {
+            canvasContext: canvasAndContext.context,
+            viewport,
+        };
+
+        const renderTask = page.render(renderContext);
+        await renderTask.promise;
+        // Convert the canvas to an image buffer.
+        const img = canvasAndContext.canvas.toBuffer("image/png");
         imgs.push(img);
+        page.cleanup();
     }
     return imgs;
 };
