@@ -8,7 +8,7 @@
         "default-speed"
       ],
       "Name": "speed",
-      "Timeout": 800
+      "Timeout": 500
       
     },
     {
@@ -16,21 +16,21 @@
         "default-speed-ml"
       ],
       "Name": "speed-ml",
-      "Timeout": 300
+      "Timeout": 500
     },
     {
       "ImageROIProcessingNameArray": [
         "default-speed-ml-nos"
       ],
       "Name": "speed-ml-nos",
-      "Timeout": 800
+      "Timeout": 500
     },
     {
       "ImageROIProcessingNameArray": [
         "default-speed-decoder"
       ],
       "Name": "speed-decoder",
-      "Timeout": 800
+      "Timeout": 500
     }
   ],
   "TargetROIDefOptions": [
