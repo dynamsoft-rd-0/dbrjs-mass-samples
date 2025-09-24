@@ -30,7 +30,8 @@ const pdf2png = async(data)=>{
         data,
         cMapUrl: CMAP_URL,
         cMapPacked: CMAP_PACKED,
-        standardFontDataUrl: STANDARD_FONT_DATA_URL,
+        //// Fonts are not necessary for barcodes
+        // standardFontDataUrl: STANDARD_FONT_DATA_URL, 
     });
     const pdfDocument = await loadingTask.promise;
     const imgs = [];
