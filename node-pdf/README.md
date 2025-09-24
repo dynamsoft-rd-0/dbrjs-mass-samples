@@ -1,5 +1,5 @@
-Tested in nodejs 22
+**Warning**: `require('xxxxx.mjs')` needs nodejs > 22
 
-`npm install` or `yarn install`
+`npm install`
 
 `node ./index.js`
