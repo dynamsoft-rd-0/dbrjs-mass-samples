@@ -40,8 +40,18 @@ const pdf2png = async(data)=>{
         const page = await pdfDocument.getPage(i + 1);
         // Render the page on a Node canvas with 100% scale.
         const canvasFactory = pdfDocument.canvasFactory;
-        // scale 1 == 72 dpi 
-        const viewport = page.getViewport({ scale: 1.0 });
+
+        // scale 1 == 72 dpi, auto change scale for different size image
+        let viewport = page.getViewport({ scale: 1.0 });
+        let areaInScale1 = viewport.width * viewport.height;
+        if(areaInScale1 > 2048 * 2048){
+            // just use scale 1 for large image
+        }else if(areaInScale1 > 1024 * 1024){
+            viewport = page.getViewport({ scale: 2.0 });
+        }else{ 
+            viewport = page.getViewport({ scale: 4.0 });
+        }
+
         const canvasAndContext = canvasFactory.create(
             viewport.width,
             viewport.height
