@@ -1,5 +1,4 @@
 // Modify from https://github.com/mozilla/pdf.js/blob/master/examples/node/pdf2png/pdf2png.js
-// todo: need more error handling 
 
 /* Copyright 2017 Mozilla Foundation
  *
@@ -40,6 +39,7 @@ const pdf2png = async(data)=>{
         const page = await pdfDocument.getPage(i + 1);
         // Render the page on a Node canvas with 100% scale.
         const canvasFactory = pdfDocument.canvasFactory;
+        // scale 1 == 72 dpi 
         const viewport = page.getViewport({ scale: 1.0 });
         const canvasAndContext = canvasFactory.create(
             viewport.width,
