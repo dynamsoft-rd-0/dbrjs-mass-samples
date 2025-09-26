@@ -32,7 +32,9 @@
         onInitReady: (components) => {
             cvRouter = components.cvRouter;
             cameraEnhancer = components.cameraEnhancer;
-            cameraView = components.cameraView
+            cameraView = components.cameraView;
+            // turn off webgl fetching
+            cameraEnhancer._imageDataGetter.useWebGLByDefault = false;
         }
         // engineResourcePaths: {rootDirectory:"./dist"},
         // scannerViewConfig: {
