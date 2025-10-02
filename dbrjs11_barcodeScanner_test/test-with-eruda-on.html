@@ -10,11 +10,14 @@
   // Initialize Eruda
   eruda.init();
 
-  // Open Eruda console right away
-  eruda.show();
-
-  // Select a specific tab, e.g., "console"
-  eruda.show('network'); 
+const origFetch = window.fetch;
+window.fetch = async function (...args) {
+  const url = args[0];
+  if (typeof url === "string" && url.endsWith(".wasm")) {
+    console.log("WASM file loaded:", url);
+  }
+  return origFetch.apply(this, args);
+};
 
   // Other tabs you can select include: 'elements', 'network', 'resources', 'sources', 'info', 'settings'
 </script>
