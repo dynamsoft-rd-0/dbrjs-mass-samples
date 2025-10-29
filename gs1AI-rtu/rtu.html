@@ -307,43 +307,52 @@
         funcOpenScanner();
       });
 
+      // Start initialization immediately in the background
+      const initPromise = (async () => {
+        try {
+          console.log("Starting background initialization...");
+          // Start both operations in parallel without waiting
+          const licensePromise = Dynamsoft.License.LicenseManager.initLicense(
+            "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
+            { executeNow: true }
+          );
+          const specPromise = Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI");
+
+          // Wait for spec loading (needed for parser creation)
+          await specPromise;
+          console.log("GS1_AI spec loaded.");
+
+          parser = await Dynamsoft.DCP.CodeParser.createInstance();
+          console.log("CodeParser instance created.");
+
+          // Ensure license is initialized before proceeding
+          await licensePromise;
+          console.log("License initialized.");
+
+          isInitialized = true;
+          console.log("Background initialization complete!");
+        } catch (error) {
+          console.error("Failed to initialize:", error);
+          throw error;
+        }
+      })();
+
       // Play button click handler
       elPlayButton.addEventListener("click", async () => {
-        // Hide landing page and show loading
+        // Hide landing page
         elLandingPage.style.display = "none";
-        elLoading.style.display = "";
 
-        // Initialize if not already done
+        // Wait for initialization if not done yet
         if (!isInitialized) {
+          elLoading.style.display = "";
           try {
-            // Start both operations in parallel without waiting
-            const licensePromise = Dynamsoft.License.LicenseManager.initLicense(
-              "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
-              { executeNow: true }
-            );
-            const specPromise = Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI");
-
-            // Wait for spec loading (needed for parser creation)
-            await specPromise;
-            console.log("GS1_AI spec loaded.");
-
-            parser = await Dynamsoft.DCP.CodeParser.createInstance();
-            console.log("CodeParser instance created.");
-
-            // Ensure license is initialized before proceeding
-            await licensePromise;
-            console.log("License initialized.");
-
-            isInitialized = true;
-
+            await initPromise;
             elLoading.style.display = "none";
             funcOpenScanner();
           } catch (error) {
-            console.error("Failed to initialize:", error);
             elLoading.textContent = "Failed to initialize. Please refresh the page.";
           }
         } else {
-          elLoading.style.display = "none";
           funcOpenScanner();
         }
       });
