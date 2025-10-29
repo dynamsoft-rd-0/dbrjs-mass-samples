@@ -288,6 +288,9 @@
 
             // Parse GS1 barcode
             const parseResult = await parser.parse(barcodeResult.bytes);
+            if (parseResult.codeType !== "GS1_AI") {
+              throw new Error("The scanned barcode is not a valid GS1 AI barcode.");
+            }
             const gs1AIInfo = JSON.parse(parseResult.jsonString).ResultInfo;
             console.log(gs1AIInfo);
 
