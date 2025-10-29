@@ -1,165 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    *{box-sizing:border-box;}
-    html,body{margin:0;padding:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;font-size:16px;}
-    
-    .loading{
-      text-align:center;position:absolute;
-      left:50%;top:50%;transform:translate(-50%,-50%);
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+      }
 
-    .result-page{background:rgb(235,239,240);width:100%;height:100%;line-height:32px;}
-    
-    .barcode-text{
-      text-align:center;word-break:break-all;background:rgba(255,255,255,0.5);color:#555;
-      border-radius:6px;margin-left:50%;transform:translateX(-50%);padding:4px 8px;
-      position:absolute;bottom:71%;line-height:16px;
-    }
-    .barcode-text{width:100%;}
-    @media screen and (min-width: 230px){
-      .barcode-text{width:230px;}
-    }
-    @media screen and (min-width: 460px){
-      .barcode-text{width:460px;}
-    }
+      .loading {
+        text-align: center;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
 
-    .goods-name{font-size:32px;font-weight:bolder;}
-    .id{color:#777;}
-    .price{background:white;border-radius:6px;margin:12px;padding:12px;}
+      .result-page {
+        background: rgb(235, 239, 240);
+        width: 100%;
+        height: 100%;
+        line-height: 32px;
+      }
 
-    .back-to-scan{
-      background:rgb(42,130,202);text-align:center;font-size:24px;color:white;
-      border-radius:6px;margin:12px;padding:12px;width:calc(100% - 24px);display:block;
-    }
-  </style>
-</head>
-<body>
-  <div id="loading" class="loading">Loading...</div>
-  <div id="result-page" class="result-page" style="display:none;">
-    <canvas id="barcode-image" style="width:100%;height:30%;object-fit:fill;"></canvas>
-    <div id="barcode-text" class="barcode-text">[01]08059710154093[17]160213[3103]000210[3922]000187</div>
-    <div style="background:white;border-radius:6px;margin:12px;padding:12px;">
-      <div class="goods-name">&lt;Goods Name&gt;</div>
-      <div class="id"><span id="id-name">GTIN</span>: <span id="id-value">08059710154093</span> (AI <span id="id-AI">00</span>)</div>
+      .barcode-text {
+        text-align: center;
+        word-break: break-all;
+        background: rgba(255, 255, 255, 0.5);
+        color: #555;
+        border-radius: 6px;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        padding: 4px 8px;
+        position: absolute;
+        bottom: 71%;
+        line-height: 16px;
+      }
+      .barcode-text {
+        width: 100%;
+      }
+      @media screen and (min-width: 230px) {
+        .barcode-text {
+          width: 230px;
+        }
+      }
+      @media screen and (min-width: 460px) {
+        .barcode-text {
+          width: 460px;
+        }
+      }
+
+      .goods-name {
+        font-size: 32px;
+        font-weight: bolder;
+      }
+      .id {
+        color: #777;
+      }
+      .price {
+        background: white;
+        border-radius: 6px;
+        margin: 12px;
+        padding: 12px;
+      }
+
+      .back-to-scan {
+        background: rgb(42, 130, 202);
+        text-align: center;
+        font-size: 24px;
+        color: white;
+        border-radius: 6px;
+        margin: 12px;
+        padding: 12px;
+        width: calc(100% - 24px);
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading" class="loading">Loading...</div>
+    <div id="result-page" class="result-page" style="display: none">
+      <canvas id="barcode-image" style="width: 100%; height: 30%; object-fit: fill"></canvas>
+      <div id="barcode-text" class="barcode-text">[01]08059710154093[17]160213[3103]000210[3922]000187</div>
+      <div style="background: white; border-radius: 6px; margin: 12px; padding: 12px">
+        <div class="goods-name">&lt;Goods Name&gt;</div>
+        <div class="id"><span id="id-name">GTIN</span>: <span id="id-value">08059710154093</span> (AI <span id="id-AI">00</span>)</div>
+      </div>
+      <div style="background: white; border-radius: 6px; margin: 12px; padding: 12px; color: #333">
+        <div class="time"><span id="time-name">Expiry</span>: <span id="time-value"></span> (AI <span id="time-AI">00</span>)</div>
+        <div class="quantity">
+          <span id="quantity-name">Net Weight (kg)</span>: <span id="quantity-value">x.xx</span> (AI <span id="quantity-AI">000n</span>)
+        </div>
+      </div>
+      <div class="price">
+        <span id="price-name">Price</span>: <span id="price-value" style="font-size: 24px">xx.x</span> (AI <span id="price-AI">392n</span>)
+      </div>
+      <button id="back-to-scan" class="back-to-scan">Back to Scan</button>
     </div>
-    <div style="background:white;border-radius:6px;margin:12px;padding:12px;color:#333;">
-      <div class="time"><span id="time-name">Expiry</span>: <span id="time-value"></span> (AI <span id="time-AI">00</span>)</div>
-      <div class="quantity"><span id="quantity-name">Net Weight (kg)</span>: <span id="quantity-value">x.xx</span> (AI <span id="quantity-AI">000n</span>)</div>
-    </div>
-    <div class="price"><span id="price-name">Price</span>: <span id="price-value" style="font-size:24px;">xx.x</span> (AI <span id="price-AI">392n</span>)</div>
-    <button id="back-to-scan" class="back-to-scan">Back to Scan</button>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.2.2000-beta-202510282254/dist/dbr.bundle.js"></script>
-  <script>
-    let parser;
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.2.2000-beta-202510282254/dist/dbr.bundle.js"></script>
+    <script>
+      let parser;
 
-    const elLoading = document.getElementById('loading');
-    const elResultPage = document.getElementById('result-page');
-    const elBarcodeImage = document.getElementById('barcode-image');
-    const ctxBarcodeImage = elBarcodeImage.getContext('2d');
-    const elBarcodeText = document.getElementById('barcode-text');
+      const elLoading = document.getElementById("loading");
+      const elResultPage = document.getElementById("result-page");
+      const elBarcodeImage = document.getElementById("barcode-image");
+      const ctxBarcodeImage = elBarcodeImage.getContext("2d");
+      const elBarcodeText = document.getElementById("barcode-text");
 
-    const elIdName = document.getElementById('id-name');
-    const elIdValue = document.getElementById('id-value');
-    const elIdAI = document.getElementById('id-AI');
+      const elIdName = document.getElementById("id-name");
+      const elIdValue = document.getElementById("id-value");
+      const elIdAI = document.getElementById("id-AI");
 
-    const elTimeName = document.getElementById('time-name');
-    const elTimeValue = document.getElementById('time-value');
-    const elTimeAI = document.getElementById('time-AI');
+      const elTimeName = document.getElementById("time-name");
+      const elTimeValue = document.getElementById("time-value");
+      const elTimeAI = document.getElementById("time-AI");
 
-    const elQuantityName = document.getElementById('quantity-name');
-    const elQuantityValue = document.getElementById('quantity-value');
-    const elQuantityAI = document.getElementById('quantity-AI');
+      const elQuantityName = document.getElementById("quantity-name");
+      const elQuantityValue = document.getElementById("quantity-value");
+      const elQuantityAI = document.getElementById("quantity-AI");
 
-    const elPriceName = document.getElementById('price-name');
-    const elPriceValue = document.getElementById('price-value');
-    const elPriceAI = document.getElementById('price-AI');
+      const elPriceName = document.getElementById("price-name");
+      const elPriceValue = document.getElementById("price-value");
+      const elPriceAI = document.getElementById("price-AI");
 
-    const funcOpenScanner = async () => {
-      elResultPage.style.display = 'none';
+      const funcOpenScanner = async () => {
+        try {
+          elResultPage.style.display = "none";
 
-      // Initialize the Dynamsoft Barcode Scanner
-      const barcodeScanner = new Dynamsoft.BarcodeScanner({
-        // Please don't forget to replace YOUR_LICENSE_KEY_HERE
-        license: "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",
-        templateFilePath: "./rtu_gs1.json",
-        showUploadImageButton: true,
-        scannerViewConfig: {
-          showFlashButton: true,
-          showCloseButton: false,
-          cameraSwitchControl: "toggleFrontBack",
-        },
-        //onInitReady: ()=>{}
+          // Initialize the Dynamsoft Barcode Scanner
+          const barcodeScanner = new Dynamsoft.BarcodeScanner({
+            // Please don't forget to replace YOUR_LICENSE_KEY_HERE
+            license:
+              "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
+            templateFilePath: "./rtu_gs1.json",
+            showUploadImageButton: true,
+            scannerViewConfig: {
+              showFlashButton: true,
+              showCloseButton: false,
+              cameraSwitchControl: "toggleFrontBack",
+            },
+            //onInitReady: ()=>{}
+          });
+
+          // Launch the scanner and wait for the result
+          const result = await barcodeScanner.launch();
+          // Display the first detected barcode's text in an alert
+          if (result.barcodeResults.length) {
+            const barcodeResult = result.barcodeResults[0];
+
+            console.log(barcodeResult.text);
+            elBarcodeText.textContent = barcodeResult.text;
+
+            const barcodeImage = result.barcodeImage;
+            //console.log(barcodeImage);
+            ctxBarcodeImage.canvas.width = barcodeImage.width;
+            ctxBarcodeImage.canvas.height = barcodeImage.height;
+            const imageData = new ImageData(new Uint8ClampedArray(barcodeImage.bytes), barcodeImage.width, barcodeImage.height);
+            ctxBarcodeImage.putImageData(imageData, 0, 0);
+
+            // Check if parser is available
+            if (!parser) {
+              throw new Error("Parser not initialized");
+            }
+
+            // Parse GS1 barcode
+            const parseResult = await parser.parse(barcodeResult.bytes);
+            const gs1AIInfo = JSON.parse(parseResult.jsonString).ResultInfo;
+            console.log(gs1AIInfo);
+
+            // Safely access parsed data with error checking
+            if (gs1AIInfo && gs1AIInfo.length > 0) {
+              // ID Information (GTIN)
+              if (gs1AIInfo[0] && gs1AIInfo[0].ChildFields && gs1AIInfo[0].ChildFields[0]) {
+                let idName = gs1AIInfo[0].ChildFields[0][0]?.Value || "ID";
+                if (idName.includes("(") && idName.includes(")")) {
+                  idName = idName.substring(idName.indexOf("(") + 1);
+                  idName = idName.substring(0, idName.indexOf(")"));
+                }
+                elIdName.textContent = idName;
+                elIdValue.textContent = gs1AIInfo[0].ChildFields[0][1]?.Value || "N/A";
+                elIdAI.textContent = gs1AIInfo[0].FieldName || "N/A";
+              }
+
+              // Time Information (Expiry)
+              if (gs1AIInfo[1] && gs1AIInfo[1].ChildFields && gs1AIInfo[1].ChildFields[0]) {
+                elTimeName.textContent = gs1AIInfo[1].ChildFields[0][0]?.Value || "Date";
+                const dateFields = gs1AIInfo[1].ChildFields[0][1]?.ChildFields?.[0];
+                if (dateFields && dateFields.length >= 3) {
+                  elTimeValue.textContent = `${dateFields[0]?.Value || "00"}-${dateFields[1]?.Value || "00"}-${dateFields[2]?.Value || "00"}`;
+                } else {
+                  elTimeValue.textContent = gs1AIInfo[1].ChildFields[0][1]?.Value || "N/A";
+                }
+                elTimeAI.textContent = gs1AIInfo[1].FieldName || "N/A";
+              }
+
+              // Quantity Information
+              if (gs1AIInfo[2] && gs1AIInfo[2].ChildFields && gs1AIInfo[2].ChildFields[0]) {
+                elQuantityName.textContent = gs1AIInfo[2].ChildFields[0][0]?.Value || "Quantity";
+                elQuantityValue.textContent = gs1AIInfo[2].ChildFields[0][1]?.Value || "N/A";
+                elQuantityAI.textContent = gs1AIInfo[2].FieldName || "N/A";
+              }
+
+              // Price Information
+              if (gs1AIInfo[3] && gs1AIInfo[3].ChildFields && gs1AIInfo[3].ChildFields[0]) {
+                elPriceValue.textContent = gs1AIInfo[3].ChildFields[0][1]?.Value || "N/A";
+                elPriceAI.textContent = gs1AIInfo[3].FieldName || "N/A";
+              }
+            }
+
+            elResultPage.style.display = "";
+          } else {
+            console.log("No barcode detected, retrying...");
+            funcOpenScanner();
+          }
+        } catch (error) {
+          console.error("Scanner error:", error);
+          alert("Scanner error: " + error.message + ". Please try again.");
+          funcOpenScanner();
+        }
+      };
+
+      document.getElementById("back-to-scan").addEventListener("click", () => {
+        funcOpenScanner();
       });
 
-      // Launch the scanner and wait for the result
-      const result = await barcodeScanner.launch();
-      // Display the first detected barcode's text in an alert
-      if (result.barcodeResults.length) {
-        const barcodeResult = result.barcodeResults[0];
+      (async () => {
+        try {
+          await Dynamsoft.License.LicenseManager.initLicense(
+            "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
+            true
+          );
 
-        console.log(barcodeResult.text);
-        elBarcodeText.textContent = barcodeResult.text;
-
-        const barcodeImage = result.barcodeImage;
-        //console.log(barcodeImage);
-        ctxBarcodeImage.canvas.width = barcodeImage.width;
-        ctxBarcodeImage.canvas.height = barcodeImage.height;
-        const imageData = new ImageData(
-          new Uint8ClampedArray(barcodeImage.bytes), 
-          barcodeImage.width, barcodeImage.height
-        );
-        ctxBarcodeImage.putImageData(imageData, 0, 0);
-
-        // TODO: check barcode type
-        const gs1AIInfo = JSON.parse((await parser.parse(barcodeResult.bytes)).jsonString).ResultInfo;
-        console.log(gs1AIInfo);
-
-        let idName = gs1AIInfo[0].ChildFields[0][0].Value;
-        if(idName.includes("(") && idName.includes(")")){
-          idName = idName.substring(idName.indexOf("(")+1);
-          idName = idName.substring(0, idName.indexOf(")"));
+          Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI")
+            .then(() => {
+              console.log("GS1_AI spec loaded.");
+              return Dynamsoft.DCP.CodeParser.createInstance();
+            })
+            .then((parserInstance) => {
+              parser = parserInstance;
+              console.log("CodeParser instance created.");
+              elLoading.style.display = "none";
+              funcOpenScanner();
+            })
+            .catch((error) => {
+              console.error("Failed to initialize parser:", error);
+              elLoading.textContent = "Failed to initialize. Please refresh the page.";
+            });
+        } catch (error) {
+          console.error("Failed to initialize license:", error);
+          elLoading.textContent = "Failed to initialize license. Please check your connection.";
         }
-        elIdName.textContent = idName;
-        elIdValue.textContent = gs1AIInfo[0].ChildFields[0][1].Value;
-        elIdAI.textContent = gs1AIInfo[0].FieldName;
-
-        elTimeName.textContent = gs1AIInfo[1].ChildFields[0][0].Value;
-        elTimeValue.textContent = `${gs1AIInfo[1].ChildFields[0][1].ChildFields[0][0].Value}-${gs1AIInfo[1].ChildFields[0][1].ChildFields[0][1].Value}-${gs1AIInfo[1].ChildFields[0][1].ChildFields[0][2].Value}`;
-        elTimeAI.textContent = gs1AIInfo[1].FieldName;
-
-        elQuantityName.textContent = gs1AIInfo[2].ChildFields[0][0].Value;
-        elQuantityValue.textContent = gs1AIInfo[2].ChildFields[0][1].Value;
-        elQuantityAI.textContent = gs1AIInfo[2].FieldName;
-
-        //elPriceName.textContent = gs1AIInfo[3].ChildFields[0][0].Value;
-        elPriceValue.textContent = gs1AIInfo[3].ChildFields[0][1].Value;
-        elPriceAI.textContent = gs1AIInfo[3].FieldName;
-
-        elResultPage.style.display = '';
-      }else{
-        funcOpenScanner();
-      }
-    };
-
-    document.getElementById('back-to-scan').addEventListener('click', () => {
-      funcOpenScanner();
-    });
-
-    (async () => {
-      await Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", true);
-
-      await Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI");
-      parser = await Dynamsoft.DCP.CodeParser.createInstance();
-
-      elLoading.style.display = "none";
-      funcOpenScanner();
-    })();
-  </script>
-</body>
+      })();
+    </script>
+  </body>
 </html>
