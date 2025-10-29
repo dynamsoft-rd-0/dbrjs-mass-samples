@@ -113,7 +113,8 @@
         justify-content: center;
         cursor: pointer;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s, box-shadow 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+        position: relative;
       }
 
       .play-button:hover {
@@ -123,6 +124,45 @@
 
       .play-button:active {
         transform: scale(0.95);
+      }
+
+      .play-button.disabled {
+        opacity: 0.8;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .play-button.disabled .play-icon {
+        display: none;
+      }
+
+      .play-button.disabled::before {
+        content: "";
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .play-button.disabled::after {
+        content: "Loading";
+        position: absolute;
+        color: #667eea;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       .play-icon {
@@ -138,7 +178,7 @@
   <body>
     <div id="landing-page" class="landing-page">
       <div class="landing-title">Read a GS1 Application Identifier (AI)</div>
-      <div id="play-button" class="play-button">
+      <div id="play-button" class="play-button disabled">
         <div class="play-icon"></div>
       </div>
     </div>
@@ -331,6 +371,9 @@
 
           isInitialized = true;
           console.log("Background initialization complete!");
+
+          // Enable the play button
+          elPlayButton.classList.remove("disabled");
         } catch (error) {
           console.error("Failed to initialize:", error);
           throw error;
@@ -339,22 +382,15 @@
 
       // Play button click handler
       elPlayButton.addEventListener("click", async () => {
-        // Hide landing page
-        elLandingPage.style.display = "none";
-
-        // Wait for initialization if not done yet
+        // Button should only be clickable when initialized, but check just in case
         if (!isInitialized) {
-          elLoading.style.display = "";
-          try {
-            await initPromise;
-            elLoading.style.display = "none";
-            funcOpenScanner();
-          } catch (error) {
-            elLoading.textContent = "Failed to initialize. Please refresh the page.";
-          }
-        } else {
-          funcOpenScanner();
+          console.warn("Button clicked before initialization complete");
+          return;
         }
+
+        // Hide landing page and start scanner
+        elLandingPage.style.display = "none";
+        funcOpenScanner();
       });
     </script>
   </body>
