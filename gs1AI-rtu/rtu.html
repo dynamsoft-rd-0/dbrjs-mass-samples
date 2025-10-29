@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Read a GS1 Application Identifier (AI)</title>
     <style>
       * {
         box-sizing: border-box;
@@ -83,10 +83,66 @@
         width: calc(100% - 24px);
         display: block;
       }
+
+      .landing-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .landing-title {
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 48px;
+        padding: 0 24px;
+      }
+
+      .play-button {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .play-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+      }
+
+      .play-button:active {
+        transform: scale(0.95);
+      }
+
+      .play-icon {
+        width: 0;
+        height: 0;
+        border-left: 24px solid #667eea;
+        border-top: 16px solid transparent;
+        border-bottom: 16px solid transparent;
+        margin-left: 6px;
+      }
     </style>
   </head>
   <body>
-    <div id="loading" class="loading">Loading...</div>
+    <div id="landing-page" class="landing-page">
+      <div class="landing-title">Read GS1Read a GS1 Application Identifier (AI)</div>
+      <div id="play-button" class="play-button">
+        <div class="play-icon"></div>
+      </div>
+    </div>
+    <div id="loading" class="loading" style="display: none">Loading...</div>
     <div id="result-page" class="result-page" style="display: none">
       <canvas id="barcode-image" style="width: 100%; height: 30%; object-fit: fill"></canvas>
       <div id="barcode-text" class="barcode-text">[01]08059710154093[17]160213[3103]000210[3922]000187</div>
@@ -106,7 +162,10 @@
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.2.2000-beta-202510282254/dist/dbr.bundle.js"></script>
     <script>
       let parser;
+      let isInitialized = false;
 
+      const elLandingPage = document.getElementById("landing-page");
+      const elPlayButton = document.getElementById("play-button");
       const elLoading = document.getElementById("loading");
       const elResultPage = document.getElementById("result-page");
       const elBarcodeImage = document.getElementById("barcode-image");
@@ -152,10 +211,10 @@
 
               // Set the scan region to a rectangle with percentage values by cameraEnhancer
               let region = {
-                x: 5,
-                y: 5,
-                width: 90,
-                height: 90,
+                x: 10,
+                y: 20,
+                width: 80,
+                height: 60,
                 isMeasuredInPercentage: true,
               };
               components.cameraEnhancer.setScanRegion(region);
@@ -248,33 +307,46 @@
         funcOpenScanner();
       });
 
-      (async () => {
-        try {
-          await Dynamsoft.License.LicenseManager.initLicense(
-            "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
-            true
-          );
+      // Play button click handler
+      elPlayButton.addEventListener("click", async () => {
+        // Hide landing page and show loading
+        elLandingPage.style.display = "none";
+        elLoading.style.display = "";
 
-          Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI")
-            .then(() => {
-              console.log("GS1_AI spec loaded.");
-              return Dynamsoft.DCP.CodeParser.createInstance();
-            })
-            .then((parserInstance) => {
-              parser = parserInstance;
-              console.log("CodeParser instance created.");
-              elLoading.style.display = "none";
-              funcOpenScanner();
-            })
-            .catch((error) => {
-              console.error("Failed to initialize parser:", error);
-              elLoading.textContent = "Failed to initialize. Please refresh the page.";
-            });
-        } catch (error) {
-          console.error("Failed to initialize license:", error);
-          elLoading.textContent = "Failed to initialize license. Please check your connection.";
+        // Initialize if not already done
+        if (!isInitialized) {
+          try {
+            // Start both operations in parallel without waiting
+            const licensePromise = Dynamsoft.License.LicenseManager.initLicense(
+              "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAwLTEwMzk4OTAwMyIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbS8iLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMCIsInN0YW5kYnlTZXJ2ZXJVUkwiOiJodHRwczovL3NsdHMuZHluYW1zb2Z0LmNvbS8iLCJjaGVja0NvZGUiOjk0NTQ3NzkxMX0=",
+              { executeNow: true }
+            );
+            const specPromise = Dynamsoft.DCP.CodeParserModule.loadSpec("GS1_AI");
+
+            // Wait for spec loading (needed for parser creation)
+            await specPromise;
+            console.log("GS1_AI spec loaded.");
+
+            parser = await Dynamsoft.DCP.CodeParser.createInstance();
+            console.log("CodeParser instance created.");
+
+            // Ensure license is initialized before proceeding
+            await licensePromise;
+            console.log("License initialized.");
+
+            isInitialized = true;
+
+            elLoading.style.display = "none";
+            funcOpenScanner();
+          } catch (error) {
+            console.error("Failed to initialize:", error);
+            elLoading.textContent = "Failed to initialize. Please refresh the page.";
+          }
+        } else {
+          elLoading.style.display = "none";
+          funcOpenScanner();
         }
-      })();
+      });
     </script>
   </body>
 </html>
