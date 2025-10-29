@@ -6,7 +6,9 @@
       "BarcodeFormatIds": [
         "BF_GS1_DATABAR",
         "BF_CODE_128",
-        "BF_GS1_COMPOSITE"
+        "BF_GS1_COMPOSITE",
+        "BF_DATAMATRIX",
+        "BF_QR_CODE"
       ],
       "BarcodeFormatSpecificationNameArray": [
         "bfs_gs1_ai"
