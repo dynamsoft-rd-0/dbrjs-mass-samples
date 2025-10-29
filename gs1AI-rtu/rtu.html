@@ -162,11 +162,15 @@
             elBarcodeText.textContent = barcodeResult.text;
 
             const barcodeImage = result.barcodeImage;
-            //console.log(barcodeImage);
-            ctxBarcodeImage.canvas.width = barcodeImage.width;
-            ctxBarcodeImage.canvas.height = barcodeImage.height;
-            const imageData = new ImageData(new Uint8ClampedArray(barcodeImage.bytes), barcodeImage.width, barcodeImage.height);
-            ctxBarcodeImage.putImageData(imageData, 0, 0);
+            if (barcodeImage) {
+              //console.log(barcodeImage);
+              ctxBarcodeImage.canvas.width = barcodeImage.width;
+              ctxBarcodeImage.canvas.height = barcodeImage.height;
+              const imageData = new ImageData(new Uint8ClampedArray(barcodeImage.bytes), barcodeImage.width, barcodeImage.height);
+              ctxBarcodeImage.putImageData(imageData, 0, 0);
+            } else {
+              console.warn("No barcode image available");
+            }
 
             // Check if parser is available
             if (!parser) {
