@@ -109,9 +109,13 @@ body {
 
 .landing-page .logo {
   position: absolute;
-  bottom: 5%;
+  bottom: 8%;
   left: 50%;
   transform: translateX(-50%);
+}
+.landing-page .logo img { 
+  width: 95px;
+  height: 23.5px;
 }
 
 .result-page {
@@ -144,22 +148,11 @@ body {
 .gs1AI-info > div > span:first-child{
   color: rgb(50, 50, 50);
 }
-.has-question::after{
-  content: "?";
-  font-size: 14px;
-  background: #fe8e14;
-  display: inline-block;
-  border-radius: 8px;
-  width: 16px;
-  height: 16px;
-  vertical-align: middle;
-  line-height: 16px;
-  text-align: center;
-  font-weight: bolder;
-  color: white;
+.has-info::after{
+  content: url("info.svg");
   margin-left: 2px;
   position: relative;
-  bottom: 1px;
+  top: 1px;
   cursor: pointer;
 }
 
