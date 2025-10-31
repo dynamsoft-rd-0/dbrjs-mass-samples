@@ -182,9 +182,15 @@
         
         const barcodeResult = result.barcodeResults[0];
 
-        const strNotValidGS1AI = "The scanned barcode is not a valid GS1 AI barcode.";
+        const strNotValidGS1AI = "Not a GS1-compliant barcode.";
         // Parse GS1 barcode
-        let parseResult = await parser.parse(barcodeResult.bytes);
+        let parseResult;
+        try{
+          parseResult = await parser.parse(barcodeResult.bytes);
+        }catch(ex){
+          console.error(ex);
+          throw Error(strNotValidGS1AI);
+        }
         if (parseResult.codeType !== "GS1_AI") {
           throw Error(strNotValidGS1AI);
         }
