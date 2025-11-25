@@ -113,6 +113,12 @@
         "roi-read-barcodes-distant"
       ],
       "Name": "ReadBarcodes_SpeedFirst"
+    },
+    {
+      "ImageROIProcessingNameArray": [
+        "roi-read-barcodes-distant"
+      ],
+      "Name": "ReadBarcodes_ReadRateFirst"
     }
   ],
   "ImageParameterOptions": [
