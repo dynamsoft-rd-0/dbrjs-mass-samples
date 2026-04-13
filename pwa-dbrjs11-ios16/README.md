@@ -1,1 +1,1 @@
-quick run: https://dynamsoft.github.io/javascript-barcode/example/web/pwa-dbrjs-ios16/
+quick run: https://dynamsoft-rd-0.github.io/dbrjs-mass-samples/pwa-dbrjs11-ios16/helloworld-pwa.html
