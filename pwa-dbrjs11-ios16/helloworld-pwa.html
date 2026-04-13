@@ -69,6 +69,11 @@
 
   await camera.open();
 
+  // in iOS PWA, wasm seems to be slow, need more time to warmup
+  let warmupFinished = false;
+  let warmupRound = 0;
+  const MAX_WARMUP_ROUND = 3;
+
   if('disabled' === camera.singleFrameMode){
     // Video played successfully.
     while(true){
@@ -76,9 +81,13 @@
         await new Promise(r=>setTimeout(r, 1000));
         continue;
       }
+      if(!warmupFinished && warmupRound++ < MAX_WARMUP_ROUND){
+        camera.funcShowToast('warmup...');
+      }
       const captureResult = await cvRouter.capture(camera.getFrame(), 'ReadBarcodes_SpeedFirst');
       const items = captureResult.decodedBarcodesResult?.barcodeResultItems;
       if(items?.length){
+        warmupFinished = false;
         let arrTxt = [];
         for(let item of items){
           arrTxt.push(item.text);
@@ -91,8 +100,6 @@
   }else{
     // Failback to `singleFrameMode = 'camera'`.
 
-    // in iOS PWA, wasm seems to be slow, need more time to warmup
-    let warmupFinished = false;
 
     camera.on('singleFrameAcquired', async (frame) => {
 
@@ -113,7 +120,7 @@
         items = captureResult.decodedBarcodesResult?.barcodeResultItems;
       }else{
         // need warmup
-        for(let i = 0; i < 3; i++){
+        for(; warmupRound < MAX_WARMUP_ROUND; warmupRound++){
           const captureResult = await cvRouter.capture(frame, 'ReadBarcodes_SpeedFirst');
           items = captureResult.decodedBarcodesResult?.barcodeResultItems;
           if(items?.length){ break; }
