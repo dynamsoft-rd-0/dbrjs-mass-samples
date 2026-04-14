@@ -87,7 +87,7 @@
       const captureResult = await cvRouter.capture(camera.getFrame(), 'ReadBarcodes_SpeedFirst');
       const items = captureResult.decodedBarcodesResult?.barcodeResultItems;
       if(items?.length){
-        warmupFinished = false;
+        warmupFinished = true;
         let arrTxt = [];
         for(let item of items){
           arrTxt.push(item.text);
