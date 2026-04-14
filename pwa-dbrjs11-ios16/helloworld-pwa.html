@@ -69,11 +69,6 @@
 
   await camera.open();
 
-  // in iOS PWA, wasm seems to be slow, need more time to warmup
-  let warmupFinished = false;
-  let warmupRound = 0;
-  const MAX_WARMUP_ROUND = 3;
-
   if('disabled' === camera.singleFrameMode){
     // Video played successfully.
     while(true){
@@ -81,13 +76,9 @@
         await new Promise(r=>setTimeout(r, 1000));
         continue;
       }
-      if(!warmupFinished && warmupRound++ < MAX_WARMUP_ROUND){
-        camera.funcShowToast('warmup...');
-      }
       const captureResult = await cvRouter.capture(camera.getFrame(), 'ReadBarcodes_SpeedFirst');
       const items = captureResult.decodedBarcodesResult?.barcodeResultItems;
       if(items?.length){
-        warmupFinished = true;
         let arrTxt = [];
         for(let item of items){
           arrTxt.push(item.text);
@@ -103,7 +94,7 @@
 
     camera.on('singleFrameAcquired', async (frame) => {
 
-      // The frame might too big and decoding will timeout
+      // The frame might too big and decoding will be slow
       // make it smaller
       if(frame.width > 2300 || frame.height > 2300){
         let newFrame = document.createElement('canvas');
@@ -113,23 +104,8 @@
         frame = newFrame;
       }
 
-      let items;
-
-      if(warmupFinished){
-        const captureResult = await cvRouter.capture(frame, 'ReadBarcodes_SpeedFirst');
-        items = captureResult.decodedBarcodesResult?.barcodeResultItems;
-      }else{
-        // need warmup
-        for(; warmupRound < MAX_WARMUP_ROUND; warmupRound++){
-          const captureResult = await cvRouter.capture(frame, 'ReadBarcodes_SpeedFirst');
-          items = captureResult.decodedBarcodesResult?.barcodeResultItems;
-          if(items?.length){ break; }
-          camera.funcShowToast('warmup...');
-          await new Promise(r => setTimeout(r, 1000));
-        }
-        warmupFinished = true;
-      }
-
+      const captureResult = await cvRouter.capture(frame, 'ReadBarcodes_ReadRateFirst');
+      const items = captureResult.decodedBarcodesResult?.barcodeResultItems;
 
       if(items?.length){
         let arrTxt = [];
