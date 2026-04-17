@@ -68,25 +68,32 @@ self.addEventListener("fetch", (e) => {
       // Fetch cached response if exists
       const cachedResponse = await caches.match(e.request);
       console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
-      if (cachedResponse) {
+      if (cachedResponse && !e.request.url?.endsWith(".html")) {
         return cachedResponse;
       }
 
-      // Otherwise, fetch from network
-      const response = await fetch(e.request);
+      try{
+        // Otherwise, fetch from network
+        const response = await fetch(e.request);
 
-      if (
-        e.request.method !== "POST" &&
-        // Authorization requests should not be cached
-        !/https:\/\/.*?\.dynamsoft.com\/auth/.test(e.request.url)
-        // You can add other filter conditions
-      ) {
-        const cache = await caches.open(cacheName);
-        console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
-        cache.put(e.request, response.clone());
+        if (
+          e.request.method !== "POST" &&
+          // Authorization requests should not be cached
+          !/https:\/\/.*?\.dynamsoft.com\/auth/.test(e.request.url)
+          // You can add other filter conditions
+        ) {
+          const cache = await caches.open(cacheName);
+          console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
+          cache.put(e.request, response.clone());
+        }
+
+        return response;
+      }catch(ex){
+        if(cachedResponse && e.request.url?.endsWith(".html")){
+          return cachedResponse;
+        }
+        throw ex;
       }
-
-      return response;
     })()
   );
 });

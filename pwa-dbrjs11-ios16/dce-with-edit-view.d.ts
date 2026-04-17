@@ -74,6 +74,8 @@ declare class Camera {
     static _delayBeforeGetUserMedia: number;
     static _delayBeforeApplyConstraints: number;
     static _countEnsureResolution: number;
+    static _videoPlayTimeout: number;
+    static _bReopenWhenChangeResolution: boolean;
     static _arrConstructors: CameraZsFunc[];
     static _arrOnOpen: CameraZsFunc[];
     static _arrBeforeClose: CameraZsFunc[];
@@ -166,6 +168,15 @@ declare class Camera {
     }): Promise<void>;
     requestResolution(notRequired: null): Promise<void>;
     requestResolution(resetToDefault: undefined): Promise<void>;
+    /**
+     * Similar to `camera.track.applyConstraints`,
+     * but auto add constraints of original camera and original resolution.
+     * Primarily used for advanced camera settings like focusDistance, zoom, colorTemperature.
+     * Don't directly change camera or resolution by this API,
+     * use `requestCamera` and `requestResolution` instead.
+     * Set camera or resolution using `applyConstraints` will result in undefined behavior.
+    */
+    applyConstraints(constraints?: MediaTrackConstraints): Promise<void>;
     /**
      * @param config
      * `x`/`y`/`width`/`height` is normally `0 ~ video.videoWidth` or `0 ~ video.videoHeight`,
@@ -833,17 +844,17 @@ declare class Feedback {
     static vibrateDuration: number;
 }
 declare const DrawingStyleManager: {
-    STYLE_GREEN_STROKE: any;
-    STYLE_GREEN_STROKE_FILL: any;
-    STYLE_GREEN_STROKE_TRANSPARENT: any;
     STYLE_BLUE_STROKE: any;
-    STYLE_BLUE_STROKE_FILL: any;
-    STYLE_BLUE_STROKE_TRANSPARENT: any;
+    STYLE_GREEN_STROKE: any;
     STYLE_ORANGE_STROKE: any;
-    STYLE_ORANGE_STROKE_FILL: any;
-    STYLE_ORANGE_STROKE_TRANSPARENT: any;
     STYLE_YELLOW_STROKE: any;
+    STYLE_BLUE_STROKE_FILL: any;
+    STYLE_GREEN_STROKE_FILL: any;
+    STYLE_ORANGE_STROKE_FILL: any;
     STYLE_YELLOW_STROKE_FILL: any;
+    STYLE_BLUE_STROKE_TRANSPARENT: any;
+    STYLE_GREEN_STROKE_TRANSPARENT: any;
+    STYLE_ORANGE_STROKE_TRANSPARENT: any;
     STYLE_YELLOW_STROKE_TRANSPARENT: any;
     createDrawingStyle(style: any): any;
     getDrawingStyle(id: any): any;
@@ -958,7 +969,16 @@ declare class LineDrawingItem extends DrawingItem {
             y: number;
         };
     };
-    setLine(value: any): void;
+    setLine(value: {
+        startPoint: {
+            x: number;
+            y: number;
+        };
+        endPoint: {
+            x: number;
+            y: number;
+        };
+    }): void;
 }
 declare class QuadDrawingItem extends DrawingItem {
     quad: {
@@ -983,7 +1003,12 @@ declare class QuadDrawingItem extends DrawingItem {
             y: number;
         }[];
     };
-    setQuad(value: any): void;
+    setQuad(value: {
+        points: {
+            x: number;
+            y: number;
+        }[];
+    }): void;
 }
 declare class RectDrawingItem extends DrawingItem {
     rect: {
@@ -1008,7 +1033,12 @@ declare class RectDrawingItem extends DrawingItem {
         width: number;
         height: number;
     };
-    setRect(value: any): void;
+    setRect(value: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }): void;
 }
 declare class TextDrawingItem extends DrawingItem {
     text: string;
@@ -1029,14 +1059,19 @@ declare class TextDrawingItem extends DrawingItem {
         height: number;
     }, drawingStyleId?: any);
     getText(): string;
-    setText(value: any): void;
-    getRect(): {
+    setText(value: string): void;
+    getTextRect(): {
         x: number;
         y: number;
         width: number;
         height: number;
     };
-    setRect(value: any): void;
+    setTextRect(value: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }): void;
 }
 declare class ImageDrawingItem extends DrawingItem {
     image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
@@ -1064,14 +1099,25 @@ declare class ImageDrawingItem extends DrawingItem {
         height: number;
     }, maintainAspectRatio: boolean, drawingStyleId?: any);
     getImage(): HTMLVideoElement | HTMLCanvasElement | HTMLImageElement;
-    setImage(value: any): void;
-    getRect(): {
+    setImage(image: {
+        bytes: Uint8Array;
+        width: number;
+        height: number;
+        stride: number;
+        format: any;
+    } | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement): void;
+    getImageRect(): {
         x: number;
         y: number;
         width: number;
         height: number;
     };
-    setRect(value: any): void;
+    setImageRect(value: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }): void;
 }
 
 declare enum EnumDrawingItemMediaType {
@@ -1088,25 +1134,13 @@ declare enum EnumDrawingItemMediaType {
      */
     DIMT_TEXT = 4,
     /**
-     * Represents an arc, which is a portion of the circumference of a circle or an ellipse. Arcs are used to create curved shapes and segments.
-     */
-    DIMT_ARC = 8,
-    /**
      * Represents an image. This enables embedding bitmap images within the drawing context.
      */
     DIMT_IMAGE = 16,
     /**
-     * Represents a polygon, which is a plane figure that is described by a finite number of straight line segments connected to form a closed polygonal chain or circuit.
-     */
-    DIMT_POLYGON = 32,
-    /**
      * Represents a line segment. This is the simplest form of a drawing item, defined by two endpoints and the straight path connecting them.
      */
-    DIMT_LINE = 64,
-    /**
-     * Represents a group of drawing items. This allows for the logical grouping of multiple items, treating them as a single entity for manipulation or transformation purposes.
-     */
-    DIMT_GROUP = 128
+    DIMT_LINE = 64
 }
 declare enum EnumDrawingItemState {
     /**
