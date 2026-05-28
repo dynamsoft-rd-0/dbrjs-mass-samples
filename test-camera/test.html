@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <p>Version: 2026-05-28T09:01:00Z</p>
+    <p>Version: 2026-05-28T09:08:00Z</p>
     <button id="btn-open">open</button>
     <button id="btn-close">close</button>
     <button id="btn-capabilities">capabilities</button>
@@ -43,7 +43,7 @@
             camera.enableTapToFocus = 'experimental-advanced'//'simple';
             //camera.shouldPauseWhenHide = false;
             //await camera.requestCamera('macro-back');//kdebug
-            await camera.requestedCamera(null);
+            await camera.requestCamera(null);
             await camera.requestResolution(null);
             await camera.open();
             //console.log(camera.currentCamera)//kdebug
