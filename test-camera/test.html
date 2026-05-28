@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btn-open">open</button>
+    <button id="btn-close">close</button>
+    <button id="btn-capabilities">capabilities</button>
+    <button id="btn-settings">settings</button>
+    <br>
+    <textarea id="textarea" style="width: 100%; height: 300px;" disabled></textarea>
+    <br>
+    <script src="dm-camera.js?v=20250814.1"></script>
+    <!-- <script src="./eruda.min.js"></script> -->
+    <script>
+        // eruda.init();
+        //let camera = new DMCamera.Camera();
+        document.querySelector('#btn-open').addEventListener('click', async () => {
+            console.log(await DMCamera.Camera.getDeviceInfos());
+            let camera = window.camera ??= new DMCamera.Camera();
+            //camera.isMirrored = true;
+            camera.ui = await fetch('./mobile-native.ui.xml?v=20250519.5').then(r=>r.text());
+// `<h1>test h1 color</h1>
+// <div class="dm-camera-core-container" style="height:70vh"></div>
+// <style>h1{color:red;}</style>
+// <script>
+//     document.querySelector('h1').innerText += ' (script add something)';
+//     console.log(document.currentScript.currentDMCamera)
+// <\/script>
+// <div style="height:70vh"></div>
+// `;
+//console.log('test script'); test.js data:text/javascript;base64,Y29uc29sZS5sb2coJ3Rlc3Qgc2NyaXB0Jyk7 type="module"
+            camera.ui.style.height = '70vh';
+            //camera.ui.style.resize = 'both';
+            camera.setRegionBox({width:0.5,height:0.5,unit:'view-min'});//
+            //camera._regionBoxWrapper.style.background = 'rgba(255,0,0,0.5)';
+            //camera.objectFit = 'contain';
+            document.body.append(camera.ui);
+            camera.enableTapToFocus = 'experimental-advanced'//'simple';
+            //camera.shouldPauseWhenHide = false;
+            //await camera.requestCamera('macro-back');//kdebug
+            await camera.open();
+            //console.log(camera.currentCamera)//kdebug
+            setTimeout(()=>{
+                if('opened'===camera.status){
+                    camera.turnAutoTorch();
+                }
+            }, 3000);
+        });
+        document.querySelector('#btn-close').addEventListener('click', async () => {
+            try{ await camera.close(); }catch(_){}
+            camera.ui.remove();
+        });
+        document.querySelector('#btn-capabilities').addEventListener('click', async () => {
+            let track = camera.video.srcObject.getTracks()[0];
+            document.querySelector('#textarea').value = JSON.stringify(track.getCapabilities(),null,2);
+        });
+        document.querySelector('#btn-settings').addEventListener('click', async () => {
+            let track = camera.video.srcObject.getTracks()[0];
+            document.querySelector('#textarea').value = JSON.stringify(track.getSettings(),null,2);
+        });
+    </script>
+</body>
+</html>
