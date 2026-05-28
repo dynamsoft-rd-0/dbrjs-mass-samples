@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <p>Version: 2026-05-28T09:08:00Z</p>
+    <p>Version: 2026-05-28T09:45:00Z</p>
     <button id="btn-open">open</button>
     <button id="btn-close">close</button>
     <button id="btn-capabilities">capabilities</button>
@@ -19,11 +19,12 @@
     <script>
         // eruda.init();
         //let camera = new DMCamera.Camera();
+        DMCamera.Camera._videoPlayTimeout = 10000;
         document.querySelector('#btn-open').addEventListener('click', async () => {
             console.log(await DMCamera.Camera.getDeviceInfos());
             let camera = window.camera ??= new DMCamera.Camera();
             //camera.isMirrored = true;
-            camera.ui = await fetch('./mobile-native.ui.xml?v=20250519.5').then(r=>r.text());
+            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
 // `<h1>test h1 color</h1>
 // <div class="dm-camera-core-container" style="height:70vh"></div>
 // <style>h1{color:red;}</style>
