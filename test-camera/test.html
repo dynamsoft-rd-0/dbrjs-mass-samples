@@ -42,6 +42,8 @@
             camera.enableTapToFocus = 'experimental-advanced'//'simple';
             //camera.shouldPauseWhenHide = false;
             //await camera.requestCamera('macro-back');//kdebug
+            await camera.requestedCamera(null);
+            await camera.requestResolution(null);
             await camera.open();
             //console.log(camera.currentCamera)//kdebug
             setTimeout(()=>{
