@@ -1,88 +1,99 @@
 const engineResourcePaths = {
-  std: "https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-std@1.4.21/dist/",
-  dip: "https://cdn.jsdelivr.net/npm/dynamsoft-image-processing@2.4.31/dist/",
-  core: "https://cdn.jsdelivr.net/npm/dynamsoft-core@3.4.31/dist/",
-  license: "https://cdn.jsdelivr.net/npm/dynamsoft-license@3.4.31/dist/",
-  cvr: "https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-router@2.4.33/dist/",
-  dbr: "https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.4.31/dist/",
-  dce: "https://cdn.jsdelivr.net/npm/dynamsoft-camera-enhancer@4.1.1/dist/",
-  utility: "https://cdn.jsdelivr.net/npm/dynamsoft-utility@1.4.32/dist/",
+  dbrBundle: "https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.4.2001/dist/",
 };
 
 // Files to cache
-const cacheName = "react-pwa";
-const appShellFiles = [
+const CACHE_PREFIX = "helloworld-pwa-";
+const CACHE_NAME = `${CACHE_PREFIX}v1`;
+// Here we choose some files into ASSETS_TO_CACHE to cache.
+// You can find these files in "node_modules/dynamsoft-barcode-reader-bundle/dist".
+const ASSETS_TO_CACHE = [
   "./index.html",
+  "./dynamsoft-192x192.png",
+  "./dynamsoft-512x512.png",
   "./manifest.json",
-  "./template.json",
-  "./static/css/main.5b037586.css",
-  "./static/css/main.5b037586.css.map",
-  "./static/js/main.1d2fa9db.js",
-  "./static/js/main.1d2fa9db.js.LICENSE.txt",
-  "./static/js/main.1d2fa9db.js.map",
-  "./static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
-  "./logo192.png",
-  "./logo512.png",
-  "./favicon.ico",
-  `${engineResourcePaths.std}std.js`,
-  `${engineResourcePaths.std}std.wasm`,
-  `${engineResourcePaths.dip}dip.wasm`,
-  `${engineResourcePaths.core}core.js`,
-  `${engineResourcePaths.core}core.worker.js`,
-  `${engineResourcePaths.core}core.wasm`,
-  `${engineResourcePaths.license}license.js`,
-  `${engineResourcePaths.license}dls.license.dialog.html`,
-  `${engineResourcePaths.license}license.worker.js`,
-  `${engineResourcePaths.license}license.wasm`,
-  `${engineResourcePaths.utility}utility.js`,
-  `${engineResourcePaths.dbr}dbr.js`,
-  `${engineResourcePaths.dbr}dbr.wasm`,
-  `${engineResourcePaths.dbr}DBR-PresetTemplates.json`,
-  `${engineResourcePaths.cvr}cvr.js`,
-  `${engineResourcePaths.cvr}cvr.wasm`,
-  `${engineResourcePaths.cvr}cvr.worker.js`,
-  `${engineResourcePaths.dce}dce.js`,
-  `${engineResourcePaths.dce}dce.ui.html`,
+  `${engineResourcePaths.dbrBundle}dbr.bundle.js`,
+  `${engineResourcePaths.dbrBundle}dbr.bundle.worker.js`,
+  `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle-ml-simd.js`,
+  `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle-ml-simd.wasm`,
+  `${engineResourcePaths.dbrBundle}models/Code128Decoder.data`,
+  `${engineResourcePaths.dbrBundle}models/EAN13Decoder.data`,
+  `${engineResourcePaths.dbrBundle}models/Code39ITFDecoder.data`,
+  `${engineResourcePaths.dbrBundle}templates/DBR-PresetTemplates.json`,
+  `${engineResourcePaths.dbrBundle}ui/dce.ui.xml`,
+  `${engineResourcePaths.dbrBundle}ui/dls.license.dialog.html`,
+  
+  // `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle.js`,
+  // `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle.wasm`,
+  // `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle-ml-simd-pthread.js`,
+  // `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle-ml-simd-pthread.worker.js`,
+  // `${engineResourcePaths.dbrBundle}dynamsoft-barcode-reader-bundle-ml-simd-pthread.wasm`,
+  // `${engineResourcePaths.dbrBundle}models/OneDDeblur.data`,
+  // `${engineResourcePaths.dbrBundle}models/OneDLocalization.data`,
+  // `${engineResourcePaths.dbrBundle}models/DataMatrixQRCodeLocalization.data`,
+  // `${engineResourcePaths.dbrBundle}models/DataMatrixQRCodeDeblur.data`,
+  // `${engineResourcePaths.dbrBundle}models/PDF417Deblur.data`,
+  // `${engineResourcePaths.dbrBundle}models/PDF417Localization.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/AADHAAR.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/AAMVA_DL_ID.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/GS1_AI.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/MRTD.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/SOUTH_AFRICA_DL.data`,
+  // `${engineResourcePaths.dbrBundle}parser-resources/VIN.data`,
 ];
 
 // Installing Service Worker
 self.addEventListener("install", (e) => {
   console.log("[Service Worker] Install");
   e.waitUntil(
-    (async () => {
-      const cache = await caches.open(cacheName);
-      console.log(cache);
+    caches.open(CACHE_NAME).then((cache) => {
       console.log("[Service Worker] Caching all: app shell and content");
-      await cache.addAll(appShellFiles);
-    })()
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+  // Force the waiting service worker to become the active one
+  self.skipWaiting();
+});
+
+// 2. Activate: Clean up old caches
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName.startsWith(CACHE_PREFIX) && cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
 
-self.addEventListener("fetch", (e) => {
+// 3. Fetch: Stale-While-Revalidate Strategy
+self.addEventListener('fetch', (e) => {
   e.respondWith(
-    (async () => {
-      // Fetch cached response if exists
-      const cachedResponse = await caches.match(e.request);
-      console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+    caches.match(e.request).then((cachedResponse) => {
+      // Return cached response if found, but fetch a fresh version anyway
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
+        if(
+          'GET' === e.request.method && networkResponse.ok &&
+          // Authorization requests should not be cached
+          !/https:\/\/.*?\.dynamsoft.com\/auth/.test(e.request.url)
+          // You can add other filter conditions
+        ){
+          // Update the cache with the new version
+          const clonedRep = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, clonedRep);
+            console.log(`[Service Worker] Cache updated: ${e.request.url}`);
+          });
+        }
+        return networkResponse;
+      });
 
-      // Otherwise, fetch from network
-      const response = await fetch(e.request);
-
-      if (
-        e.request.method !== "POST" &&
-        // Authorization requests should not be cached
-        !/https:\/\/.*?\.dynamsoft.com\/auth/.test(e.request.url)
-        // You can add other filter conditions
-      ) {
-        const cache = await caches.open(cacheName);
-        console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
-        cache.put(e.request, response.clone());
-      }
-
-      return response;
-    })()
+      return cachedResponse || fetchPromise;
+    })
   );
 });

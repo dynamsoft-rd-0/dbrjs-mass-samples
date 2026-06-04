@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "../../dynamsoft.config"; // import side effects. The license, engineResourcePath, so on.
-import { CameraEnhancer, CameraView } from "dynamsoft-camera-enhancer";
-import { CaptureVisionRouter } from "dynamsoft-capture-vision-router";
-import { MultiFrameResultCrossFilter } from "dynamsoft-utility";
+import { CameraEnhancer, CameraView, CaptureVisionRouter, MultiFrameResultCrossFilter } from "dynamsoft-barcode-reader-bundle";
 import "./VideoCapture.css";
 
 const componentDestroyedErrorMsg = "VideoCapture Component Destroyed";
@@ -25,6 +23,10 @@ function VideoCapture() {
       try {
         // Create a `CameraEnhancer` instance for camera control and a `CameraView` instance for UI control.
         const cameraView = await CameraView.createInstance();
+
+        // Hide the "Powered by Message" overlay on the scanner view
+        // cameraView.setPowerByMessageVisible(false);
+
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         } // Check if component is destroyed after every async
@@ -41,12 +43,10 @@ function VideoCapture() {
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
-        await cvRouter.initSettings("./template.json");
-
         cvRouter.setInput(cameraEnhancer);
 
         // Define a callback for results.
-        cvRouter.addResultReceiver({
+        await cvRouter.addResultReceiver({
           onDecodedBarcodesReceived: (result) => {
             if (!result.barcodeResultItems.length) return;
 
@@ -71,13 +71,13 @@ function VideoCapture() {
           throw Error(componentDestroyedErrorMsg);
         }
 
-        // Open camera and start scanning single barcode.
+        // Open camera and start scanning barcode.
         await cameraEnhancer.open();
         cameraView.setScanLaserVisible(true);
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
-        await cvRouter.startCapturing("Read_Curved_QRCode");
+        await cvRouter.startCapturing("ReadBarcodes_SpeedFirst");
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
         }
@@ -86,7 +86,7 @@ function VideoCapture() {
           console.log(componentDestroyedErrorMsg);
         } else {
           let errMsg = ex.message || ex;
-          console.error(errMsg);
+          console.error(ex);
           alert(errMsg);
         }
       }

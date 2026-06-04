@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, MutableRefObject, useState } from "react";
 import "../../dynamsoft.config"; // import side effects. The license, engineResourcePath, so on.
-import { EnumCapturedResultItemType } from "dynamsoft-core";
-import { BarcodeResultItem } from "dynamsoft-barcode-reader";
-import { CaptureVisionRouter } from "dynamsoft-capture-vision-router";
+import { EnumCapturedResultItemType, CaptureVisionRouter, BarcodeResultItem } from "dynamsoft-barcode-reader-bundle";
 import "./ImageCapture.css";
 
 function ImageCapture() {
@@ -20,11 +18,11 @@ function ImageCapture() {
       // ensure cvRouter is created only once
       const cvRouter = await (pCvRouter.current = pCvRouter.current || CaptureVisionRouter.createInstance());
       if (isDestroyed.current) return;
-      await cvRouter.initSettings("./template.json");
 
       let _resultText = "";
       for (let file of files) {
-        const result = await cvRouter.capture(file, "Read_Curved_QRCode");
+        // Decode selected image with 'ReadBarcodes_ReadRateFirst' template.
+        const result = await cvRouter.capture(file, "ReadBarcodes_ReadRateFirst");
         console.log(result);
         if (isDestroyed.current) return;
 
@@ -45,7 +43,7 @@ function ImageCapture() {
       }
     } catch (ex: any) {
       let errMsg = ex.message || ex;
-      console.error(errMsg);
+      console.error(ex);
       alert(errMsg);
     }
   };

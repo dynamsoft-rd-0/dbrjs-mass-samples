@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import reactLogo from "./assets/logo.svg";
-import VideoCapture from "./components/VideoCapture/VideoCapture";
-import ImageCapture from "./components/ImageCapture/ImageCapture";
 import "./App.css";
 
+const VideoCapture = lazy(()=>import("./components/VideoCapture/VideoCapture"));
+const ImageCapture = lazy(()=>import("./components/ImageCapture/ImageCapture"));
+
 enum Modes {
+  NONE = "none",
   VIDEO_CAPTURE = "video",
   IMAGE_CAPTURE = "image",
 }
 
 function App() {
-  const [mode, setMode] = useState(Modes.VIDEO_CAPTURE);
+  const [mode, setMode] = useState(Modes.NONE);
 
   const showVideoCapture = () => setMode(Modes.VIDEO_CAPTURE);
 
@@ -40,7 +42,10 @@ function App() {
           Decode Image
         </button>
       </div>
-      <div className="container">{mode === Modes.VIDEO_CAPTURE ? <VideoCapture /> : <ImageCapture />}</div>
+      <div className="container">
+        {mode === Modes.VIDEO_CAPTURE && <Suspense fallback={'Loading...'}><VideoCapture /></Suspense>}
+        {mode === Modes.IMAGE_CAPTURE && <Suspense fallback={'Loading...'}><ImageCapture /></Suspense>}
+      </div>
     </div>
   );
 }

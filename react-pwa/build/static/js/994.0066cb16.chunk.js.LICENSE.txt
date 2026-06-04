@@ -1,0 +1,10 @@
+/*!
+* Dynamsoft JavaScript Library
+* @product Dynamsoft Barcode Reader JS Edition Bundle
+* @website http://www.dynamsoft.com
+* @copyright Copyright 2026, Dynamsoft Corporation
+* @author Dynamsoft
+* @version 11.4.2001
+* @fileoverview Dynamsoft JavaScript Library for Barcode Reader
+* More info on dbr JS: https://www.dynamsoft.com/barcode-reader/docs/web/programming/javascript/
+*/
