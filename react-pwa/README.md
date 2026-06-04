@@ -8,6 +8,9 @@ modified from https://github.com/Dynamsoft/barcode-reader-javascript-samples/tre
   * and if we detect that the iOS PWA is certain to fail to open the camera during the current session, we will automatically switch to photo mode.
 * Use `Suspense, lazy` to lazy load, instead of dynamic add `<script>`.
 * No need initLicense `{executeNow: true}`.
+* Prefer public CDN instead of self-hosting resources, it might load faster.
+  * if you prefer self-hosting resources, please gzip resources to optimize bandwidth.
+* Add eruda for debugging.
 
 ## Quick run in github.io
 
