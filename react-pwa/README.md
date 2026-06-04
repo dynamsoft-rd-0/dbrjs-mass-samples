@@ -15,3 +15,7 @@ modified from https://github.com/Dynamsoft/barcode-reader-javascript-samples/tre
 ## Quick run in github.io
 
 https://dynamsoft-rd-0.github.io/dbrjs-mass-samples/react-pwa/build/index.html
+
+## How to download directory of a repo
+
+https://download-directory.github.io/
