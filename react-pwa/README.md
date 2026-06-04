@@ -5,7 +5,8 @@ modified from https://github.com/Dynamsoft/barcode-reader-javascript-samples/tre
 ## Key points
 
 * Upgrade to dbrjs > 11.4.2001, it specifically optimized for iOS PWA.
-  * and if we detect that the iOS PWA is certain to fail to open the camera during the current session, we will automatically switch to photo mode.
+  * Although improved, iOS PWA sometimes can't open anyway, we have no solution but auto fallback to photo mode.
+  * If it always always fails to open, please tap the tools icon (eruda console), take a screenshot of any camera-related warnings or errors, send to us.
 * Use `Suspense, lazy` to lazy load, instead of dynamic add `<script>`.
   * For demonstration, you need click the button to start scanning, instead of auto start scanning when page loaded. You can check F12 network to see how it works.
 * No need initLicense `{executeNow: true}`.
