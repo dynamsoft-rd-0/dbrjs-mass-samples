@@ -7,18 +7,47 @@
 </head>
 <body>
     <p>Pls <span style="color:red">refresh</span> before each open, so no hardware camera cache.</p>
-    <button id="btn-open-d">open default, now in PC(win/mac) timeout should be 10s</button>
+    <p id="p-ua"></p>
+    <label><input id="cb-no-rsl" type="checkbox">no need for resolution</label>
+    <br>
+    <button id="btn-open-d">no need for back</button>
+    <button id="btn-open-b">back</button>
+    <button id="btn-open-qb">quick back</button>
     <br>
     <script src="dm-camera.js?v=20250814.1"></script>
     <script>
+        document.querySelector('#p-ua').textContent = navigator.userAgent;
         document.querySelector('#btn-open-d').addEventListener('click', async function(){
             let camera = window.camera ??= new DMCamera.Camera();
-            console.log(`current timeout: ${DMCamera.Camera._videoPlayTimeout}`);
             camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
             camera.ui.style.height = '70vh';
             document.body.append(camera.ui);
+            const noRsl = document.querySelector('#cb-no-rsl').checked;
+            if(noRsl){ await camera.requestResolution(null); }
             await camera.open();
-            alert(this.textContent);
+            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
+        });
+        document.querySelector('#btn-open-b').addEventListener('click', async function(){
+            let camera = window.camera ??= new DMCamera.Camera();
+            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
+            camera.ui.style.height = '70vh';
+            document.body.append(camera.ui);
+            const noRsl = document.querySelector('#cb-no-rsl').checked;
+            if(noRsl){ await camera.requestResolution(null); }
+            await camera.requestCamera('back');
+            await camera.open();
+            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
+        });
+        document.querySelector('#btn-open-qb').addEventListener('click', async function(){
+            let camera = window.camera ??= new DMCamera.Camera();
+            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
+            camera.ui.style.height = '70vh';
+            document.body.append(camera.ui);
+            const noRsl = document.querySelector('#cb-no-rsl').checked;
+            if(noRsl){ await camera.requestResolution(null); }
+            await camera.requestCamera('quick-back');
+            await camera.open();
+            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
         });
     </script>
 </body>
