@@ -7,51 +7,26 @@
 </head>
 <body>
     <p>Pls <span style="color:red">refresh</span> before each open, so no hardware camera cache.</p>
-    <p id="p-ua"></p>
+    <p id="p-platform"></p>
+    <p id="p-requested-camera"></p>
     <textarea id="ta-device-info" style="width:95%;height:500px;overflow-y:auto;display:block;" disabled></textarea>
-    <label><input id="cb-no-rsl" type="checkbox">no need for resolution</label>
     <br>
-    <button id="btn-open-d">no need for back</button>
-    <button id="btn-open-b">back</button>
-    <button id="btn-open-qb">quick back</button>
+    <button id="btn-open-d">open</button>
     <br>
     <script src="dm-camera.js?v=20250814.1"></script>
     <script>
-        document.querySelector('#p-ua').textContent = navigator.userAgent;
+        document.querySelector('#p-platform').textContent = navigator?.platform;
         document.querySelector('#btn-open-d').addEventListener('click', async function(){
+            document.querySelector('#ta-device-info').textContent = JSON.stringify(await DMCamera.Camera.getDeviceInfos(),null,2);
             let camera = window.camera ??= new DMCamera.Camera();
             camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
+            camera.ui.style.width = '500px';
             camera.ui.style.height = '200px';
             document.body.append(camera.ui);
-            const noRsl = document.querySelector('#cb-no-rsl').checked;
-            if(noRsl){ await camera.requestResolution(null); }
+            // await camera.requestResolution(null);
+            // await camera.requestCamera('back');
             await camera.open();
-            document.querySelector('#ta-device-info').textContent = JSON.stringify(await DMCamera.Camera.getDeviceInfos(),null,2);;
-            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
-        });
-        document.querySelector('#btn-open-b').addEventListener('click', async function(){
-            let camera = window.camera ??= new DMCamera.Camera();
-            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
-            camera.ui.style.height = '200px';
-            document.body.append(camera.ui);
-            const noRsl = document.querySelector('#cb-no-rsl').checked;
-            if(noRsl){ await camera.requestResolution(null); }
-            await camera.requestCamera('back');
-            await camera.open();
-            document.querySelector('#ta-device-info').textContent = JSON.stringify(await DMCamera.Camera.getDeviceInfos(),null,2);;
-            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
-        });
-        document.querySelector('#btn-open-qb').addEventListener('click', async function(){
-            let camera = window.camera ??= new DMCamera.Camera();
-            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
-            camera.ui.style.height = '200px';
-            document.body.append(camera.ui);
-            const noRsl = document.querySelector('#cb-no-rsl').checked;
-            if(noRsl){ await camera.requestResolution(null); }
-            await camera.requestCamera('quick-back');
-            await camera.open();
-            document.querySelector('#ta-device-info').textContent = JSON.stringify(await DMCamera.Camera.getDeviceInfos(),null,2);;
-            alert(`${noRsl?'no need for resolution + ':''}${this.textContent}`);
+            document.querySelector('#p-requested-camera').textContent = 'requestedCamera: '+JSON.stringify(camera.requestedCamera);
         });
     </script>
 </body>
