@@ -35,9 +35,6 @@ function VideoCapture() {
           throw Error(componentDestroyedErrorMsg);
         }
 
-        // Get default UI and append it to DOM.
-        cameraViewContainer.current!.append(cameraView.getUIElement());
-
         // Create a `CaptureVisionRouter` instance and set `CameraEnhancer` instance as its image source.
         cvRouter = await CaptureVisionRouter.createInstance();
         if (isDestroyed) {
@@ -71,8 +68,12 @@ function VideoCapture() {
           throw Error(componentDestroyedErrorMsg);
         }
 
+
+        // Get default UI and append it to DOM.
+        cameraViewContainer.current!.append(cameraView.getUIElement());
         // Open camera and start scanning barcode.
         await cameraEnhancer.open();
+        
         cameraView.setScanLaserVisible(true);
         if (isDestroyed) {
           throw Error(componentDestroyedErrorMsg);
