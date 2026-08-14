@@ -374,6 +374,7 @@ C92.9,14.1,92.8,14.1,92.7,14.1z" />
       let option;
       if(option = target.closest('.dm-camera-mn-camera-option')){
         // change camera
+        console.log('========change camera========')//debug
         if(option.hasAttribute('selected')){ return; }
         const requestedDeviceId = option.getAttribute('data-device-id');
         await camera.requestCamera(requestedDeviceId);
@@ -450,6 +451,7 @@ C92.9,14.1,92.8,14.1,92.7,14.1z" />
     elCameraClose?.addEventListener('click', ()=>{ camera.close(); });
 
     elCameraSwitch?.addEventListener('pointerdown', async()=>{
+      console.log('========switch camera========')//debug
       await camera.requestCamera(camera.currentCamera.isFront ? 'back': 'front');
     });
 

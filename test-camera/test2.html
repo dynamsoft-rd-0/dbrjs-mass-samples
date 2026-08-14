@@ -6,27 +6,20 @@
     <title>Document</title>
 </head>
 <body>
-    <p>Pls <span style="color:red">refresh</span> before each open, so no hardware camera cache.</p>
-    <p id="p-platform"></p>
-    <p id="p-requested-camera"></p>
-    <textarea id="ta-device-info" style="width:95%;height:500px;overflow-y:auto;display:block;" disabled></textarea>
-    <br>
     <button id="btn-open-d">open</button>
-    <br>
-    <script src="dm-camera.2.js"></script>
+    <br><script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <script src="dm-camera.2.1.js"></script>
     <script>
-        document.querySelector('#p-platform').textContent = navigator?.platform;
         document.querySelector('#btn-open-d').addEventListener('click', async function(){
-            document.querySelector('#ta-device-info').textContent = JSON.stringify(await DMCamera.Camera.getDeviceInfos(),null,2);
             let camera = window.camera ??= new DMCamera.Camera();
-            camera.ui = await fetch('./mobile-native.ui.xml?v=20250528').then(r=>r.text());
+            camera.ui = await fetch('./mobile-native.ui.xml?v=20250814').then(r=>r.text());
             camera.ui.style.width = '400px';
             camera.ui.style.height = '600px';
             document.body.append(camera.ui);
             // await camera.requestResolution(null);
             // await camera.requestCamera('back');
             await camera.open();
-            document.querySelector('#p-requested-camera').textContent = 'requestedCamera: '+JSON.stringify(camera.requestedCamera);
         });
     </script>
 </body>
