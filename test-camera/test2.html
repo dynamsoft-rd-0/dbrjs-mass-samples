@@ -6,8 +6,11 @@
     <title>Document</title>
 </head>
 <body>
-    <button id="btn-open-d">open</button>
-    <br><script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <button id="btn-open-d">open</button> <button id="btn-copy">copy</button>
+    <br>
+    <textarea id="ta" style="width:95%;height:200px;overflow-y:auto;display:block;" disabled></textarea>
+    <br>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
     <script src="dm-camera.2.1.js"></script>
     <script>
@@ -21,6 +24,89 @@
             // await camera.requestCamera('back');
             await camera.open();
         });
+
+
+        const ta = document.querySelector('#ta');
+
+        document.querySelector('#btn-copy').addEventListener('click', async function () {
+          copyTextToClipboard(ta.textContent);
+        });
+
+        setInterval(()=>{
+            if('opened' !== window.camera?.status){return;}
+            const coreShellRect = camera._coreShell.getBoundingClientRect();
+            const coreOuterLayerRect = camera._coreOuterLayer.getBoundingClientRect();
+            const coreInnerLayerRect = camera._coreInnerLayer.getBoundingClientRect();
+            const videoRect = camera.video.getBoundingClientRect();
+            ta.innerHTML = [
+                `) coreShellRect: ${coreShellRect.width}x${coreShellRect.height}`,
+                camera._coreShell.getAttribute('style'),
+                `) coreOuterLayerRect: ${coreOuterLayerRect.width}x${coreOuterLayerRect.height}`,
+                camera._coreOuterLayer.getAttribute('style'),
+                `) coreInnerLayerRect: ${coreInnerLayerRect.width}x${coreInnerLayerRect.height}`,
+                camera._coreInnerLayer.getAttribute('style'),
+                `) videoRect: ${videoRect.width}x${videoRect.height}`,
+                camera.video.getAttribute('style'),
+            ].join('\n');
+        },500);
+
+        function copyTextToClipboard(text) {
+          // 1. Try the modern standard Clipboard API (iOS 13.4+)
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+              .then(() => {
+                alert('Text successfully copied to clipboard!');
+              })
+              .catch((err) => {
+                //console.error('Modern Clipboard API failed, trying fallback...', err);
+                fallbackCopyTextToClipboard(text);
+              });
+          } else {
+            // 2. Fallback to older execCommand method for older iOS versions
+            fallbackCopyTextToClipboard(text);
+          }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+          // Create a temporary textarea element
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          
+          // Prevent scrolling and position off-screen
+          textArea.style.top = "0";
+          textArea.style.left = "0";
+          textArea.style.position = "fixed";
+          textArea.style.visibility = "hidden"; // Or ultra-small size to avoid visual jumps
+          
+          document.body.appendChild(textArea);
+          
+          // iOS Safari requires a very specific selection mechanism
+          if (navigator.userAgent.match(/ipad|iphone/i)) {
+            const range = document.createRange();
+            range.selectNodeContents(textArea);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            textArea.setSelectionRange(0, 999999);
+          } else {
+            textArea.select();
+          }
+
+          try {
+            const successful = document.execCommand("copy");
+            if (successful) {
+              alert('Fallback: Text successfully copied!');
+            } else {
+              alert('Fallback: Copy command was unsuccessful');
+            }
+          } catch (err) {
+            alert('Fallback: Unable to copy', err);
+          }
+
+          // Clean up the DOM
+          document.body.removeChild(textArea);
+        }
+
     </script>
 </body>
 </html>
