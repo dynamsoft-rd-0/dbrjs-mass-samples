@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",        // 或 "nodenext"
+    "esModuleInterop": true,      // 允许默认导入
+    "allowSyntheticDefaultImports": true,
+    "ignoreDeprecations": "6.0",
+    "moduleResolution": "node",
+    "types": ["node"]
+  }
+}
