@@ -12,6 +12,8 @@ Build
 npm run build
 ```
 
+> For Node.js 16, pls `npm i typescript@4`
+
 Run as commonjs:
 ```sh
 node app.cjs
