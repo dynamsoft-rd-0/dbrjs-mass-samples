@@ -1,3 +1,7 @@
+## Why Edge Slow
+
+If you turn on `Enhance your security on the web` in edge://settings/privacy/security, our SDK might be very slow.
+
 ## Key Code
 
 timeout:
